@@ -13,8 +13,8 @@ const {User}      = require("./models/user");
 let app = express();
 const port = process.env.PORT;
 
-app.locals.title = SME_TITLE;
-app.locals.email = SME_EMAIL;
+app.locals.title = process.env.SME_TITLE;
+app.locals.email = process.env.SME_EMAIL;
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/../views/partials');
 
@@ -45,6 +45,7 @@ app.use((req, res, next) => {
 
 app.listen(port, () => {
 	console.log(`server running on ${port}`);
+  console.log(`process.env`)
 });
 
 module.exports = {app};
