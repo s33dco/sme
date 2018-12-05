@@ -9,11 +9,10 @@ if (env === 'development' || env === 'test') {
   });
 
 
-// ENV_VARIABLES for app.locals 
+// ENV_VARIABLES for app.locals
 
-process.env.SME_TITLE = 'SME';
-process.env.SME_EMAIL = 'sme@sme.com';
-
+process.env.SME_TITLE           = 'SME';
+process.env.SME_EMAIL           = 'sme@sme.com'
 }
 
 

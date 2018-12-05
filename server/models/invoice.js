@@ -7,15 +7,15 @@ let InvoiceSchema = new mongoose.Schema({
     required: true,
     minlength: 1,
     trim: true
-  }
-
+            }
+  // invoice number
   // billingDate
   // paid (bolean)
   // datepaid
   //
-  // charges [ date, description, amount, tax]
+  // charges [ dateWorked, description, amount, tax]
   //
-
+  // billedTo
 });
 
 

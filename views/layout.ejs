@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include  partials/head %>
+    <meta charset="utf-8">
+    <title>Forms in Node.js</title>
+    <link rel="stylesheet" href="/style.css" type="text/css" />
+  </head>
+
+  <body>
+
+    <header>
+      <% include partials/header %>
+    </header>
+
+    <main>
+      <% if (messages.success) { %>
+        <div class="flash flash-success"><%= messages.success %></div>
+      <% } %>
+      <% if (messages.alert) { %>
+        <div class="flash flash-failure"><%= messages.failure %></div>
+      <% } %>
+      <section>
+        <%- body %>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <% include partials/footer %>
+    </footer>
+
+  </body>
+</html>
