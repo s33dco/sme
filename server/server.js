@@ -1,6 +1,8 @@
 require('./config/config');
 
-const path          = require('path')               // The path module provides utilities for working with file and directory paths
+const fs            = require('fs')                 // logging
+const path          = require('path')
+const rfs           = require('rotating-file-stream')
 const morgan        = require('morgan')
 const express       = require('express')
 const layout        = require('express-layout')     // ejs
@@ -16,6 +18,18 @@ const port 				  = process.env.PORT;
 const routes        = require('./routes')
 const app           = express();
 
+// set up logger....
+const logDirectory  = path.join(__dirname, '/../log')
+
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+
+let accessLogStream = rfs('access.log', {
+                        size:     '10M', // rotate every 10 MegaBytes written
+                        interval: '1d',  // rotate daily
+                        compress: 'gzip', // compress rotated files
+                        path: logDirectory
+                      });
+
 app.locals.title    = process.env.SME_TITLE;
 app.locals.email    = process.env.SME_EMAIL;
 
@@ -24,15 +38,15 @@ app.set('view engine', 'ejs')
 
 const middlewares = [
   helmet(),
-  morgan('dev'),
+  morgan('short'),
   layout(),
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
   validator(),
   cookieParser(),
   session({
-    secret: 'super-secret-key',
-    key: 'super-secret-cookie',
+    secret: process.env.SUPER_SECRET_KEY,
+    key: process.env.SUPER_SECRET_COOKIE,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60000 }
