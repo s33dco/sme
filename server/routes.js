@@ -52,11 +52,6 @@ router.post('/contact', [
           res.redirect('/')
 });
 
-
-
-
-// private routes
-
 router.get('/login', (req, res) => {
   res.render('login', {
     data: {},
@@ -66,6 +61,9 @@ router.get('/login', (req, res) => {
     pageDescription: "Come on in."
   })
 })
+
+
+// private routes
 
 router.post('/login', [
     check('email')
@@ -120,8 +118,5 @@ router.get('/users', (req, res) => {
     pageDescription: "User Admin."
   });
 });
-
-
-
 
 module.exports = router
