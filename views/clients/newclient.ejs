@@ -1,0 +1,36 @@
+<div class="form-header">
+  <% if (Object.keys(errors).length === 0) { %>
+    <h2>Create a new client.</h2>
+  <% } else { %>
+    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <ul class="errors-list">
+      <% Object.values(errors).forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
+
+<form method="post" action="/clients" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="form-field <%= errors.clientName ? 'form-field-invalid' : '' %>">
+    <label for="clientName">Client Name</label>
+    <input class="input" id="clientName" name="clientName" type="clientName" value="<%= data.clientName %>" />
+    <% if (errors.firstName) { %>
+      <div class="error"><%= errors.clientName.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
+    <label for="email">Email</label>
+    <input class="input" id="email" name="email" type="email" value="<%= data.email %>" />
+    <% if (errors.email) { %>
+      <div class="error"><%= errors.email.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn" type="submit">Send</button>
+  </div>
+</form>

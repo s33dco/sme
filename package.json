@@ -31,6 +31,7 @@
     "express-validator": "^4.3.0",
     "helmet": "^3.15.0",
     "jsonwebtoken": "^8.4.0",
+    "mailgun-js": "^0.22.0",
     "mongodb": "^3.1.10",
     "mongoose": "^5.3.14",
     "morgan": "^1.9.1",
