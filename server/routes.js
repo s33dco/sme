@@ -51,6 +51,9 @@ router.post('/contact', [
                 });
               };
           console.log(req.body)
+
+// todo send email !
+
           req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
           res.redirect('/')
 });
@@ -65,7 +68,9 @@ router.get('/login', (req, res) => {
   })
 })
 
-// private routes
+// ********************************************
+// protected routes
+// ********************************************
 
 router.post('/login', [                           // users/login
     check('email')
@@ -96,17 +101,21 @@ router.post('/login', [                           // users/login
         console.log(email, password);
 
         // check email and password with db and generate x-token
+        // send back user object
 
 
         // set flash message and redirect
-        req.flash('success', `Welcome back!`)
+        req.flash('success', `Welcome back ${email}!`)
         res.redirect('/dashboard')
 });
 
 router.get('/logout', (req, res, next) => {
-    // delete tokens
+    // if user then
+    // delete tokens and send flash else just redirect to /
 
-    req.flash('alert', "You've logged out, come back soon.")
+    req.flash('alert', "You've logged out - come back soon.")
+
+
     res.redirect('/');
 });   // logout delete tokens
 
@@ -146,14 +155,19 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
 // ********************************************
 
 
-router.get('/clients', (req, res) => {            //  view all clients
+router.get('/clients', (req, res) => {            // list all clients
+  let clients = Client.find({}).sort({clientName: 1}).then((clients) => {
     res.render('clients/clients', {
-    pageTitle: "Clients",
-    pageDescription: "Client Admin."
-  });
+        pageTitle       : "Client List",
+        pageDescription : "Clients.",
+        clients
+    });
+  }).catch((e) => {
+    res.send(400);
+  })
 });
 
-router.get('/clients/new', (req, res) => {          // new client form
+router.get('/clients/new', (req, res) => {        // new client form
   res.render('clients/newclient', {
     data            : {},
     errors          : {},
@@ -163,7 +177,7 @@ router.get('/clients/new', (req, res) => {          // new client form
   });
 });
 
-router.post('/clients', [                           // create client
+router.post('/clients', [                         // create client
   check('clientName')
     .isLength({ min: 1 })
     .withMessage("Client name too short!")
@@ -199,6 +213,8 @@ router.post('/clients', [                           // create client
 });
 
 // GET/clients/:id
+  // show number of invoices
+  // link to edit details
 
 // PATCH/clients/:id
 
@@ -207,12 +223,14 @@ router.post('/clients', [                           // create client
 // ********************************************
 
 router.get('/users', (req, res) => {              // list all users
-  User.find().then((users) => {
+  let users = User.find().sort({firstName: 1}).then((users) => {
     res.render('users/users', {
-      pageTitle       : "Users",
-      pageDescription : "User Admin.",
-      users           : users
+        pageTitle       : "Users",
+        pageDescription : "People with access.",
+        users
     });
+  }).catch((e) => {
+    res.send(400);
   });
 });
 

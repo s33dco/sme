@@ -1,2 +1,11 @@
 <h1>Users.</h1>
-<%= console.log(users) %>
+<a href="/users/new">Add a new user with admin access.</a>
+<div class="user-list">
+  <ul>
+  <% users.forEach((user) => {%>
+    <li>
+      <a href="/users/<%=user._id%>"><%=user.firstName%></a>
+    </li>
+    <%})%>
+  </ul>
+</div>

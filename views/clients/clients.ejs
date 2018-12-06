@@ -1,1 +1,9 @@
-<h1>Clients.</h1>
+<h1>Client List.</h1>
+<a href="/clients/new">Add a new client.</a>
+
+<div class="client-list">
+  <% clients.forEach((client) => {%>
+    <p><%=client.clientName%></p>
+  <%})%>
+
+</div>

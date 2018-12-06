@@ -38,7 +38,7 @@ app.set('view engine', 'ejs')
 
 const middlewares = [
   helmet(),
-  morgan('short'),
+  morgan('dev'), // ,{ stream: accessLogStream } - to direct to log file
   layout(),
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
