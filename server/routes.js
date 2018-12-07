@@ -4,6 +4,7 @@ const bodyParser    = require('body-parser');
 const { check,
  validationResult } = require('express-validator/check');
 const {mongoose}    = require('./db/mongoose');
+const {ObjectID}    = require('mongodb');
 const {Invoice}     = require("./models/invoice");
 const {User}        = require("./models/user");
 const {Client}      = require("./models/client");
@@ -156,7 +157,8 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
 
 
 router.get('/clients', (req, res) => {            // list all clients
-  let clients = Client.find({}).sort({clientName: 1}).then((clients) => {
+  let clients = Client.find({}, {clientName:1}).sort({clientName: 1}).then((clients) => {
+    console.log(clients);
     res.render('clients/clients', {
         pageTitle       : "Client List",
         pageDescription : "Clients.",
@@ -212,9 +214,38 @@ router.post('/clients', [                         // create client
     });
 });
 
-// GET/clients/:id
-  // show number of invoices
-  // link to edit details
+router.get('/clients/:id',  (req, res) => {
+  let id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "Not possible.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  Client.findOne({
+    _id: id,
+  }).then((client) => {
+    if (!client) {
+      return res.status(404).send();
+    }
+
+    res.render('clients/client', {
+        pageTitle       : "Client",
+        pageDescription : "Client.",
+        client
+    });
+
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
 
 // PATCH/clients/:id
 
@@ -223,7 +254,8 @@ router.post('/clients', [                         // create client
 // ********************************************
 
 router.get('/users', (req, res) => {              // list all users
-  let users = User.find().sort({firstName: 1}).then((users) => {
+  let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {
+    console.log(users);
     res.render('users/users', {
         pageTitle       : "Users",
         pageDescription : "People with access.",
@@ -253,7 +285,7 @@ router.post('/users', [                           // create user
     .trim(),
   check('lastName')
     .isLength({ min: 1 })
-    .withMessage("lasy name too short!")
+    .withMessage("last name too short!")
     .isAlpha()
     .withMessage("only letters")
     .trim(),
@@ -287,9 +319,8 @@ router.post('/users', [                           // create user
           });
         };
 
-      let { firstName, lastName, email, mobile, password } = req.body;
-      let body = {firstName, lastName, email, password};
-      let user = new User(body);
+      const { firstName, lastName, email, mobile, password } = req.body;
+      let user = new User({ firstName, lastName, email, mobile, password });
 
 // todo
 // do not make token and auth new user.
@@ -303,6 +334,36 @@ router.post('/users', [                           // create user
         res.status(400).send(e);
     });
 });
+
+router.get('/users/:id', (req, res) => {
+  let id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "that's never going to work.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+  User.findOne({
+    _id: id,
+  }).then((user) => {
+    if (!user) {
+      return res.status(404).send();
+    }
+    res.render('users/user', {
+        pageTitle       : "Users",
+        pageDescription : "People with access.",
+        user
+    });
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+
 
 // PATCH/users/:id
 

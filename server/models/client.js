@@ -15,12 +15,10 @@ let ClientSchema = new mongoose.Schema({
   }
 });
 
-ClientSchema.methods.toJSON             = function () {
-  let client = this;
-  let clientObject = client.toObject();
+ClientSchema.methods.toJSON = function () {
+  return this.toObject();
+}
 
-  return clientObject;
-};
 
 
 let Client = mongoose.model('Client', ClientSchema);
