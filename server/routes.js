@@ -218,7 +218,7 @@ router.get('/clients/:id',  (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible.");
+    req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
@@ -229,7 +229,11 @@ router.get('/clients/:id',  (req, res) => {
     _id: id,
   }).then((client) => {
     if (!client) {
-      return res.status(404).send();
+      req.flash('alert', "Can't find that client, maybe try later.");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client",
+      });
     }
 
     res.render('clients/client', {
@@ -338,7 +342,7 @@ router.post('/users', [                           // create user
 router.get('/users/:id', (req, res) => {
   let id = req.params.id;
   if (!ObjectID.isValid(id)) {
-    req.flash('alert', "that's never going to work.");
+    req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
@@ -348,7 +352,11 @@ router.get('/users/:id', (req, res) => {
     _id: id,
   }).then((user) => {
     if (!user) {
-      return res.status(404).send();
+      req.flash('alert', "Can't find that client, maybe try later.");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client",
+      });
     }
     res.render('users/user', {
         pageTitle       : "Users",

@@ -2,8 +2,11 @@
 <a href="/clients/new">Add a new client.</a>
 
 <div class="client-list">
-  <% clients.forEach((client) => {%>
-    <p><%=client.clientName%></p>
-  <%})%>
-
+  <ul>
+    <% clients.forEach((client) => {%>
+      <li>
+        <a href="/clients/<%=client._id%>"><%= client.clientName%></a>
+      </li>
+    <%})%>
+  </ul>
 </div>
