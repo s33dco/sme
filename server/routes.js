@@ -139,7 +139,20 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
   });
 });
 
-// GET/invoices/new
+router.get('/invoices/new', (req, res) => {        // new client form
+  Client.find({}, {clientName:1}).sort({clientName: 1}).then((clients) => {
+    res.render('invoices/newinvoice', {
+      data            : {},
+      errors          : {},
+      csrfToken       : req.csrfToken(),  // generate a csrf token
+      pageTitle       : "Add an Invoice",
+      pageDescription : "Create a new Invoice.",
+      clients
+    });
+  }).catch((e) => {
+    res.send(400);
+  })
+});
 
 // POST/invoices
 
@@ -149,12 +162,9 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
 
 // DELETE/invoices/:id
 
-
-
 // ********************************************
 // client routes
 // ********************************************
-
 
 router.get('/clients', (req, res) => {            // list all clients
   let clients = Client.find({}, {clientName:1}).sort({clientName: 1}).then((clients) => {
@@ -202,9 +212,8 @@ router.post('/clients', [                         // create client
           });
         };
 
-      let { clientName, email} = req.body;
-      let body = {clientName, email};
-      let client = new Client(body);
+      const { clientName, email} = req.body;
+      let client = new Client({clientName, email});
 
       client.save().then(() => {
         req.flash('success', `${client.clientName} created !`)
@@ -372,10 +381,8 @@ router.get('/users/:id', (req, res) => {
   });
 });
 
-
 // PATCH/users/:id
 
 // DELETE/users/:id  (can't delete yourself)
-
 
 module.exports = router
