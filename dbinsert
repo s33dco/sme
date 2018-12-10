@@ -1,0 +1,28 @@
+db.invoice.insertOne(
+    { invNo  : 1,
+      invDate : new Date(),
+      billTo  : {
+                clientId    :1,
+                clientName  :'fred',
+                clientEmail :'client@example.com'
+                },
+      message: 'Thanks for your business.',
+      standardInfo: {
+            utr: 'ieueunbebebebbe',
+            email: 'myemail@address.com',
+            phone: '0796878787878'
+      },
+      items   : [
+                  {
+                  date: new Date(),
+                  desc:'some stuff about doing stuff',
+                  fee:123.34
+                  },
+                  {
+                  date: new Date(),
+                  desc:'some other stuff',
+                  fee:567.89
+                  }
+                  ],
+        paid:false
+        });

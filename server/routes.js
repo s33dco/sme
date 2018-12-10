@@ -8,6 +8,7 @@ const {ObjectID}    = require('mongodb');
 const {Invoice}     = require("./models/invoice");
 const {User}        = require("./models/user");
 const {Client}      = require("./models/client");
+const {Detail}      = require("./models/detail");
 
 // ********************************************
 // public routes
@@ -144,17 +145,43 @@ router.get('/invoices/new', (req, res) => {        // new client form
     res.render('invoices/newinvoice', {
       data            : {},
       errors          : {},
-      csrfToken       : req.csrfToken(),  // generate a csrf token
+      csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",
       pageDescription : "Create a new Invoice.",
+      extrafields     : '<% include partials/invoiceitem%>',
       clients
     });
   }).catch((e) => {
-    res.send(400);
+    res.sendStatus(400);
   })
 });
 
-// POST/invoices
+router.post('/invoices', // todo add check validation
+      (req, res) => {
+          const errors = validationResult(req)
+
+          if (!errors.isEmpty()) {
+            return res.render( 'invoices/newinvoice' , {
+                data            : req.body,
+                errors          : errors.mapped(),
+                csrfToken       : req.csrfToken(),  // generate new csrf token
+                pageTitle       : "create invoice",
+                pageDescription : "Give it another shot."
+            });
+          };
+
+        console.log(req.body);
+        let {invNo} = req.body;
+        console.log(invNo);
+
+        // check email and password with db and generate x-token
+        // send back user object
+
+
+        // set flash message and redirect
+        req.flash('success', `Invoice ${invNo} created!`)
+        res.redirect('/dashboard')
+});
 
 // GET/invoices/:id
 

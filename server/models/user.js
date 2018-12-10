@@ -26,6 +26,7 @@ let UserSchema = new mongoose.Schema({
     require: true,
     minlength: 7
   },
+  
   tokens: [{
     access: {
       type: String,

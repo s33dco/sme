@@ -11,9 +11,10 @@ let InvoiceSchema = new mongoose.Schema({
     default: Date.now,
     required: true
   },
+  message: {
+    type: String
+  },
   billTo:   {           //embedded document
-
-
               clientId   : {
                   type: ObjectID,
                   required: true
@@ -27,11 +28,16 @@ let InvoiceSchema = new mongoose.Schema({
                   required: true
                   }
             },
-  billedItem: [
+  standardInfo: {
+    utr: {type: String},
+    email: {type:String},
+    phone: {type:String}
+  },
+  items: [
     {
-      billedDate: {type: Date},
-      billedDesc: {type: String},
-      billedAmount: {type: Number}
+      date: {type: Date},
+      desc: {type: String},
+      fee: {type: Number}
     }
   ],
   paid: {
