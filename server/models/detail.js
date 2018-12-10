@@ -9,7 +9,7 @@ let DetailSchema = new mongoose.Schema({
 
 
 
-let Detail = mongoose.model('Details', DetailSchema);
+let Detail = mongoose.model('Detail', DetailSchema);
 
 
 module.exports = {Detail};

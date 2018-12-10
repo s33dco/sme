@@ -162,7 +162,7 @@ router.post('/invoices', (req, res) => {
         name: client.name,
         email: client.email
     };
-    const invoice = {
+    const insert = {
         invNo   : req.body.invNo,
         invDate : req.body.invDate,
         message : req.body.message,
@@ -170,18 +170,60 @@ router.post('/invoices', (req, res) => {
         items   : req.body.items,
         paid: false
     };
+    console.log(insert);
 
-    console.log(invoice);
-    req.flash('success', `Invoice ${invoice.invNo} created!`)
-    res.redirect('/dashboard')
+    // add standardInfo to insert object
 
+
+    // save invoice to db writing standardInfo DB
+
+    // redirect to invoice/:id with doc
+
+    req.flash('success', `${insert.invNo} created !`)
+    res.redirect(`dashboard`);
   }).catch((e) => {
     res.sendStatus(400);
-  })
+  });
 });
 
 
-// GET/invoices/:id
+
+router.get('/invoices/:id',  (req, res) => {
+  let id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  Invoice.findOne({
+    _id: id,
+  }).then((invoice) => {
+    if (!invoice) {
+      req.flash('alert', "Can't find that invoice, maybe try later.");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client",
+      });
+    }
+
+    res.render('invoices/invoice', {
+        pageTitle       : "Invoice",
+        pageDescription : "invoice.",
+        invoice
+    });
+
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
 
 // PATCH/invoices/:id
 
@@ -192,7 +234,7 @@ router.post('/invoices', (req, res) => {
 // ********************************************
 
 router.get('/clients', (req, res) => {            // list all clients
-  let clients = Client.find({}, {clientName:1}).sort({clientName: 1}).then((clients) => {
+let clients = Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
     console.log(clients);
     res.render('clients/clients', {
         pageTitle       : "Client List",
