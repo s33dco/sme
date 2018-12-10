@@ -19,7 +19,7 @@
       <label for="clientId">Bill to</label>
       <select name="clientId" autofocus>
         <% clients.forEach((client) => {%>
-          <option value="<%=client._id%>"><%=client.clientName%></option>
+          <option value="<%=client._id%>"><%=client.name%></option>
         <%})%>
       </select>
     </div>

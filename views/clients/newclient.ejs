@@ -14,11 +14,11 @@
 <form method="post" action="/clients" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-  <div class="form-field <%= errors.clientName ? 'form-field-invalid' : '' %>">
-    <label for="clientName">Client Name</label>
-    <input class="input" id="clientName" name="clientName" type="clientName" value="<%= data.clientName %>" />
-    <% if (errors.firstName) { %>
-      <div class="error"><%= errors.clientName.msg %></div>
+  <div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
+    <label for="name">Client Name</label>
+    <input class="input" id="name" name="name" type="name" value="<%= data.name %>" />
+    <% if (errors.name) { %>
+      <div class="error"><%= errors.name.msg %></div>
     <% } %>
   </div>
 

@@ -1,7 +1,7 @@
 const mongoose  = require('mongoose');
 
 let ClientSchema = new mongoose.Schema({
-  clientName: {
+  name: {
     type: String,
     required: true,
     minlength: 1,

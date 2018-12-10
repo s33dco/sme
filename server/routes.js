@@ -140,15 +140,14 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
   });
 });
 
-router.get('/invoices/new', (req, res) => {        // new client form
-  Client.find({}, {clientName:1}).sort({clientName: 1}).then((clients) => {
+router.get('/invoices/new', (req, res) => {       // new client form
+  Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
     res.render('invoices/newinvoice', {
       data            : {},
       errors          : {},
       csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",
       pageDescription : "Create a new Invoice.",
-      extrafields     : '<% include partials/invoiceitem%>',
       clients
     });
   }).catch((e) => {
@@ -156,32 +155,31 @@ router.get('/invoices/new', (req, res) => {        // new client form
   })
 });
 
-router.post('/invoices', // todo add check validation
-      (req, res) => {
-          const errors = validationResult(req)
+router.post('/invoices', (req, res) => {
+  Client.findOne({_id: req.body.clientId}).then((client) => {
+    const billTo =  {
+        _id : client._id,
+        name: client.name,
+        email: client.email
+    };
+    const invoice = {
+        invNo   : req.body.invNo,
+        invDate : req.body.invDate,
+        message : req.body.message,
+        billTo,
+        items   : req.body.items,
+        paid: false
+    };
 
-          if (!errors.isEmpty()) {
-            return res.render( 'invoices/newinvoice' , {
-                data            : req.body,
-                errors          : errors.mapped(),
-                csrfToken       : req.csrfToken(),  // generate new csrf token
-                pageTitle       : "create invoice",
-                pageDescription : "Give it another shot."
-            });
-          };
+    console.log(invoice);
+    req.flash('success', `Invoice ${invoice.invNo} created!`)
+    res.redirect('/dashboard')
 
-        console.log(req.body);
-        let {invNo} = req.body;
-        console.log(invNo);
-
-        // check email and password with db and generate x-token
-        // send back user object
-
-
-        // set flash message and redirect
-        req.flash('success', `Invoice ${invNo} created!`)
-        res.redirect('/dashboard')
+  }).catch((e) => {
+    res.sendStatus(400);
+  })
 });
+
 
 // GET/invoices/:id
 
@@ -217,7 +215,7 @@ router.get('/clients/new', (req, res) => {        // new client form
 });
 
 router.post('/clients', [                         // create client
-  check('clientName')
+  check('name')
     .isLength({ min: 1 })
     .withMessage("Client name too short!")
     .trim(),
@@ -239,11 +237,11 @@ router.post('/clients', [                         // create client
           });
         };
 
-      const { clientName, email} = req.body;
-      let client = new Client({clientName, email});
+      const { name, email} = req.body;
+      let client = new Client({name, email});
 
       client.save().then(() => {
-        req.flash('success', `${client.clientName} created !`)
+        req.flash('success', `${client.name} created !`)
         res.redirect('/dashboard') // create custom header 'x-auth' with value of token
       }).catch((e) => {
         res.status(400).send(e);

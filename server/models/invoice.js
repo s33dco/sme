@@ -15,15 +15,15 @@ let InvoiceSchema = new mongoose.Schema({
     type: String
   },
   billTo:   {           //embedded document
-              clientId   : {
+              _id   : {
                   type: ObjectID,
                   required: true
                           },
-              clientName  : {
+              name  : {
                   type: String,
                   required: true
                           },
-              clientEmail : {
+              email : {
                   type: String,
                   required: true
                   }
