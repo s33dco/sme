@@ -1,28 +1,14 @@
-db.invoice.insertOne(
-    { invNo  : 1,
-      invDate : new Date(),
-      billTo  : {
-                _id    :1,
-                name  :'fred',
-                email :'client@example.com'
-                },
-      message: 'Thanks for your business.',
-      details: {
-            utr: 'ieueunbebebebbe',
-            email: 'myemail@address.com',
-            phone: '0796878787878'
-      },
-      items   : [
-                  {
-                  date: new Date(),
-                  desc:'some stuff about doing stuff',
-                  fee:123.34
-                  },
-                  {
-                  date: new Date(),
-                  desc:'some other stuff',
-                  fee:567.89
-                  }
-                  ],
-        paid:false
-        });
+db.details.insertOne({
+  utr: "abcdefg-234234-ffgghh",
+  email: "payme@myemail.com",
+  phone: '07543677754',
+  bank : 'Co Operative Bank PLC',
+  sortcode: '20-34-23',
+  accountNo:  '45678943',
+  terms: 'bank transfer within seven days.'
+});
+
+db.clients.insertOne({
+  name: "Richard Rich",
+  email : "richman@riches.com"
+});

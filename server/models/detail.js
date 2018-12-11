@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
-const {ObjectID}    = require('mongodb');
 
 let DetailSchema = new mongoose.Schema({
-    utr   : {type: String},
-    email : {type:String},
-    phone : {type:String}
+    utr       : {type: String},
+    email     : {type:String},
+    phone     : {type:String},
+    bank      : {type:String},
+    sortcode  : {type:String},
+    accountNo : {type:String},
+    terms     : {type:String}
   });
 
 
-
 let Detail = mongoose.model('Detail', DetailSchema);
-
-
 module.exports = {Detail};

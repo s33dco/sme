@@ -1,56 +1,30 @@
 const mongoose = require('mongoose');
-const {ObjectID}    = require('mongodb');
 
 let InvoiceSchema = new mongoose.Schema({
-  invNo:    {
-    type: Number,
-    required: true
+  invNo       : { type: Number},
+  invDate     : { type: Date, default: Date.now},
+  client      : {
+    _id     : { type: mongoose.Schema.Types.ObjectId},
+    name   : { type: String},
+    email  : { type: String}
   },
-  invDate:  {
-    type: Date,
-    default: Date.now,
-    required: true
+  message     : { type: String},
+  details : {
+    utr         : { type: String},
+    email       : { type: String},
+    phone       : { type: String},
+    bank        : { type: String},
+    sortcode    : { type: String},
+    accountNo   : { type: String},
+    terms       : { type: String}
   },
-  message: {
-    type: String
-  },
-  billTo:   {           //embedded document
-              _id   : {
-                  type: ObjectID,
-                  required: true
-                          },
-              name  : {
-                  type: String,
-                  required: true
-                          },
-              email : {
-                  type: String,
-                  required: true
-                  }
-            },
-  standardInfo: {
-    utr: {type: String},
-    email: {type:String},
-    phone: {type:String}
-  },
-  items: [
-    {
-      date: {type: Date},
-      desc: {type: String},
-      fee: {type: Number}
-    }
-  ],
-  paid: {
-    type: Boolean
-  },
-  datePaid: {
-    type: Date
-  }
+  paid        : { type: Boolean },
+  datePaid    : { type: Date },
+  items       : [{  date: {type: Date},
+                    desc: {type: String},
+                    fee : {type: String} }]
 });
 
-
-
 let Invoice = mongoose.model('Invoice', InvoiceSchema);
-
 
 module.exports = {Invoice};

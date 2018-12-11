@@ -134,10 +134,17 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 // ********************************************
 
 router.get('/invoices', (req, res) => {           // list all invoices invoices home
-    res.render('invoices/invoices', {
-    pageTitle: "Invoices",
-    pageDescription: "Invoice Admin."
-  });
+  Invoice.find({},{invNo:1, invDate:1, client_name:1}).sort({invDate: -1})
+    .then((invoices)=> {
+      res.render('invoices/invoices', {
+      pageTitle: "Invoices",
+      pageDescription: "Invoice Admin.",
+      invoices
+    })
+  }).catch((e) => {
+    console.log(e.message);
+    res.sendStatus(400);
+  })
 });
 
 router.get('/invoices/new', (req, res) => {       // new client form
@@ -156,46 +163,43 @@ router.get('/invoices/new', (req, res) => {       // new client form
 });
 
 router.post('/invoices', (req, res) => {
+
   const promise = Promise.all([
-        Client.findOne({_id: req.body.clientId}),
-        Detail.findOne()
-      ]);
+    Detail.findOne(),
+    Client.findOne({_id: req.body.clientId})
+  ]);
 
-  promise.then(([client, standardInfo]) => {
-
-    const insert = {
-        invNo   : req.body.invNo,
-        invDate : req.body.invDate,
-        message : req.body.message,
-        billTo  : {
-            _id   : client._id,
-            name  : client.name,
-            email : client.email
-        },
-        standardInfo: {
-            utr : standardInfo.utr,
-            email: standardInfo.email,
-            phone: standardInfo.phone
-        },
-        items   : req.body.items,
-        paid: false
-          };
-
-    console.log(insert);
-    req.flash('success', `${insert.invNo} created !`)
-    res.redirect(`dashboard`);
-    }).catch((e) => {
-    res.sendStatus(400);
+  promise.then(([detail, client]) => {
+    return new Invoice({
+      invNo      : req.body.invNo,
+      invDate    : req.body.invDate,
+      message    : req.body.message,
+      client     : {
+          _id   : client._id,
+          name : client.name,
+          email: client.email
+      },
+      items      : req.body.items,
+      details    : {
+          utr         : detail.utr,
+          email       : detail.email,
+          phone       : detail.phone,
+          bank        : detail.bank,
+          sortcode    : detail.sortcode,
+          accountNo   : detail.accountNo,
+          terms       : detail.terms
+      },
+      paid        : false
+    }).save();
+  }).then((invoice) => {
+      console.log(invoice);
+      req.flash('success', `Invoice ${invoice.invNo} created !`)
+      res.redirect(`invoices/${invoice._id}`);
+  }).catch((e) => {
+      console.log(e.message);
+      res.status(400);
   });
 });
-
-
-
-
-
-
-
-
 
 router.get('/invoices/:id',  (req, res) => {
   let id = req.params.id;
@@ -215,7 +219,7 @@ router.get('/invoices/:id',  (req, res) => {
       req.flash('alert', "Can't find that invoice, maybe try later.");
       return res.render('404', {
           pageTitle       : "404",
-          pageDescription : "Can't find that client",
+          pageDescription : "Can't find that client"
       });
     }
 
@@ -223,7 +227,7 @@ router.get('/invoices/:id',  (req, res) => {
         pageTitle       : "Invoice",
         pageDescription : "invoice.",
         invoice
-    });
+  });
 
   }).catch((e) => {
     req.flash('alert', `${e.message}`);

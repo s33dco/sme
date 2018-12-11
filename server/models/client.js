@@ -1,5 +1,6 @@
 const mongoose  = require('mongoose');
 
+
 let ClientSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -14,12 +15,6 @@ let ClientSchema = new mongoose.Schema({
     trim: true
   }
 });
-
-ClientSchema.methods.toJSON = function () {
-  return this.toObject();
-}
-
-
 
 let Client = mongoose.model('Client', ClientSchema);
 

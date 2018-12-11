@@ -1,2 +1,10 @@
 <h1>Invoices.</h1>
 <a href="/invoices/new">Make a new invoice.</a>
+
+<% invoices.forEach((invoice) => { %>
+  <div class="invoice">
+    <p>Number <%= invoice.invNo %></p>
+    <p>Date <%= invoice.invDate %></p><br>
+    <p>Client <%= invoice.client_name %></p><br>
+  </div>
+<% }); %>

@@ -1,11 +1,9 @@
-<h1>Invoice.</h1>
-<p><%= invoice.invNo %></p>
-<p><%= invoice.date %></p>
-<p><%= invoice.billTo.name %></p>
-<p><%= invoice.billTo.email %></p>
+<h1>Invoice <%= invoice.invNo %>.</h1>
 
-<% invoice.items.forEach((item)=> {%>
+<p><%= invoice.date %></p>
+<p><%= invoice.client.name %> (<%= invoice.client.email %>)</p>
+
+<% invoice.items.forEach((item) => { %>
   <p><%= item.date %></p>
-  <p><%= item.desc %></p>
-  <p><%= item.fee %></p>
-<% }); %>
+  <p><%= item.desc %> £<%= item.fee %></p>
+<% }) %>
