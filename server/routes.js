@@ -156,35 +156,44 @@ router.get('/invoices/new', (req, res) => {       // new client form
 });
 
 router.post('/invoices', (req, res) => {
-  Client.findOne({_id: req.body.clientId}).then((client) => {
-    const billTo =  {
-        _id : client._id,
-        name: client.name,
-        email: client.email
-    };
+  const promise = Promise.all([
+        Client.findOne({_id: req.body.clientId}),
+        Detail.findOne()
+      ]);
+
+  promise.then(([client, standardInfo]) => {
+
     const insert = {
         invNo   : req.body.invNo,
         invDate : req.body.invDate,
         message : req.body.message,
-        billTo,
+        billTo  : {
+            _id   : client._id,
+            name  : client.name,
+            email : client.email
+        },
+        standardInfo: {
+            utr : standardInfo.utr,
+            email: standardInfo.email,
+            phone: standardInfo.phone
+        },
         items   : req.body.items,
         paid: false
-    };
+          };
+
     console.log(insert);
-
-    // add standardInfo to insert object
-
-
-    // save invoice to db writing standardInfo DB
-
-    // redirect to invoice/:id with doc
-
     req.flash('success', `${insert.invNo} created !`)
     res.redirect(`dashboard`);
-  }).catch((e) => {
+    }).catch((e) => {
     res.sendStatus(400);
   });
 });
+
+
+
+
+
+
 
 
 
