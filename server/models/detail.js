@@ -7,7 +7,8 @@ let DetailSchema = new mongoose.Schema({
     bank      : {type:String},
     sortcode  : {type:String},
     accountNo : {type:String},
-    terms     : {type:String}
+    terms     : {type:String},
+    contact   : {type:String}
   });
 
 

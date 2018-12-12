@@ -6,6 +6,7 @@ let InvoiceSchema = new mongoose.Schema({
   client      : {
       _id     : { type: mongoose.Schema.Types.ObjectId},
       name    : { type: String},
+      phone   : { type: String},
       email   : { type: String}},
   message     : { type: String},
   details     : {
@@ -15,6 +16,7 @@ let InvoiceSchema = new mongoose.Schema({
     bank      : { type: String},
     sortcode  : { type: String},
     accountNo : { type: String},
+    contact   : { type: String},
     terms     : { type: String}},
   paid        : { type: Boolean },
   datePaid    : { type: Date },

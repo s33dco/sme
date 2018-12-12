@@ -13,6 +13,12 @@ let ClientSchema = new mongoose.Schema({
     required: true,
     minlength: 1,
     trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true
   }
 });
 

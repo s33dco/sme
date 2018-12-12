@@ -172,9 +172,10 @@ router.post('/invoices', (req, res) => {
       invDate    : req.body.invDate,
       message    : req.body.message,
       client     : {
-          _id   : client._id,
-          name : client.name,
-          email: client.email
+            _id   : client._id,
+            name  : client.name,
+            email : client.email,
+            phone : client.phone
       },
       items      : req.body.items,
       details    : {
@@ -184,13 +185,14 @@ router.post('/invoices', (req, res) => {
           bank        : detail.bank,
           sortcode    : detail.sortcode,
           accountNo   : detail.accountNo,
-          terms       : detail.terms
+          terms       : detail.terms,
+          contact     : detail.contact
       },
       paid        : false
     }).save();
   }).then((invoice) => {
       console.log(invoice);
-      req.flash('success', `Invoice ${invoice.invNo} created !`)
+      req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
       res.redirect(`invoices/${invoice._id}`);
   }).catch((e) => {
       console.log(e.message);
@@ -220,10 +222,16 @@ router.get('/invoices/:id',  (req, res) => {
       });
     }
 
+    console.log(invoice);
+
+    let total = invoice.totalInvoiceValue();
+
+    console.log(total);
 
     res.render('invoices/invoice', {
         pageTitle       : "Invoice",
         pageDescription : "invoice.",
+        total,
         invoice
   });
 

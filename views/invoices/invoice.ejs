@@ -1,11 +1,41 @@
 <h1>Invoice <%= invoice.invNo %>.</h1>
 
-<p><%= moment(invoice.date).format("MMMM Do YYYY") %></p>
-<p><%= invoice.client.name %> (<%= invoice.client.email %>)</p>
+<div class="invoice-header">
+  <p>Invoice Date : <%= moment(invoice.invDate).format("MMMM Do YYYY") %></p>
+  <p>Client : <a href="/clients/<%= invoice.client._id %>"><%= invoice.client.name %></a></p>
+  <p>Email : <%= invoice.client.email %></p>
+  <p>Telephone : <%= invoice.client.phone %></p>
+</div>
 
-<% invoice.items.forEach((item) => { %>
-  <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
-  <p><%= item.desc %> £<%= item.fee %></p>
-<% }) %>
+<div class="invoice-message">
+  <h4><%= invoice.message%> </h4>
+</div>
 
-<p>Total Due £ </p>
+<div class="billed-items">
+  <h3>Billed Items</h3>
+  <% invoice.items.forEach((item) => { %>
+    <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
+    <p><%= item.desc %></p>
+    <p>£<%= item.fee %></p>
+  <% }) %>
+</div>
+
+<div class="total-due">
+    <h3>Total Due £<%= total %></h3>
+</div>
+
+<div class="signature">
+  <h4>with thanks,</br>
+  <%= invoice.details.contact %></br>
+  <%= invoice.details.email %></br>
+  <%= invoice.details.phone %></h4>
+</div>
+
+<div class="pay-details">
+  <h3>Payee Details</h3>
+  <p>tax reference : <%= invoice.details.utr %></p>
+  <p><%= invoice.details.bank %></p>
+  <p>Account No: <%= invoice.details.accountNo %></p>
+  <p>Sort Code : <%= invoice.details.sortcode %></p>
+  <p>(<%= invoice.details.terms %>)</p>
+</div>

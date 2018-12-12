@@ -5,17 +5,38 @@ db.details.insertOne({
   bank : 'Co Operative Bank PLC',
   sortcode: '20-34-23',
   accountNo:  '45678943',
-  terms: 'bank transfer within seven days.'
+  terms: 'bank transfer within seven days',
+  contact: 'Jill Pendleton'
 });
 
 db.clients.insertOne({
   name: "Richard Rich",
-  email : "richman@riches.com"
+  email : "richman@riches.com",
+  phone : "07897 678456"
 });
 
 db.clients.insertOne({
-  name: "Tony Malone",
-  email : "tony@tonywarm.com"
+  name: "Freddy Fox",
+  email : "foxy@foxes.com",
+  phone : "07897 678456"
+});
+
+db.clients.insertOne({
+  name: "Delbert Wilkins",
+  email : "del@ditches.com",
+  phone : "07897 678456"
+});
+
+db.clients.insertOne({
+  name: "Tony Soprano",
+  email : "anthony@singers.co.uk",
+  phone : "07897 678456"
+});
+
+db.clients.insertOne({
+  name: "Becky Chatter",
+  email : "bex@chats.com",
+  phone : "07897 678456"
 });
 
 // lists all billed / invoiced items in descending date order.
@@ -52,7 +73,22 @@ db.invoices.aggregate(
   ]).pretty()
 
 // output :
-//{ "_id" : { "invoice" : 2, "date" : ISODate("2018-11-30T00:00:00Z"), "invoice_id" : ObjectId("5c10f86322fe560ccea4e210"), "client" : "Richard Rich" }, "total" : 380 }
-{ "_id" : { "invoice" : 1, "date" : ISODate("2018-11-01T00:00:00Z"), "invoice_id" : ObjectId("5c10f82c22fe560ccea4e20d"), "client" : "Tony Malone" }, "total" : 246 }
-//
-//
+
+{
+	"_id" : {
+		"invoice" : 2,
+		"date" : ISODate("2018-11-30T00:00:00Z"),
+		"invoice_id" : ObjectId("5c10f86322fe560ccea4e210"),
+		"client" : "Richard Rich"
+	},
+	"total" : 380
+}
+{
+	"_id" : {
+		"invoice" : 1,
+		"date" : ISODate("2018-11-01T00:00:00Z"),
+		"invoice_id" : ObjectId("5c10f82c22fe560ccea4e20d"),
+		"client" : "Tony Malone"
+	},
+	"total" : 246
+}
