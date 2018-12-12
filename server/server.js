@@ -32,6 +32,7 @@ let accessLogStream = rfs('access.log', {
 
 app.locals.title    = process.env.SME_TITLE;
 app.locals.email    = process.env.SME_EMAIL;
+app.locals.moment = require('moment');
 
 app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'ejs')

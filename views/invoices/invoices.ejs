@@ -1,10 +1,12 @@
-<h1>Invoices.</h1>
 <a href="/invoices/new">Make a new invoice.</a>
+
+<h1>Previous Invoices.</h1>
 
 <% invoices.forEach((invoice) => { %>
   <div class="invoice">
-    <p>Number <%= invoice.invNo %></p>
-    <p>Date <%= invoice.invDate %></p><br>
-    <p>Client <%= invoice.client_name %></p><br>
+    <a href="/invoices/<%=invoice._id.invoice_id%>">
+      Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %>
+    </a>
+    <p><%= invoice._id.client%>, total £<%= invoice.total%>.</p><br>
   </div>
 <% }); %>

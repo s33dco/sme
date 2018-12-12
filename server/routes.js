@@ -75,40 +75,39 @@ router.get('/login', (req, res) => {
 // ********************************************
 
 router.post('/login', [                           // users/login
-    check('email')
-      .isEmail()
-      .withMessage('That email doesn‘t look right')
-      .trim()
-      .normalizeEmail(),
-    check('password')
-      .isLength({ min: 7 })
-      .withMessage("password too short!")
-      .trim()
-    ],
-      (req, res) => {
-          // console.log(req.body)
-          const errors = validationResult(req)
+  check('email')
+    .isEmail()
+    .withMessage('That email doesn‘t look right')
+    .trim()
+    .normalizeEmail(),
+  check('password')
+    .isLength({ min: 7 })
+    .withMessage("password too short!")
+    .trim()
+  ],(req, res) => {
 
-          if (!errors.isEmpty()) {
-            return res.render('login', {
-                data            : req.body,
-                errors          : errors.mapped(),
-                csrfToken       : req.csrfToken(),  // generate new csrf token
-                pageTitle       : "Sign In.",
-                pageDescription : "Give it another shot."
-            });
-          };
+    const errors = validationResult(req)
 
-        let {email, password} = req.body;
-        console.log(email, password);
+    if (!errors.isEmpty()) {
+      return res.render('login', {
+          data            : req.body,
+          errors          : errors.mapped(),
+          csrfToken       : req.csrfToken(),  // generate new csrf token
+          pageTitle       : "Sign In.",
+          pageDescription : "Give it another shot."
+      });
+    };
+
+    let {email, password} = req.body;
+    console.log(email, password);
 
         // check email and password with db and generate x-token
         // send back user object
 
 
         // set flash message and redirect
-        req.flash('success', `Welcome back ${email}!`)
-        res.redirect('/dashboard')
+      req.flash('success', `Welcome back ${email}!`)
+      res.redirect('/dashboard')
 });
 
 router.get('/logout', (req, res, next) => {
@@ -116,8 +115,6 @@ router.get('/logout', (req, res, next) => {
     // delete tokens and send flash else just redirect to /
 
     req.flash('alert', "You've logged out - come back soon.")
-
-
     res.redirect('/');
 });   // logout delete tokens
 
@@ -134,8 +131,8 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 // ********************************************
 
 router.get('/invoices', (req, res) => {           // list all invoices invoices home
-  Invoice.find({},{invNo:1, invDate:1, client_name:1}).sort({invDate: -1})
-    .then((invoices)=> {
+  Invoice.listInvoices().then((invoices)=> {
+      console.log(invoices);
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
       pageDescription: "Invoice Admin.",
@@ -222,6 +219,7 @@ router.get('/invoices/:id',  (req, res) => {
           pageDescription : "Can't find that client"
       });
     }
+
 
     res.render('invoices/invoice', {
         pageTitle       : "Invoice",

@@ -1,9 +1,11 @@
 <h1>Invoice <%= invoice.invNo %>.</h1>
 
-<p><%= invoice.date %></p>
+<p><%= moment(invoice.date).format("MMMM Do YYYY") %></p>
 <p><%= invoice.client.name %> (<%= invoice.client.email %>)</p>
 
 <% invoice.items.forEach((item) => { %>
-  <p><%= item.date %></p>
+  <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
   <p><%= item.desc %> £<%= item.fee %></p>
 <% }) %>
+
+<p>Total Due £ </p>

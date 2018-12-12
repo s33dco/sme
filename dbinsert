@@ -12,3 +12,47 @@ db.clients.insertOne({
   name: "Richard Rich",
   email : "richman@riches.com"
 });
+
+db.clients.insertOne({
+  name: "Tony Malone",
+  email : "tony@tonywarm.com"
+});
+
+// lists all billed / invoiced items in descending date order.
+
+db.invoices.aggregate([
+  {$project : { invNo:1, "client.name":1, items:1}},
+  {"$unwind" : "$items"},
+  {"$sort": {"items.date" : -1}},
+  {$project : { _id:0, "client.name":1, "items.date":1, invNo:1, "items.desc":1  , "items.fee":1 }}
+  ]).pretty();
+
+// output..
+{ "invNo" : 12, "client" : { "name" : "Richard Rich" }, "items" : { "date" : ISODate("2018-12-10T00:00:00Z"), "desc" : "stuff", "fee" : "120" } }
+{ "invNo" : 124, "client" : { "name" : "Richard Rich" }, "items" : { "date" : ISODate("2018-12-10T00:00:00Z"), "desc" : "trees", "fee" : "100" } }
+{ "invNo" : 124, "client" : { "name" : "Richard Rich" }, "items" : { "date" : ISODate("2018-12-10T00:00:00Z"), "desc" : "trees", "fee" : "100" } }
+{ "invNo" : 124, "client" : { "name" : "Richard Rich" }, "items" : { "date" : ISODate("2018-12-10T00:00:00Z"), "desc" : "trees", "fee" : "100" } }
+{ "invNo" : 124, "client" : { "name" : "Richard Rich" }, "items" : { "date" : ISODate("2018-12-10T00:00:00Z"), "desc" : "trees", "fee" : "100" } }
+
+
+// aggregation for index home page
+
+
+db.invoices.aggregate(
+[
+  {$project : { invNo:1, invDate:1, "client.name":1, items:1}},
+  {"$unwind" : "$items"},
+  {"$sort": {"items.date" : -1}},
+  {"$group": {
+   "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name"},
+   "total": {"$sum": "$items.fee"}
+    }
+  },
+  {"$sort": {"_id.invoice": -1}}
+  ]).pretty()
+
+// output :
+//{ "_id" : { "invoice" : 2, "date" : ISODate("2018-11-30T00:00:00Z"), "invoice_id" : ObjectId("5c10f86322fe560ccea4e210"), "client" : "Richard Rich" }, "total" : 380 }
+{ "_id" : { "invoice" : 1, "date" : ISODate("2018-11-01T00:00:00Z"), "invoice_id" : ObjectId("5c10f82c22fe560ccea4e20d"), "client" : "Tony Malone" }, "total" : 246 }
+//
+//
