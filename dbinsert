@@ -92,3 +92,14 @@ db.invoices.aggregate(
 	},
 	"total" : 246
 }
+
+// list items by client_id
+
+db.invoices.aggregate([
+  {"$match" : { 'client._id' : '5c111bce25bb04bf2cfa0f3a' }},
+  {"$project" : { _id:1 , invNo:1 , items:1 }},
+  {"$unwind" : "$items"},
+  {"$sort": {"items.date": -1}}
+]).pretty();
+
+db.invoices.aggregate([ { '$match': { 'client._id': '5c111bce25bb04bf2cfa0f3a' } }, { '$project': { _id: 1, invNo: 1, items: 1 } }, { '$unwind': '$items' }, { '$sort': { 'items.date': -1 } } ], {})

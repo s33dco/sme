@@ -1,18 +1,20 @@
-inv = [
-	{
-		"_id" : ObjectId("5c10503b68ced74f621aaf90"),
-		"date" : ISODate("2018-12-12T00:00:00Z"),
-		"desc" : "trimming trees in Rodmel",
-		"fee" : "120"
-	},
-	{
-		"_id" : ObjectId("5c10503b68ced74f621aaf8f"),
-		"date" : ISODate("2018-12-13T00:00:00Z"),
-		"desc" : "chipping Lewes",
-		"fee" : "140"
-	}
-];
+let itemList = [ {
+					    invNo: 1,
+					    items:
+					     {
+					       desc:
+					        'rehang two doors in the front room, sand and varnish kitchen window.',
+					       fee: 240 }
+							 },
+					  {
+					    invNo: 1,
+					    items:
+					     {
+					       desc:
+					        'hang four kitchen cabinets, sand and varnish kitchen work top.',
+					       fee: 280 }
+						}]
 
-total = inv.items.map( item => item.fee).reduce((total, fee) => total + fee)
+total = itemList.map(item => item.items.fee).reduce((total, fee) => total + fee)
 
 console.log(total);

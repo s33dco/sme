@@ -1,1 +1,16 @@
-<h2><%=client.clientName%></h2>
+<h2><%=client.name%></h2>
+
+<h4><%=client.phone%></h4>
+<h4><%=client.email%></h4>
+
+<h2>£<%= total %> Previously Billed.</h2>
+
+<% itemsList.forEach((item) => { %>
+  <div class="item">
+    <p><%= moment(item.items.date).format("Do MMMM YYYY") %>
+       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+    <p><%= item.items.desc %> £<%= item.items.fee %></p>
+  </div>
+
+
+<% }); %>

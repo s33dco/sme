@@ -7,6 +7,7 @@
     <a href="/invoices/<%=invoice._id.invoice_id%>">
       Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %>
     </a>
-    <p><%= invoice._id.client%>, total £<%= invoice.total%>.</p><br>
+    <p>
+      <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>, £<%= invoice.total%>.</p><br>
   </div>
 <% }); %>

@@ -1,6 +1,7 @@
 const express       = require('express');
 const router        = express.Router();
 const bodyParser    = require('body-parser');
+const moment        = require('moment');
 const { check,
  validationResult } = require('express-validator/check');
 const {mongoose}    = require('./db/mongoose');
@@ -119,6 +120,18 @@ router.get('/logout', (req, res, next) => {
 });   // logout delete tokens
 
 router.get('/dashboard', (req, res) => {          // redirect for success login
+
+// TODO: for dashboard functionality
+
+// count of individual clients on Invoice
+// date of earliest invoice, date today (time)
+// count of Invoices produced
+// sum of invoices paid : true (incomings)
+// list of invoices paid : false
+// sum of invoices paid : false
+// average earnings = incoming / time
+
+
     res.render('dashboard', {
     pageTitle: "Invoice and Admin",
     pageDescription: "Let's get paid!."
@@ -144,10 +157,23 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
   })
 });
 
-router.get('/invoices/new', (req, res) => {       // new client form
-  Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
+router.get('/invoices/new', (req, res) => {
+
+// TODO: what happened to the validation ?
+
+  const promise = Promise.all([
+    Invoice.newestInvoiceNumber(),
+    Client.find({}, {name:1}).sort({name: 1})
+  ]);
+
+  promise.then(([lastInvNo, clients]) => {
+
+    let newNumber = lastInvNo[0].invNo + 1;
+
+    let now = moment().format("DD MMM YY");
+
     res.render('invoices/newinvoice', {
-      data            : {},
+      data            : { invDate : now, invNo : newNumber },
       errors          : {},
       csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",
@@ -161,6 +187,8 @@ router.get('/invoices/new', (req, res) => {       // new client form
 
 router.post('/invoices', (req, res) => {
 
+// TODO: what happened to the validation ?
+
   const promise = Promise.all([
     Detail.findOne(),
     Client.findOne({_id: req.body.clientId})
@@ -172,10 +200,10 @@ router.post('/invoices', (req, res) => {
       invDate    : req.body.invDate,
       message    : req.body.message,
       client     : {
-            _id   : client._id,
-            name  : client.name,
-            email : client.email,
-            phone : client.phone
+          _id         : client._id,
+          name        : client.name,
+          email       : client.email,
+          phone       : client.phone
       },
       items      : req.body.items,
       details    : {
@@ -222,19 +250,14 @@ router.get('/invoices/:id',  (req, res) => {
       });
     }
 
-    console.log(invoice);
-
     let total = invoice.totalInvoiceValue();
-
-    console.log(total);
 
     res.render('invoices/invoice', {
         pageTitle       : "Invoice",
         pageDescription : "invoice.",
         total,
         invoice
-  });
-
+    });
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
@@ -320,9 +343,13 @@ router.get('/clients/:id',  (req, res) => {
     });
   }
 
-  Client.findOne({
-    _id: id,
-  }).then((client) => {
+  const promise = Promise.all([
+    Client.findOne({_id: id}),
+    Invoice.listItemsByClient(id)
+    ]);
+
+  promise.then(([client, itemsList]) => {
+
     if (!client) {
       req.flash('alert', "Can't find that client, maybe try later.");
       return res.render('404', {
@@ -331,12 +358,15 @@ router.get('/clients/:id',  (req, res) => {
       });
     }
 
+    total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee)
+
     res.render('clients/client', {
         pageTitle       : "Client",
         pageDescription : "Client.",
-        client
+        client,
+        itemsList,
+        total
     });
-
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {

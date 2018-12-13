@@ -3,12 +3,15 @@ const mongoose = require('mongoose');
 let InvoiceSchema = new mongoose.Schema({
   invNo       : { type: Number},
   invDate     : { type: Date, default: Date.now},
+
   client      : {
       _id     : { type: mongoose.Schema.Types.ObjectId},
       name    : { type: String},
       phone   : { type: String},
       email   : { type: String}},
+
   message     : { type: String},
+
   details     : {
     utr       : { type: String},
     email     : { type: String},
@@ -18,6 +21,7 @@ let InvoiceSchema = new mongoose.Schema({
     accountNo : { type: String},
     contact   : { type: String},
     terms     : { type: String}},
+
   paid        : { type: Boolean },
   datePaid    : { type: Date },
   items       : [{  date: {type: Date},
@@ -25,26 +29,45 @@ let InvoiceSchema = new mongoose.Schema({
                     fee : {type: Number} }]
 });
 
-
 InvoiceSchema.methods.totalInvoiceValue = function () {
   inv = this;
   return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
 }
 
+InvoiceSchema.statics.newestInvoiceNumber = function () {
+  return this.aggregate([
+    {"$project" : {_id:0, invNo :1}},
+    {"$sort"    : {invNo : -1 }},
+    {"$limit"   : 1}
+  ])
+};
+
 InvoiceSchema.statics.listInvoices = function () {
   let invoiceList =
   this.aggregate([
-    {$project : { invNo:1, invDate:1, "client.name":1, items:1}},
+    {$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
     {"$unwind" : "$items"},
     {"$sort": {"items.date" : -1}},
     {"$group": {
-     "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name"},
+     "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
      "total": {"$sum": "$items.fee"}
       }
     },
     {"$sort": {"_id.invoice": -1}}
   ]);
   return invoiceList;
+}
+
+InvoiceSchema.statics.listItemsByClient = function (id) {
+
+  return this.aggregate([
+    {"$match" : { 'client._id' : mongoose.Types.ObjectId(id) }},
+    {"$project" : { _id:1 , invNo:1 , items:1 }},
+    {"$unwind" : "$items"},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    {"$sort": {"items.date": -1}}
+  ]);
+
 }
 
 let Invoice = mongoose.model('Invoice', InvoiceSchema);
