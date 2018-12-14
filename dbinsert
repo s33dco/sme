@@ -93,6 +93,52 @@ db.invoices.aggregate(
 	"total" : 246
 }
 
+
+db.invoices.aggregate([
+  { "$group" :  { _id: "$client._id" }},
+  { "$group" :  { _id: 1, count: {$sum :1}}}
+]);
+
+
+db.invoices.aggregate([
+	{$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
+	{"$unwind" : "$items"},
+	{"$sort": {"items.date" : -1}},
+	{"$group": {
+	 "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
+	 "total": {"$sum": "$items.fee"}
+		}
+	},
+	{"$sort": {"_id.invoice": -1}}
+]).pretty();
+
+
+db.invoices.aggregate([
+  {"$project" : { paid:1 , items:1 }},
+  {"$match" : { paid : false }},
+  {"$unwind" : "$items"},
+  {"$project" : { _id:1, "items.fee":1}},
+  {"$group": {_id: 1, total: {$sum: "$items.fee"}}}
+]);
+
+
+
+db.invoices.aggregate([
+  {"$match" : { paid : false}},
+  {"$project" : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
+  {"$unwind" : "$items"},
+  {"$sort": {"items.date" : -1}},
+  {"$group": {
+   "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
+   "total": {"$sum": "$items.fee"}
+    }
+  },
+  {"$sort": {"_id.invoice": -1}}
+]);
+
+
+
+
 // list items by client_id
 
 db.invoices.aggregate([

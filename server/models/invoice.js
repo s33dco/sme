@@ -34,12 +34,20 @@ InvoiceSchema.methods.totalInvoiceValue = function () {
   return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
 }
 
+InvoiceSchema.statics.countUniqueClients = function () {
+  return this.aggregate([
+    { "$group"   :  { _id: "$client._id" }},
+    { "$group"   :  { _id: 1, count: {$sum :1}}},
+    { "$project" : {count:1 }}
+  ]);
+}
+
 InvoiceSchema.statics.newestInvoiceNumber = function () {
   return this.aggregate([
     {"$project" : {_id:0, invNo :1}},
     {"$sort"    : {invNo : -1 }},
     {"$limit"   : 1}
-  ])
+  ]);
 };
 
 InvoiceSchema.statics.listInvoices = function () {
@@ -58,8 +66,42 @@ InvoiceSchema.statics.listInvoices = function () {
   return invoiceList;
 }
 
-InvoiceSchema.statics.listItemsByClient = function (id) {
+InvoiceSchema.statics.listUnpaidInvoices = function () {
+  let invoiceList =
+  this.aggregate([
+    {"$match" : { paid : false}},
+    {"$project" : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
+    {"$unwind" : "$items"},
+    {"$sort": {"items.date" : -1}},
+    {"$group": {
+     "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
+     "total": {"$sum": "$items.fee"}
+    }}
+  ]);
+  return invoiceList;
+}
 
+InvoiceSchema.statics.sumOfOwedInvoices = function () {
+    return this.aggregate([
+      {"$project" : { paid:1 , items:1 }},
+      {"$match" : { paid : false }},
+      {"$unwind" : "$items"},
+      {"$project" : { _id:1, "items.fee":1}},
+      {"$group": {_id: 1, total: {$sum: "$items.fee"}}}
+    ]);
+};
+
+InvoiceSchema.statics.sumOfPaidInvoices = function () {
+    return this.aggregate([
+      {"$project" : { paid:1 , items:1 }},
+      {"$match" : { paid : true }},
+      {"$unwind" : "$items"},
+      {"$project" : { _id:1, "items.fee":1}},
+      {"$group": {_id: 1, total: {$sum: "$items.fee"}}}
+    ]);
+};
+
+InvoiceSchema.statics.listItemsByClient = function (id) {
   return this.aggregate([
     {"$match" : { 'client._id' : mongoose.Types.ObjectId(id) }},
     {"$project" : { _id:1 , invNo:1 , items:1 }},
@@ -67,7 +109,6 @@ InvoiceSchema.statics.listItemsByClient = function (id) {
     {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
     {"$sort": {"items.date": -1}}
   ]);
-
 }
 
 let Invoice = mongoose.model('Invoice', InvoiceSchema);

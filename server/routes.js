@@ -120,24 +120,42 @@ router.get('/logout', (req, res, next) => {
 });   // logout delete tokens
 
 router.get('/dashboard', (req, res) => {          // redirect for success login
+  const promise = Promise.all([
+    Invoice.countUniqueClients(),
+    Invoice.listInvoices(),
+    Invoice.sumOfPaidInvoices(),
+    Invoice.sumOfOwedInvoices(),
+    Invoice.listUnpaidInvoices()
+  ]);
+  promise.then(([billedClients, allInvoices, totalPaid, totalOwed, unpaidInvoiceList]) => {
 
-// TODO: for dashboard functionality
-
-// count of individual clients on Invoice
-// date of earliest invoice, date today (time)
-// count of Invoices produced
-// sum of invoices paid : true (incomings)
-// list of invoices paid : false
-// sum of invoices paid : false
-// average earnings = incoming / time
-
+    let uniqueClients = billedClients[0].count;
+    let noInvoicesProduced  = allInvoices.length;
+    let noUnpaidInvoices    = unpaidInvoiceList.length
+    let firstInvoice = allInvoices.pop();
+    let percentagePaid = ((noInvoicesProduced - noUnpaidInvoices)/noInvoicesProduced) * 100;
+    let owed = totalOwed.length == 0 ? 0 : totalOwed[0].total;
+    let paid = totalPaid.length == 0 ? 0 : totalPaid[0].total;
 
     res.render('dashboard', {
-    pageTitle: "Invoice and Admin",
-    pageDescription: "Let's get paid!."
+      pageTitle: "Dashboard",
+      pageDescription: "Let's get paid!.",
+      unpaidInvoiceList,
+      noUnpaidInvoices,
+      noInvoicesProduced,
+      percentagePaid,
+      uniqueClients,
+      owed,
+      paid
+    })
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
   });
 });
-
 
 // ********************************************
 // invoice routes
@@ -145,7 +163,6 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 
 router.get('/invoices', (req, res) => {           // list all invoices invoices home
   Invoice.listInvoices().then((invoices)=> {
-      console.log(invoices);
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
       pageDescription: "Invoice Admin.",
@@ -166,14 +183,13 @@ router.get('/invoices/new', (req, res) => {
     Client.find({}, {name:1}).sort({name: 1})
   ]);
 
-  promise.then(([lastInvNo, clients]) => {
-
-    let newNumber = lastInvNo[0].invNo + 1;
+  promise.then(([lastInvoiceNo, clients]) => {
 
     let now = moment().format("DD MMM YY");
+    let nextInvNo = lastInvoiceNo[0].invNo + 1;
 
     res.render('invoices/newinvoice', {
-      data            : { invDate : now, invNo : newNumber },
+      data            : { invDate : now, invNo : nextInvNo },
       errors          : {},
       csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",

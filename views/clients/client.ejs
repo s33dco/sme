@@ -8,8 +8,8 @@
 <% itemsList.forEach((item) => { %>
   <div class="item">
     <p><%= moment(item.items.date).format("Do MMMM YYYY") %>
-       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
-    <p><%= item.items.desc %> £<%= item.items.fee %></p>
+       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>) £<%= item.items.fee %></p>
+    <p><%= item.items.desc %></p>
   </div>
 
 

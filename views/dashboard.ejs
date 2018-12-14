@@ -1,15 +1,23 @@
 <h1>Dashboard</h1>
-<div class="summary">
+
 
   <div class="summary">
-    <p>x clients over x weeks.</p>
-    <p>Average weekly earnings £</p>
-    <p>x invoices sent, £xxx received</p>
+    <p><%= uniqueClients %> unique clients</p>
+    <p>£<%= paid %> received.</p>
+    <p>£<%= owed %> outstanding.</p>
+    <p>what about average weekly earnings</p>
+    <p><%= noInvoicesProduced %> invoices produced, <%= noUnpaidInvoices %> unpaid.</p>
   </div>
 
   <div class="outstanding-invoices">
-      <p>£xxx due from x invoices.</p>
-      <p>table of due invoices with ajax to mark as paid.</p>
-    </div>
+    <h3>Unpaid Invoices.</h3>
 
-</div>
+    <% unpaidInvoiceList.forEach((invoice) => { %>
+    <div class="invoice">
+      <p><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> for
+        <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>
+      </p>
+      <p>£<%= invoice.total%> due <%= moment(invoice._id.date).fromNow()%>.</p>
+    </div>
+    <% }); %>
+  </div>
