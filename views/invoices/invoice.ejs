@@ -40,3 +40,26 @@
   <p><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
   <h4>(<%= invoice.details.terms %>)</h4>
 </div>
+
+
+<% if (invoice.datePaid){ %>
+  <form method="post" action="/invoices/unpaid" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="id" value="<%= invoice._id %>">
+    <div class="form-actions">
+      <button class="btn" type="submit">Mark as Unpaid</button>
+    </div>
+  </form>
+
+
+<% } else { %>
+
+  <form method="post" action="/invoices/paid" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="id" value="<%= invoice._id %>">
+    <div class="form-actions">
+      <button class="btn" type="submit">Mark as Paid</button>
+    </div>
+  </form>
+
+<% } %>

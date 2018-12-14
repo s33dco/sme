@@ -133,11 +133,12 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
     let noInvoicesProduced  = allInvoices.length;
     let noUnpaidInvoices    = unpaidInvoiceList.length
     let firstInvoice = allInvoices.pop();
-    let percentagePaid = ((noInvoicesProduced - noUnpaidInvoices)/noInvoicesProduced) * 100;
+    let firstDate = firstInvoice._id.date;
     let owed = totalOwed.length == 0 ? 0 : totalOwed[0].total;
     let paid = totalPaid.length == 0 ? 0 : totalPaid[0].total;
+    let tradingDays = moment(Date.now()).diff(moment(firstDate), 'days');
+    let avWeekEarnings = (paid / tradingDays) * 7;
 
-    console.log(unpaidInvoiceList);
 
     res.render('dashboard', {
       pageTitle: "Dashboard",
@@ -145,11 +146,12 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
       unpaidInvoiceList,
       noUnpaidInvoices,
       noInvoicesProduced,
-      percentagePaid,
       uniqueClients,
       owed,
       paid,
-      csrfToken: req.csrfToken()
+      csrfToken: req.csrfToken(),
+      tradingDays,
+      avWeekEarnings
     })
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
@@ -166,7 +168,6 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 
 router.get('/invoices', (req, res) => {           // list all invoices invoices home
   Invoice.listInvoices().then((invoices)=> {
-    console.log(invoices);
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
       pageDescription: "Invoice Admin.",
@@ -276,7 +277,8 @@ router.get('/invoices/:id',  (req, res) => {
         pageTitle       : "Invoice",
         pageDescription : "invoice.",
         total,
-        invoice
+        invoice,
+        csrfToken       : req.csrfToken()
     });
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
@@ -307,7 +309,44 @@ router.post('/invoices/paid', (req, res) => {
   .then((invoice) => {
 
      req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
-     res.redirect('/dashboard')
+     res.redirect('/dashboard');
+
+
+   }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+
+router.post('/invoices/unpaid', (req, res) => {
+
+  let id = req.body.id;
+
+  console.log(req.body)
+
+  if (!ObjectID.isValid(id)) {
+    console.log('invalid id', id);
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  Invoice.findOneAndUpdate(
+   { _id : id },
+   {$set: {paid:false}, $unset: {datePaid:1}},
+   {returnNewDocument: true })
+  .then((invoice) => {
+
+    console.log(invoice);
+
+     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now owing!`);
+     res.redirect("/dashboard");
+
 
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
