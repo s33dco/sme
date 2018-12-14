@@ -16,7 +16,7 @@
 <div class="outstanding-invoices">
   <h3>Unpaid Invoices.</h3>
     <% unpaidInvoiceList.forEach((invoice) => { %>
-      <form method="post" action="/invoices/paid" novalidate>
+      <form method="post" action="/invoices/paid?_method=PATCH"  novalidate>
         <p><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> for
           <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>
         </p>
