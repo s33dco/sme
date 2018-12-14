@@ -8,6 +8,7 @@ const express       = require('express')
 const layout        = require('express-layout')     // ejs
 const bodyParser    = require('body-parser')
 const validator     = require('express-validator')
+const methodOverride  = require('method-override')
 const cookieParser  = require('cookie-parser')      // for flash messaging
 const session       = require('express-session')    //
 const flash         = require('express-flash')      //
@@ -38,6 +39,7 @@ app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'ejs')
 
 const middlewares = [
+  methodOverride('_method'),
   helmet(),
   morgan('dev'), // ,{ stream: accessLogStream } - to direct to log file
   layout(),

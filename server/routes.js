@@ -1,15 +1,16 @@
-const express       = require('express');
-const router        = express.Router();
-const bodyParser    = require('body-parser');
-const moment        = require('moment');
+const express         = require('express');
+const router          = express.Router();
+const bodyParser      = require('body-parser');
+const moment          = require('moment');
+const methodOverride  = require('method-override')
 const { check,
- validationResult } = require('express-validator/check');
-const {mongoose}    = require('./db/mongoose');
-const {ObjectID}    = require('mongodb');
-const {Invoice}     = require("./models/invoice");
-const {User}        = require("./models/user");
-const {Client}      = require("./models/client");
-const {Detail}      = require("./models/detail");
+ validationResult }   = require('express-validator/check');
+const {mongoose}      = require('./db/mongoose');
+const {ObjectID}      = require('mongodb');
+const {Invoice}       = require("./models/invoice");
+const {User}          = require("./models/user");
+const {Client}        = require("./models/client");
+const {Detail}        = require("./models/detail");
 
 // ********************************************
 // public routes
@@ -289,7 +290,7 @@ router.get('/invoices/:id',  (req, res) => {
   });
 });
 
-router.post('/invoices/paid', (req, res) => {
+router.patch('/invoices/paid', (req, res) => {
 
   let id = req.body.id;
 
@@ -321,11 +322,36 @@ router.post('/invoices/paid', (req, res) => {
   });
 });
 
-router.post('/invoices/unpaid', (req, res) => {
-
+router.patch('/invoices/unpaid', (req, res) => {
   let id = req.body.id;
+  if (!ObjectID.isValid(id)) {
+    console.log('invalid id', id);
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+  Invoice.findOneAndUpdate(
+   { _id : id },
+   {$set: {paid:false}, $unset: {datePaid:1}},
+   {returnNewDocument: true })
+  .then((invoice) => {
+     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now owing!`);
+     res.redirect("/dashboard");
+   }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+// PATCH/invoices/:id
 
-  console.log(req.body)
+
+router.delete('/invoices', (req, res) => {
+  const { id, number, name } = req.body;
 
   if (!ObjectID.isValid(id)) {
     console.log('invalid id', id);
@@ -336,18 +362,10 @@ router.post('/invoices/unpaid', (req, res) => {
     });
   }
 
-  Invoice.findOneAndUpdate(
-   { _id : id },
-   {$set: {paid:false}, $unset: {datePaid:1}},
-   {returnNewDocument: true })
+  Invoice.deleteOne({ _id : id })
   .then((invoice) => {
-
-    console.log(invoice);
-
-     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now owing!`);
+     req.flash('success', `Invoice ${number} for ${name} deleted!`);
      res.redirect("/dashboard");
-
-
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
@@ -356,7 +374,8 @@ router.post('/invoices/unpaid', (req, res) => {
     });
   });
 });
-// PATCH/invoices/:id
+
+
 
 // DELETE/invoices/:id
 
