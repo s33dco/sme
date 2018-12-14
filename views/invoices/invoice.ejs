@@ -22,10 +22,13 @@
 
 <div class="total-due">
     <h3>Total Due £<%= total %>.</h3>
+    <% if (invoice.datePaid) { %>
+    <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
+    <% } %>
 </div>
 
 <div class="signature">
-  <h4>with thanks,</br>
+  <h4>kind regards,</br>
   <%= invoice.details.contact %></br>
   <%= invoice.details.email %></br>
   <%= invoice.details.phone %></h4>

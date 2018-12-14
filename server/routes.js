@@ -137,6 +137,8 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
     let owed = totalOwed.length == 0 ? 0 : totalOwed[0].total;
     let paid = totalPaid.length == 0 ? 0 : totalPaid[0].total;
 
+    console.log(unpaidInvoiceList);
+
     res.render('dashboard', {
       pageTitle: "Dashboard",
       pageDescription: "Let's get paid!.",
@@ -146,13 +148,14 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
       percentagePaid,
       uniqueClients,
       owed,
-      paid
+      paid,
+      csrfToken: req.csrfToken()
     })
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Invalid resource"
     });
   });
 });
@@ -163,6 +166,7 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 
 router.get('/invoices', (req, res) => {           // list all invoices invoices home
   Invoice.listInvoices().then((invoices)=> {
+    console.log(invoices);
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
       pageDescription: "Invoice Admin.",
@@ -283,6 +287,36 @@ router.get('/invoices/:id',  (req, res) => {
   });
 });
 
+router.post('/invoices/paid', (req, res) => {
+
+  let id = req.body.id;
+
+  if (!ObjectID.isValid(id)) {
+    console.log('invalid id');
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  Invoice.findOneAndUpdate(
+   { _id : id },
+   {$set: {paid:true},$currentDate: { datePaid: true}},
+   {returnNewDocument: true })
+  .then((invoice) => {
+
+     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
+     res.redirect('/dashboard')
+
+   }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
 // PATCH/invoices/:id
 
 // DELETE/invoices/:id

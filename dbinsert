@@ -149,3 +149,25 @@ db.invoices.aggregate([
 ]).pretty();
 
 db.invoices.aggregate([ { '$match': { 'client._id': '5c111bce25bb04bf2cfa0f3a' } }, { '$project': { _id: 1, invNo: 1, items: 1 } }, { '$unwind': '$items' }, { '$sort': { 'items.date': -1 } } ], {})
+
+
+
+to update as paid...
+
+ db.invoices.findOneAndUpdate(
+  { _id : ObjectId("5c111bce25bb04bf2cfa0f39")},
+  {$set: {paid:true},$currentDate: { datePaid: true}},
+  {returnNewDocument: true }
+  );
+
+
+
+
+
+
+db.invoices.findOneAndUpdate(
+  { "_id" : ObjectId("5c11a53460befd16b2f0155f")},
+  {
+    {$set: {paid:true},
+    $currentDate: { datePaid: true}
+  });
