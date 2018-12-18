@@ -2,7 +2,7 @@ const express         = require('express');
 const router          = express.Router();
 const bodyParser      = require('body-parser');
 const moment          = require('moment');
-const methodOverride  = require('method-override')
+const methodOverride  = require('method-override');
 const { check,
  validationResult }   = require('express-validator/check');
 const {mongoose}      = require('./db/mongoose');
@@ -44,22 +44,23 @@ router.post('/contact', [
     .trim()
     .normalizeEmail()
     ], (req, res) => {
-          const errors = validationResult(req)
-            if (!errors.isEmpty()) {
-              return res.render('contact', {
-                data: req.body,
-                errors: errors.mapped(),
-                csrfToken: req.csrfToken(),  // generate new csrf token
-                pageTitle: "Get in touch.",
-                pageDescription: "Give it another shot."
-                });
-              };
-          console.log(req.body)
+  const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.render('contact', {
+        data: req.body,
+        errors: errors.mapped(),
+        csrfToken: req.csrfToken(),  // generate new csrf token
+        pageTitle: "Get in touch.",
+        pageDescription: "Give it another shot."
+        });
+      };
 
-// todo send email !
+      // send the email.....
 
-          req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
-          res.redirect('/')
+
+    req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
+    res.redirect('/')
+
 });
 
 router.get('/login', (req, res) => {
@@ -290,6 +291,92 @@ router.get('/invoices/:id',  (req, res) => {
   });
 });
 
+
+router.post('/invoices/edit',  (req, res) => {
+  let id = req.body.id;
+
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  const promise = Promise.all([
+    Invoice.findOne({  _id: id }),
+    Client.find({}, {name:1}).sort({name: 1})
+  ]);
+
+  promise.then(([invoice, clients]) => {
+
+    if (!invoice) {
+      req.flash('alert', "Can't find that invoice, maybe try later.");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client"
+      });
+    }
+
+    let { client, _id, invNo, invDate, message, items, paid} = invoice
+
+
+    res.render('invoices/editinvoice', {
+      clients,
+      data: { client, _id, invNo, invDate, message, items, paid},
+      errors: {},
+      csrfToken: req.csrfToken(),  // generate a csrf token
+      pageTitle       : "Edit Invoice",
+      pageDescription : "edit invoice."
+    })
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+
+
+router.post('/invoices/email', (req, res) => {
+
+  let id = req.body.id;
+
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "Not possible to email this invoice.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  Invoice.findOne({  _id: id }).then((invoice) => {
+
+    if (!invoice) {
+      req.flash('alert', "Can't find that invoice, maybe try later.");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client"
+      });
+    }
+
+
+    // send the email....
+
+    req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
+    res.redirect('/dashboard')
+
+  })
+  .catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource"
+    })
+  })
+});
+
 router.patch('/invoices/paid', (req, res) => {
 
   let id = req.body.id;
@@ -323,7 +410,9 @@ router.patch('/invoices/paid', (req, res) => {
 });
 
 router.patch('/invoices/unpaid', (req, res) => {
+
   let id = req.body.id;
+
   if (!ObjectID.isValid(id)) {
     console.log('invalid id', id);
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -331,24 +420,24 @@ router.patch('/invoices/unpaid', (req, res) => {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
     });
-  }
+  };
+
   Invoice.findOneAndUpdate(
    { _id : id },
    {$set: {paid:false}, $unset: {datePaid:1}},
    {returnNewDocument: true })
   .then((invoice) => {
-     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now owing!`);
+     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
      res.redirect("/dashboard");
+
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
+      pageTitle       : "404",
+      pageDescription : "Invalid resource",
     });
   });
 });
-// PATCH/invoices/:id
-
 
 router.delete('/invoices', (req, res) => {
   const { id, number, name } = req.body;
@@ -375,9 +464,7 @@ router.delete('/invoices', (req, res) => {
   });
 });
 
-
-
-// DELETE/invoices/:id
+// PATCH/invoices/:id
 
 // ********************************************
 // client routes
@@ -406,38 +493,37 @@ router.get('/clients/new', (req, res) => {        // new client form
   });
 });
 
-router.post('/clients', [                         // create client
-  check('name')
-    .isLength({ min: 1 })
-    .withMessage("Client name too short!")
-    .trim(),
-  check('email')
-    .isEmail()
-    .withMessage('That email doesn‘t look right')
-    .trim()
-    .normalizeEmail()
-    ], (req, res) => {
-        // console.log(req.body)
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-          return res.render('clients/newclient', {
-            data            : req.body,
-            errors          : errors.mapped(),
-            csrfToken       : req.csrfToken(),  // generate new csrf token
-            pageTitle       : "Add a client",
-            pageDescription : "Give it another shot."
-          });
-        };
+router.post('/clients',[  check('name')
+                          .isLength({ min: 1 })
+                          .withMessage("Client name too short!")
+                          .trim(),
+                          check('email')
+                          .isEmail()
+                          .withMessage('That email doesn‘t look right')
+                          .trim()
+                          .normalizeEmail()], (req, res) => {
 
-      const { name, email} = req.body;
-      let client = new Client({name, email});
+      const errors = validationResult(req)
 
-      client.save().then(() => {
-        req.flash('success', `${client.name} created !`)
-        res.redirect('/dashboard') // create custom header 'x-auth' with value of token
-      }).catch((e) => {
-        res.status(400).send(e);
-    });
+      if (!errors.isEmpty()) {
+        return res.render('clients/newclient', {
+          data            : req.body,
+          errors          : errors.mapped(),
+          csrfToken       : req.csrfToken(),  // generate new csrf token
+          pageTitle       : "Add a client",
+          pageDescription : "Give it another shot."
+        });
+      };
+
+    const { name, email} = req.body;
+    let client = new Client({name, email});
+
+    client.save().then(() => {
+      req.flash('success', `${client.name} created !`)
+      res.redirect('/dashboard') // create custom header 'x-auth' with value of token
+    }).catch((e) => {
+      res.status(400).send(e);
+  });
 });
 
 router.get('/clients/:id',  (req, res) => {
@@ -466,7 +552,11 @@ router.get('/clients/:id',  (req, res) => {
       });
     }
 
-    total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee)
+    if (itemsList.length > 0){
+      total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee)
+    } else {
+      total = '0'
+    }
 
     res.render('clients/client', {
         pageTitle       : "Client",

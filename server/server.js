@@ -45,6 +45,7 @@ const middlewares = [
   layout(),
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
+  bodyParser.json(),
   validator(),
   cookieParser(),
   session({
@@ -71,7 +72,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  res.status(500).send('Something broke!')
+  res.status(500).send("Something broke big time.")
 });
 
 app.listen(port, () => {

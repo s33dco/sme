@@ -42,6 +42,23 @@
 </div>
 
 
+
+<form method="post" action="/invoices/email?_method=post" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="id" value="<%= invoice._id %>">
+  <div class="form-actions">
+    <button class="btn" type="submit">Email Invoice</button>
+  </div>
+</form>
+
+<form method="post" action="/invoices/edit?_method=post" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="id" value="<%= invoice._id %>">
+  <div class="form-actions">
+    <button class="btn" type="submit">Edit Invoice</button>
+  </div>
+</form>
+
 <% if (invoice.datePaid){ %>
   <form method="post" action="/invoices/unpaid?_method=PATCH" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
