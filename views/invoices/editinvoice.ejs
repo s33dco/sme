@@ -11,13 +11,12 @@
   <% } %>
 </div>
 
-<form method="patch" action="/invoices" novalidate>
+<form method="post" action="/invoices/<%= data._id%>?_method=patch" novalidate>
+
+<!-- ABSTRAST INTO PARTIAL -->
+
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <fieldset class='details'>
-
-<% console.log(data)%>
-<% console.log(data.items)%>
-
 
     <div class="form-field">
       <label for="clientId">Bill to</label>
@@ -43,6 +42,7 @@
         <div class="error"><%= errors.invNo.msg %></div>
       <% } %>
     </div>
+
     <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
       <label for="message">Message</label>
       <textarea class="input" id="message" name="message" rows="2"><%=data.message%></textarea>
@@ -59,15 +59,15 @@
       <% data.items.forEach((item, index)=>{ %>
         <fieldset id= "item-<%=index%>" >
           <div class='form-field'>
-            <input class="input" name= "item[<%=index%>][date]" type="date" value="<%=moment(item.date).format("DD MMM YYYY")%>"/>
+            <input class="input" id= "items[<%=index%>][date]" name= "items[<%=index%>][date]" type="date" value="<%=moment(item.date).format("DD MMM YYYY")%>"/>
           </div>
 
           <div class='form-field'>
-            <textarea class='input' id='item[<%=index%>][desc]' name='desc' rows='6'><%= item.desc %></textarea>
+            <textarea class='input' id='items[<%=index%>][desc]' name='items[<%=index%>][desc]' rows='6'><%= item.desc %></textarea>
           </div>
 
           <div class='form-field'>
-            <input class='input' id='item[<%=index%>][fee]' name='fee' type='number' value="<%=item.fee%>">
+            <input class='input' id='items[<%=index%>][fee]' name='items[<%=index%>][fee]' type='number' value="<%=item.fee%>">
           </div>
           <div class="form-actions">
             <button onclick="remove_fieldset(<%=index%>)" class="btn danger"  type="button">remove</button>
@@ -81,9 +81,10 @@
     <button onclick="add_item_fields()" class="btn"  type="button">add item</button>
   </div>
 
+<!-- ABSTRAST INTO PARTIAL -->
+
   <div class="form-actions">
     <button class="btn" type="submit">Update</button>
   </div>
-</form>
 
 </form>
