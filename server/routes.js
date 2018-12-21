@@ -194,9 +194,10 @@ router.get('/invoices/new', (req, res) => {
 
     let now = moment().format("DD MMM YY");
     let nextInvNo = lastInvoiceNo[0].invNo + 1;
+    let items = [];
 
     res.render('invoices/newinvoice', {
-      data            : { invDate : now, invNo : nextInvNo },
+      data            : { invDate : now, invNo : nextInvNo, items},
       errors          : {},
       csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",
@@ -386,7 +387,7 @@ router.patch('/invoices/paid', (req, res) => {
   Invoice.findOneAndUpdate(
    { _id : id },
    {$set: {paid:true},$currentDate: { datePaid: true}},
-   {returnNewDocument: true })
+   {new : true })
   .then((invoice) => {
      req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
      res.redirect('/dashboard');
@@ -415,7 +416,7 @@ router.patch('/invoices/unpaid', (req, res) => {
   Invoice.findOneAndUpdate(
      { _id : id },
      {$set: {paid:false}, $unset: {datePaid:1}},
-     {returnNewDocument: true })
+     {new : true })
   .then((invoice) => {
      req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
      res.redirect("/dashboard");

@@ -1,5 +1,8 @@
 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
 <fieldset class='details'>
+
+<!-- basic invoice details -->
 
   <div class="form-field">
     <label for="clientId">Bill to</label>
@@ -36,6 +39,7 @@
 
 </fieldset>
 
+<!-- invoice items -->
 
 <div id="invoiceItems">
   <% if (data.items.length > 0) { %>

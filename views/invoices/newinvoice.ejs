@@ -12,53 +12,11 @@
 </div>
 
 <form method="post" action="/invoices" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <fieldset class='details'>
 
-    <div class="form-field">
-      <label for="clientId">Bill to</label>
-      <select name="clientId" autofocus>
-        <% clients.forEach((client) => {%>
-          <option value="<%=client._id%>"><%=client.name%></option>
-        <%})%>
-      </select>
-    </div>
-
-    <div class="form-field <%= errors.invNo ? 'form-field-invalid' : '' %>">
-      <label for="invDate">Invoice Date</label>
-      <input class="input" name="invDate" type="date" value="<%=data.invDate%>" />
-      <% if (errors.invNo) { %>
-        <div class="error"><%= errors.invDate.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.invNo ? 'form-field-invalid' : '' %>">
-      <label for="invNo">Invoice Number</label>
-      <input class="input" id="invNo" name="invNo" type="number" value="<%=data.invNo%>" />
-      <% if (errors.invNo) { %>
-        <div class="error"><%= errors.invNo.msg %></div>
-      <% } %>
-    </div>
-    <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
-      <label for="message">Message</label>
-      <textarea class="input" id="message" name="message" rows="2"></textarea>
-      <% if (errors.message) { %>
-        <div class="error"><%= errors.message.msg %></div>
-      <% } %>
-    </div>
-  </fieldset>
-
-
-  <div id="invoiceItems">
-  </div>
-
-  <div class="form-actions">
-    <button onclick="add_item_fields()" class="btn"  type="button">add item</button>
-  </div>
+  <% include ../partials/invoicefields %>
 
   <div class="form-actions">
     <button class="btn" type="submit">Create</button>
   </div>
-</form>
 
 </form>

@@ -13,75 +13,7 @@
 
 <form method="post" action="/invoices/<%= data._id%>?_method=patch" novalidate>
 
-<!-- ABSTRAST INTO PARTIAL -->
-
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <fieldset class='details'>
-
-    <div class="form-field">
-      <label for="clientId">Bill to</label>
-      <select name="clientId">
-        <% clients.forEach((client) => {%>
-            <option value="<%=client._id%>"><%=client.name%></option>
-        <%})%>
-      </select>
-    </div>
-
-    <div class="form-field <%= errors.invNo ? 'form-field-invalid' : '' %>">
-      <label for="invDate">Invoice Date</label>
-      <input class="input" name="invDate" type="date" value="<%=moment(data.invDate).format("DD MMM YYYY")%>" />
-      <% if (errors.invNo) { %>
-        <div class="error"><%= errors.invDate.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.invNo ? 'form-field-invalid' : '' %>">
-      <label for="invNo">Invoice Number</label>
-      <input class="input" id="invNo" name="invNo" type="number" value="<%=data.invNo%>" />
-      <% if (errors.invNo) { %>
-        <div class="error"><%= errors.invNo.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
-      <label for="message">Message</label>
-      <textarea class="input" id="message" name="message" rows="2"><%=data.message%></textarea>
-      <% if (errors.message) { %>
-        <div class="error"><%= errors.message.msg %></div>
-      <% } %>
-    </div>
-
-  </fieldset>
-
-
-  <div id="invoiceItems">
-    <% if (data.items.length > 0) { %>
-      <% data.items.forEach((item, index)=>{ %>
-        <fieldset id= "item-<%=index%>" >
-          <div class='form-field'>
-            <input class="input" id= "items[<%=index%>][date]" name= "items[<%=index%>][date]" type="date" value="<%=moment(item.date).format("DD MMM YYYY")%>"/>
-          </div>
-
-          <div class='form-field'>
-            <textarea class='input' id='items[<%=index%>][desc]' name='items[<%=index%>][desc]' rows='6'><%= item.desc %></textarea>
-          </div>
-
-          <div class='form-field'>
-            <input class='input' id='items[<%=index%>][fee]' name='items[<%=index%>][fee]' type='number' value="<%=item.fee%>">
-          </div>
-          <div class="form-actions">
-            <button onclick="remove_fieldset(<%=index%>)" class="btn danger"  type="button">remove</button>
-          </div>
-        </fieldset>
-      <%  }); %>
-    <% } %>
-  </div>
-
-  <div class="form-actions">
-    <button onclick="add_item_fields()" class="btn"  type="button">add item</button>
-  </div>
-
-<!-- ABSTRAST INTO PARTIAL -->
+  <% include ../partials/invoicefields %>
 
   <div class="form-actions">
     <button class="btn" type="submit">Update</button>
