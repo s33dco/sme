@@ -209,48 +209,107 @@ router.get('/invoices/new', (req, res) => {
   })
 });
 
-router.post('/invoices', (req, res) => {
+router.post('/invoices', [
+    check('clientId')
+      .isMongoId()
+      .isIn(Client.listClients)
+      .withMessage('check client'),
 
-// TODO: what happened to the validation ?
+    // check('invDate')
+    //   .isBefore(new Date()).withMessage('date should be today or earlier'),
+    //   // .custom( value => {
+    //   //     if (value === "Invalid Date"){ return Promise.reject('The date is wrong')}
+    //   //   }),
 
-  const promise = Promise.all([
-    Detail.findOne(),
-    Client.findOne({_id: req.body.clientId})
-  ]);
+    check('invNo')
+      .isInt().withMessage('check invoice number'),
 
-  promise.then(([detail, client]) => {
-    return new Invoice({
-      invNo      : req.body.invNo,
-      invDate    : req.body.invDate,
-      message    : req.body.message,
-      client     : {
-          _id         : client._id,
-          name        : client.name,
-          email       : client.email,
-          phone       : client.phone
-      },
-      items      : req.body.items,
-      details    : {
-          utr         : detail.utr,
-          email       : detail.email,
-          phone       : detail.phone,
-          bank        : detail.bank,
-          sortcode    : detail.sortcode,
-          accountNo   : detail.accountNo,
-          terms       : detail.terms,
-          contact     : detail.contact
-      },
-      paid        : false
-    }).save();
-  }).then((invoice) => {
-      console.log(invoice);
-      req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
-      res.redirect(`invoices/${invoice._id}`);
-  }).catch((e) => {
-      console.log(e.message);
-      res.status(400);
+    check('message')
+      .isLength({ min: 1 }).withMessage('include a message'),
+
+    check('items')
+      .isLength({ min: 1 })
+      .withMessage("Need at least one item"),
+
+
+
+
+
+
+
+    // check('items.*.date')
+    //   .custom( value => {if (value === 'Invalid Date'){ throw new Error('Check the date');} }).withMessage('Check the date')
+    //   .isBefore(Date.now()).withMessage('date should be today or earlier'),
+
+    check('items.*.desc')
+      .isLength({ min: 1 })
+      .withMessage('Include details for the item'),
+
+    check('items.*.fee')
+      .isNumeric().withMessage('fee must be a number'),
+
+                          ], (req, res) => {
+
+    const errors = validationResult(req)
+
+    console.log("request :");
+    console.log(req.body);
+    console.log("errors :");
+    console.log(errors.mapped());
+
+    if (!errors.isEmpty()) {
+
+      Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
+        return res.render('invoices/newinvoice', {
+            data            : req.body,
+            errors          : errors.mapped(),
+            csrfToken       : req.csrfToken(),  // generate new csrf token
+            pageTitle       : "Invoice",
+            pageDescription : "Give it another shot.",
+            clients
+        });
+      });
+    } else {;
+
+      const promise = Promise.all([
+        Detail.findOne(),
+        Client.findOne({_id: req.body.clientId})
+      ]);
+
+      promise.then(([detail, client]) => {
+        return new Invoice({
+          invNo      : req.body.invNo,
+          invDate    : req.body.invDate,
+          message    : req.body.message,
+          client     : {
+              _id         : client._id,
+              name        : client.name,
+              email       : client.email,
+              phone       : client.phone
+          },
+          items      : req.body.items,
+          details    : {
+              utr         : detail.utr,
+              email       : detail.email,
+              phone       : detail.phone,
+              bank        : detail.bank,
+              sortcode    : detail.sortcode,
+              accountNo   : detail.accountNo,
+              terms       : detail.terms,
+              contact     : detail.contact
+          },
+          paid        : false
+        }).save();
+      }).then((invoice) => {
+          console.log(invoice);
+          req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
+          res.redirect(`invoices/${invoice._id}`);
+      }).catch((e) => {
+          console.log(e.message);
+          res.status(400);
+      });
+    };
   });
-});
 
 router.get('/invoices/:id',  (req, res) => {
   let id = req.params.id;

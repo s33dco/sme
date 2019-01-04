@@ -10,13 +10,17 @@
       <% clients.forEach((client) => {%>
           <option value="<%=client._id%>"><%=client.name%></option>
       <%})%>
+      <option value="1272hhh2h">Bonkner</option>
     </select>
+    <% if (errors.clientId) { %>
+      <div class="error"><%= errors.clientId.msg %></div>
+    <% } %>
   </div>
 
-  <div class="form-field <%= errors.invNo ? 'form-field-invalid' : '' %>">
+  <div class="form-field <%= errors.invDate ? 'form-field-invalid' : '' %>">
     <label for="invDate">Invoice Date</label>
     <input class="input" name="invDate" type="date" value="<%=moment(data.invDate).format("DD MMM YYYY")%>" />
-    <% if (errors.invNo) { %>
+    <% if (errors.invDate) { %>
       <div class="error"><%= errors.invDate.msg %></div>
     <% } %>
   </div>
@@ -42,7 +46,7 @@
 <!-- invoice items -->
 
 <div id="invoiceItems">
-  <% if (data.items.length > 0) { %>
+  <% if (Array.isArray(data.items) && data.items.length) { %>
     <% data.items.forEach((item, index)=>{ %>
       <fieldset id= "item-<%=index%>" >
         <div class='form-field'>
