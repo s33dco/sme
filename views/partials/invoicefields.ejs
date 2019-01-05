@@ -4,13 +4,20 @@
 
 <!-- basic invoice details -->
 
-  <div class="form-field">
+  <div class="form-field <%= errors.clientId ? 'form-field-invalid' : '' %>">
     <label for="clientId">Bill to</label>
     <select name="clientId">
-      <% clients.forEach((client) => {%>
-          <option value="<%=client._id%>"><%=client.name%></option>
-      <%})%>
-      <option value="1272hhh2h">Bonkner</option>
+      <% if (data.clientId && !errors.clientId) { %>
+        <option value="<%=data.clientId%>">Selected</option>
+      <% } else { %>
+        <option value='select'>select client</option>
+        <%   } %>
+        <% clients.forEach((client) => { %>
+          <option value="<%=client._id%>"><%=client.name%>
+          <%= client._id === data.clientId ? "selected='selected'":"" %></option>
+        <%})%>
+
+
     </select>
     <% if (errors.clientId) { %>
       <div class="error"><%= errors.clientId.msg %></div>

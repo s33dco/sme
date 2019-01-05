@@ -22,9 +22,16 @@ let ClientSchema = new mongoose.Schema({
   }
 });
 
-ClientSchema.statics.listClients = function () {
-  return this.find({},{name:0, email:0,phone:0}).map(client => client._id);
-}
+ClientSchema.statics.isValid = function (id) {
+      return this.findById(id)
+        .then(result => {
+          if (!result) {return false} else {return id}})
+      }
+
+
+// ClientSchema.statics.listClients = function () {
+//   return this.find({},{name:0, email:0,phone:0}).then((list) => {list.map(client => client._id)});
+// }
 
 let Client = mongoose.model('Client', ClientSchema);
 

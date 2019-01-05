@@ -192,7 +192,7 @@ router.get('/invoices/new', (req, res) => {
 
   promise.then(([lastInvoiceNo, clients]) => {
 
-    let now = moment().format("DD MMM YY");
+    let now = moment().format("DD-MMM-YY");
     let nextInvNo = lastInvoiceNo[0].invNo + 1;
     let items = [];
 
@@ -211,15 +211,17 @@ router.get('/invoices/new', (req, res) => {
 
 router.post('/invoices', [
     check('clientId')
+      .exists()
       .isMongoId()
-      .isIn(Client.listClients)
-      .withMessage('check client'),
+      .custom(id => Client.isValid(id))
+      .withMessage('Wrong Client'),
 
-    // check('invDate')
-    //   .isBefore(new Date()).withMessage('date should be today or earlier'),
-    //   // .custom( value => {
-    //   //     if (value === "Invalid Date"){ return Promise.reject('The date is wrong')}
-    //   //   }),
+    check('invDate')
+      .custom( value => {
+          if (value === "Invalid Date"){
+            throw new Error(wrong);
+          } else { return true }
+        }).withMessage('date is wrong'),
 
     check('invNo')
       .isInt().withMessage('check invoice number'),
@@ -250,12 +252,8 @@ router.post('/invoices', [
 
                           ], (req, res) => {
 
-    const errors = validationResult(req)
+    let errors = validationResult(req)
 
-    console.log("request :");
-    console.log(req.body);
-    console.log("errors :");
-    console.log(errors.mapped());
 
     if (!errors.isEmpty()) {
 
