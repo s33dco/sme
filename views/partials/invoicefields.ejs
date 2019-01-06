@@ -10,7 +10,7 @@
       <% if (data.clientId && !errors.clientId) { %>
         <option value="<%=selected._id%>"><%= selected.name%></option>
       <% } else { %>
-        <option value='select'>select client</option>
+        <option value='select client'>select client</option>
         <%   } %>
         <% clients.forEach((client) => { %>
           <option value="<%=client._id%>"><%=client.name%>
@@ -25,8 +25,8 @@
   </div>
 
   <div class="form-field <%= errors.invDate ? 'form-field-invalid' : '' %>">
-    <label for="invDate">Invoice Date</label>
-    <input class="input" name="invDate" type="date" value="<%=moment(data.invDate).format("DD MMM YYYY")%>" />
+    <label for="invDate">Invoice Date add date picker ot IsoString</label>
+    <input class="input" name="invDate" type="date" value="<%=moment(data.invDate).format('YYYY-MM-DD')%>" />
     <% if (errors.invDate) { %>
       <div class="error"><%= errors.invDate.msg %></div>
     <% } %>
@@ -57,7 +57,7 @@
     <% data.items.forEach((item, index)=>{ %>
       <fieldset id= "item-<%=index%>" >
         <div class='form-field'>
-          <input class="input" id= "items[<%=index%>][date]" name= "items[<%=index%>][date]" type="date" value="<%=moment(item.date).format("DD MMM YYYY")%>"/>
+          <input class="input" id= "items[<%=index%>][date]" name= "items[<%=index%>][date]" type="date" value="<%=moment(item.date).format("YYYY-MM-DD")%>"/>
         </div>
 
         <div class='form-field'>

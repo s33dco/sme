@@ -192,7 +192,7 @@ router.get('/invoices/new', (req, res) => {
 
   promise.then(([lastInvoiceNo, clients]) => {
 
-    let now = moment().format("DD-MMM-YY");
+    let now = moment().toISOString();
     let nextInvNo = lastInvoiceNo[0].invNo + 1;
     let items = [];
 
@@ -213,15 +213,22 @@ router.post('/invoices', [
     check('clientId')
       .exists()
       .isMongoId()
-      .custom(id => Client.isValid(id))
-      .withMessage('Wrong Client'),
+      .withMessage('Select Client')
+      .custom(id => {
+        return Client.findById(id).then(client => {
+          if (!client) {
+            return Promise.reject('Client not in DB');
+          } else {
+            return true
+          }
+        })
+      }),
 
     check('invDate')
-      .custom( value => {
-          if (value === "Invalid Date"){
-            throw new Error(wrong);
-          } else { return true }
-        }).withMessage('date is wrong'),
+      .isISO8601()
+      .withMessage('date is wrong YYYY-MM-DD')
+      .isBefore(new Date().toISOString())
+      .withMessage('must be today or earlier'),
 
     check('invNo')
       .isInt().withMessage('check invoice number'),
@@ -233,12 +240,11 @@ router.post('/invoices', [
       .isLength({ min: 1 })
       .withMessage("Need at least one item"),
 
-    // check('items.*.date')
-    //   .custom( value => {
-    //       if (value === "Invalid Date"){
-    //         throw new Error(wrong);
-    //       } else { return true }
-    //     }).withMessage('date is wrong'),
+    check('items.*.date')
+      .isISO8601()
+      .withMessage('date is wrong YYYY-MM-DD')
+      .isBefore(new Date().toISOString())
+      .withMessage('must be today or earlier YYYY-MM-DD'),
 
     check('items.*.desc')
       .isLength({ min: 1 })
@@ -251,12 +257,23 @@ router.post('/invoices', [
 
     const errors = validationResult(req)
 
+    console.log(req.body)
 
     if (!errors.isEmpty()) {
 
-      Client.find({}, {name:1}).sort({name: 1}).then((people) => {
-        let selected = people.find(c => c._id == req.body.clientId);
-        let clients = people.filter((p) => p._id != selected._id);
+      Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
+          let selected;
+        if (req.body.clientId) {
+          selected = clients.find(c => c._id == req.body.clientId);
+          if (!selected){
+            clients
+          } else {
+            clients = clients.filter((c) => c._id != selected._id);
+          }
+        } else {
+          clients
+        }
+
         return res.render('invoices/newinvoice', {
             data            : req.body,
             errors          : errors.mapped(),
