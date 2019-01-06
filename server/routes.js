@@ -233,38 +233,38 @@ router.post('/invoices', [
       .isLength({ min: 1 })
       .withMessage("Need at least one item"),
 
-
-
-
-
-
-
     // check('items.*.date')
-    //   .custom( value => {if (value === 'Invalid Date'){ throw new Error('Check the date');} }).withMessage('Check the date')
-    //   .isBefore(Date.now()).withMessage('date should be today or earlier'),
+    //   .custom( value => {
+    //       if (value === "Invalid Date"){
+    //         throw new Error(wrong);
+    //       } else { return true }
+    //     }).withMessage('date is wrong'),
 
     check('items.*.desc')
       .isLength({ min: 1 })
       .withMessage('Include details for the item'),
 
     check('items.*.fee')
-      .isNumeric().withMessage('fee must be a number'),
+      .isNumeric().withMessage('fee must be a number')
 
                           ], (req, res) => {
 
-    let errors = validationResult(req)
+    const errors = validationResult(req)
 
 
     if (!errors.isEmpty()) {
 
-      Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
+      Client.find({}, {name:1}).sort({name: 1}).then((people) => {
+        let selected = people.find(c => c._id == req.body.clientId);
+        let clients = people.filter((p) => p._id != selected._id);
         return res.render('invoices/newinvoice', {
             data            : req.body,
             errors          : errors.mapped(),
-            csrfToken       : req.csrfToken(),  // generate new csrf token
+            csrfToken       : req.csrfToken(),
             pageTitle       : "Invoice",
             pageDescription : "Give it another shot.",
-            clients
+            clients,
+            selected
         });
       });
     } else {;
