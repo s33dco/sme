@@ -1,1 +1,20 @@
 <h2><%=user.firstName%> <%=user.lastName%></h2>
+
+<form method="post" action="/users/edit?_method=post" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="id" value="<%= user._id %>">
+  <div class="form-actions">
+    <button class="btn" type="submit">Edit</button>
+  </div>
+</form>
+
+
+<form method="post" action="/users?_method=DELETE" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="id" value="<%= user._id %>">
+  <input type="hidden" name="firstName" value="<%= user.firstName %>">
+  <input type="hidden" name="lastName" value="<%= user.lastName  %>">
+  <div class="form-actions">
+    <button class="btn danger" type="submit">Delete</button>
+  </div>
+</form>

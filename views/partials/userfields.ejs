@@ -1,0 +1,41 @@
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+<div class="form-field <%= errors.firstName ? 'form-field-invalid' : '' %>">
+  <label for="firstName">First Name</label>
+  <input class="input" id="firstName" name="firstName" type="firstName" value="<%= data.firstName %>" />
+  <% if (errors.firstName) { %>
+    <div class="error"><%= errors.firstName.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.lastName ? 'form-field-invalid' : '' %>">
+  <label for="lastName">Last Name</label>
+  <input class="input" id="lastName" name="lastName" type="lastName" value="<%= data.lastName %>" />
+  <% if (errors.lastName) { %>
+    <div class="error"><%= errors.lastName.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
+  <label for="email">Email</label>
+  <input class="input" id="email" name="email" type="email" value="<%= data.email %>" />
+  <% if (errors.email) { %>
+    <div class="error"><%= errors.email.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.password ? 'form-field-invalid' : '' %>">
+  <label for="password">Password</label>
+  <input class="input" id="password" name="password" type="password" value="" />
+  <% if (errors.password) { %>
+    <div class="error"><%= errors.password.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.passwordConfirmation ? 'form-field-invalid' : '' %>">
+  <label for="passwordConfirmation">Confirm Password</label>
+  <input class="input" id="passwordConfirmation" name="passwordConfirmation" type="password" value="" />
+  <% if (errors.passwordConfirmation) { %>
+    <div class="error"><%= errors.passwordConfirmation.msg %></div>
+  <% } %>
+</div>
