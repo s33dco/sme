@@ -519,7 +519,7 @@ router.delete('/invoices', (req, res) => {
 
   Invoice.deleteOne({ _id : id })
   .then((invoice) => {
-     req.flash('success', `Invoice ${number} for ${name} deleted!`);
+     req.flash('alert', `Invoice ${number} for ${name} deleted!`);
      res.redirect("/dashboard");
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
@@ -735,7 +735,7 @@ router.delete('/clients', (req, res) => {
 
   Client.deleteOne({ _id : id })
   .then((client) => {
-     req.flash('success', `Client ${req.body.name} deleted!`);
+     req.flash('alert', `${req.body.name} deleted!`);
      res.redirect("/dashboard");
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
@@ -942,7 +942,7 @@ console.log(req.body)
 
   User.deleteOne({ _id : id })
   .then((user) => {
-     req.flash('success', `${req.body.firstName} ${req.body.lastName} deleted!`);
+     req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
      res.redirect("/dashboard");
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
