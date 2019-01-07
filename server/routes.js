@@ -12,6 +12,8 @@ const {User}          = require("./models/user");
 const {Client}        = require("./models/client");
 const {Detail}        = require("./models/detail");
 
+
+
 // ********************************************
 // public routes
 // ********************************************
@@ -257,8 +259,6 @@ router.post('/invoices', [
 
     const errors = validationResult(req)
 
-    console.log(req.body)
-
     if (!errors.isEmpty()) {
 
       Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
@@ -274,17 +274,17 @@ router.post('/invoices', [
           clients
         }
 
-        return res.render('invoices/newinvoice', {
-            data            : req.body,
-            errors          : errors.mapped(),
-            csrfToken       : req.csrfToken(),
-            pageTitle       : "Invoice",
-            pageDescription : "Give it another shot.",
-            clients,
-            selected
-        });
+      return res.render('invoices/newinvoice', {
+          data            : req.body,
+          errors          : errors.mapped(),
+          csrfToken       : req.csrfToken(),
+          pageTitle       : "Invoice",
+          pageDescription : "Give it another shot.",
+          clients,
+          selected
       });
-    } else {;
+    });
+    } else {
 
       const promise = Promise.all([
         Detail.findOne(),
@@ -316,7 +316,6 @@ router.post('/invoices', [
           paid        : false
         }).save();
       }).then((invoice) => {
-          console.log(invoice);
           req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
           res.redirect(`invoices/${invoice._id}`);
       }).catch((e) => {
@@ -357,52 +356,6 @@ router.get('/invoices/:id',  (req, res) => {
         invoice,
         csrfToken       : req.csrfToken()
     });
-  }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  });
-});
-
-router.post('/invoices/edit',  (req, res) => {
-  let id = req.body.id;
-
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
-
-  const promise = Promise.all([
-    Invoice.findOne({  _id: id }),
-    Client.find({}, {name:1}).sort({name: 1})
-  ]);
-
-  promise.then(([invoice, clients]) => {
-
-    if (!invoice) {
-      req.flash('alert', "Can't find that invoice, maybe try later.");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that client"
-      });
-    }
-
-    let { client, _id, invNo, invDate, message, items, paid} = invoice
-
-
-    res.render('invoices/editinvoice', {
-      clients,
-      data: { client, _id, invNo, invDate, message, items, paid},
-      errors: {},
-      csrfToken: req.csrfToken(),  // generate a csrf token
-      pageTitle       : "Edit Invoice",
-      pageDescription : "edit invoice."
-    })
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
@@ -504,12 +457,12 @@ router.patch('/invoices/unpaid', (req, res) => {
 });
 
 
-router.patch('/invoices/:id', (req, res) => {
-  let id = req.params.id;
-// TODO: what happened to the validation ?
+// TODO: should this be get rather than post...
+
+router.post('/invoices/edit',  (req, res) => {
+  let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
-    console.log('invalid id');
     req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
@@ -517,29 +470,163 @@ router.patch('/invoices/:id', (req, res) => {
     });
   }
 
-  let invoice = Invoice.findOneAndUpdate(
-    { _id : id },
-    {$set:
-      {invNo      : req.body.invNo,
-       invDate    : req.body.invDate,
-       message    : req.body.message,
-       items      : req.body.items}
-     },
-     {new : true })
-  .then((invoice) => {
-    console.log(invoice._id, invoice.invNo)
+  const promise = Promise.all([
+    Invoice.findOne({  _id: id }),
+    Client.find({}, {name:1}).sort({name: 1})
+  ]);
 
-     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} updated!`);
-     res.redirect(`/dashboard`);
+  promise.then(([invoice, clients]) => {
 
+    if (!invoice ) {
+      req.flash('alert', "Can't find that invoice...");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client"
+      });
+    }
 
-   }).catch((e) => {
+    if (invoice.paid ) {
+      req.flash('alert', "can't edit a paid invoice!");
+      res.redirect(`/dashboard`);
+    }
+
+    let { client, _id, invNo, invDate, message, items, paid} = invoice;
+    let clientId = client._id;
+    let selected = client
+
+    res.render('invoices/editinvoice', {
+      clients,
+      selected,
+      data: { _id, invNo, invDate, message, items, paid, clientId},
+      errors: {},
+      csrfToken: req.csrfToken(),  // generate a csrf token
+      pageTitle       : "Edit Invoice",
+      pageDescription : "edit invoice."
+    })
+  }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
     });
   });
+});
+
+router.patch('/invoices/:id',[
+    check('clientId')
+      .exists()
+      .isMongoId()
+      .withMessage('Select Client')
+      .custom(id => {
+        return Client.findById(id).then(client => {
+          if (!client) {
+            return Promise.reject('Client not in DB');
+          } else {
+            return true
+          }
+        })
+      }),
+
+    check('invDate')
+      .isISO8601()
+      .withMessage('date is wrong YYYY-MM-DD')
+      .isBefore(new Date().toISOString())
+      .withMessage('must be today or earlier'),
+
+    check('invNo')
+      .isInt().withMessage('check invoice number'),
+
+    check('message')
+      .isLength({ min: 1 }).withMessage('include a message'),
+
+    check('items')
+      .isLength({ min: 1 })
+      .withMessage("Need at least one item"),
+
+    check('items.*.date')
+      .isISO8601()
+      .withMessage('date is wrong YYYY-MM-DD')
+      .isBefore(new Date().toISOString())
+      .withMessage('must be today or earlier YYYY-MM-DD'),
+
+    check('items.*.desc')
+      .isLength({ min: 1 })
+      .withMessage('Include details for the item'),
+
+    check('items.*.fee')
+      .isNumeric().withMessage('fee must be a number')
+
+    ],(req, res) => {
+
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+
+    Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
+        let selected;
+      if (req.body.clientId) {
+        selected = clients.find(c => c._id == req.body.clientId);
+        if (!selected){
+          clients
+        } else {
+          clients = clients.filter((c) => c._id != selected._id);
+        }
+      } else {
+        clients
+      }
+
+    return res.render('invoices/editinvoice', {
+        data            : req.body,
+        errors          : errors.mapped(),
+        csrfToken       : req.csrfToken(),
+        pageTitle       : "Invoice",
+        pageDescription : "Give it another shot.",
+        clients,
+        selected
+    });
+  });
+  } else {
+
+    console.log('on the success path')
+    console.log(req.params)
+    console.log(req.body)
+
+    const promise = Promise.all([
+      Invoice.findOne({_id : req.params.id}),
+      Client.findOne({_id: req.body.clientId})
+    ]);
+
+    promise.then(([invoice, client]) => {
+      console.log('here we aree',invoice);
+
+      return invoice.updateOne({
+        $set:
+        {
+            invNo    : req.body.invNo,
+            invDate  : req.body.invDate,
+            message  : req.body.message,
+            items    : req.body.items,
+            client: {
+              _id         : client._id,
+              name        : client.name,
+              email       : client.email,
+              phone       : client.phone
+            }
+        }
+      })
+    })
+    .then((client) => {
+       req.flash('success', `Invoice ${req.body.invNo} updated!`);
+       res.redirect(`/dashboard`);
+     })
+     .catch((e) => {
+      req.flash('alert', `${e.message}`);
+      res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Invalid resource",
+      });
+    });
+  }
 });
 
 
