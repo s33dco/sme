@@ -16,12 +16,12 @@
   <% invoice.items.forEach((item) => { %>
     <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
     <p><%= item.desc %></p>
-    <p>£<%= item.fee %>.</p>
+    <p>£<%= item.fee %></p>
   <% }) %>
 </div>
 
 <div class="total-due">
-    <h3>Total Due £<%= total %>.</h3>
+    <h3>Total Due £<%= total %></h3>
     <% if (invoice.datePaid) { %>
     <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
     <% } %>

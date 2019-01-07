@@ -1,0 +1,25 @@
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+<div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
+  <label for="name">Client Name</label>
+  <input class="input" id="name" name="name" type="name" value="<%= data.name %>" />
+  <% if (errors.name) { %>
+    <div class="error"><%= errors.name.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.phone ? 'form-field-invalid' : '' %>">
+  <label for="phone">Phone</label>
+  <input class="input" id="phone" name="phone" type="text" value="<%= data.phone %>" />
+  <% if (errors.phone) { %>
+    <div class="error"><%= errors.phone.msg %></div>
+  <% } %>
+</div>
+
+<div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
+  <label for="email">Email</label>
+  <input class="input" id="email" name="email" type="email" value="<%= data.email %>" />
+  <% if (errors.email) { %>
+    <div class="error"><%= errors.email.msg %></div>
+  <% } %>
+</div>

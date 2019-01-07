@@ -568,26 +568,26 @@ router.get('/clients/new', (req, res) => {
 
 router.post('/clients', validate.client, (req, res) => {
 
-      const errors = validationResult(req)
+  const errors = validationResult(req)
 
-      if (!errors.isEmpty()) {
-        return res.render('clients/newclient', {
-          data            : req.body,
-          errors          : errors.mapped(),
-          csrfToken       : req.csrfToken(),  // generate new csrf token
-          pageTitle       : "Add a client",
-          pageDescription : "Give it another shot."
-        });
-      };
+  if (!errors.isEmpty()) {
+    return res.render('clients/newclient', {
+      data            : req.body,
+      errors          : errors.mapped(),
+      csrfToken       : req.csrfToken(),  // generate new csrf token
+      pageTitle       : "Add a client",
+      pageDescription : "Give it another shot."
+    });
+  };
 
-    const { name, email} = req.body;
-    let client = new Client({name, email});
+  const { name, email, phone} = req.body;
+  let client = new Client({name, email, phone});
 
-    client.save().then(() => {
-      req.flash('success', `${client.name} created !`)
-      res.redirect('/dashboard') // create custom header 'x-auth' with value of token
-    }).catch((e) => {
-      res.status(400).send(e);
+  client.save().then(() => {
+    req.flash('success', `${client.name} created !`)
+    res.redirect('/clients')
+  }).catch((e) => {
+    res.status(400).send(e);
   });
 });
 

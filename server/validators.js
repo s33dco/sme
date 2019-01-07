@@ -1,8 +1,7 @@
-const {check}  = require('express-validator/check');
-const {Client} = require("./models/client");
+const {check}     = require('express-validator/check');
+const {Client}    = require("./models/client");
 
 module.exports = {
-
   invoice: [
     check('clientId')
       .isMongoId()
@@ -44,9 +43,9 @@ module.exports = {
       .withMessage('Include details for the item'),
 
     check('items.*.fee')
-      .isNumeric().withMessage('fee must be a number')
+      .isDecimal({force_decimal: true, decimal_digits: '1,', locale: 'en-UK'})
+      .withMessage('check fee xx.xx')
     ],
-
   email: [
     check('message')
       .isLength({ min: 1 })
@@ -58,7 +57,6 @@ module.exports = {
       .trim()
       .normalizeEmail()
   ],
-
   login: [
     check('email')
       .isEmail()
@@ -70,7 +68,6 @@ module.exports = {
       .withMessage("password too short!")
       .trim()
   ],
-
   client: [
     check('name')
       .isLength({ min: 1 })
@@ -80,9 +77,15 @@ module.exports = {
       .isEmail()
       .withMessage('That email doesn‘t look right')
       .trim()
-      .normalizeEmail()
+      .normalizeEmail(),
+    check('phone')
+      .matches(/^\d+$/)
+      .withMessage("phone digits only")
+      .isLength({ min: 11 })
+      .withMessage("too short!")
+      .isLength({ max: 16 })
+      .withMessage("too long!")
   ],
-
   user: [
     check('firstName')
       .isLength({ min: 1 })

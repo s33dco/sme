@@ -12,25 +12,10 @@
 </div>
 
 <form method="post" action="/clients" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <% include ../partials/clientfields %>
 
-  <div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
-    <label for="name">Client Name</label>
-    <input class="input" id="name" name="name" type="name" value="<%= data.name %>" />
-    <% if (errors.name) { %>
-      <div class="error"><%= errors.name.msg %></div>
-    <% } %>
-  </div>
-
-  <div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
-    <label for="email">Email</label>
-    <input class="input" id="email" name="email" type="email" value="<%= data.email %>" />
-    <% if (errors.email) { %>
-      <div class="error"><%= errors.email.msg %></div>
-    <% } %>
-  </div>
-
-  <div class="form-actions">
-    <button class="btn" type="submit">Send</button>
-  </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">Create</button>
+    </div>
+    
 </form>
