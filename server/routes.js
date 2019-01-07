@@ -1,18 +1,16 @@
-const express         = require('express');
-const router          = express.Router();
-const bodyParser      = require('body-parser');
-const moment          = require('moment');
-const methodOverride  = require('method-override');
-const { check,
- validationResult }   = require('express-validator/check');
-const {mongoose}      = require('./db/mongoose');
-const {ObjectID}      = require('mongodb');
-const {Invoice}       = require("./models/invoice");
-const {User}          = require("./models/user");
-const {Client}        = require("./models/client");
-const {Detail}        = require("./models/detail");
-
-
+const express           = require('express');
+const router            = express.Router();
+const bodyParser        = require('body-parser');
+const moment            = require('moment');
+const methodOverride    = require('method-override');
+const {validationResult}= require('express-validator/check');
+const validate          = require('./validators')
+const {mongoose}        = require('./db/mongoose');
+const {ObjectID}        = require('mongodb');
+const {Invoice}         = require("./models/invoice");
+const {User}            = require("./models/user");
+const {Client}          = require("./models/client");
+const {Detail}          = require("./models/detail");
 
 // ********************************************
 // public routes
@@ -35,17 +33,7 @@ router.get('/contact', (req, res) => {
   })
 })
 
-router.post('/contact', [
-  check('message')
-    .isLength({ min: 1 })
-    .withMessage('Message is required')
-    .trim(),
-  check('email')
-    .isEmail()
-    .withMessage('That email doesn‘t look right')
-    .trim()
-    .normalizeEmail()
-    ], (req, res) => {
+router.post('/contact', validate.email, (req, res) => {
   const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.render('contact', {
@@ -79,17 +67,7 @@ router.get('/login', (req, res) => {
 // protected routes
 // ********************************************
 
-router.post('/login', [                           // users/login
-  check('email')
-    .isEmail()
-    .withMessage('That email doesn‘t look right')
-    .trim()
-    .normalizeEmail(),
-  check('password')
-    .isLength({ min: 7 })
-    .withMessage("password too short!")
-    .trim()
-  ],(req, res) => {
+router.post('/login', validate.login, (req, res) => {
 
     const errors = validationResult(req)
 
@@ -120,10 +98,9 @@ router.get('/logout', (req, res, next) => {
     // delete tokens and send flash else just redirect to /
 
     req.flash('alert', "You've logged out - come back soon.")
-    res.redirect('/');
-});   // logout delete tokens
+    res.redirect('/');});
 
-router.get('/dashboard', (req, res) => {          // redirect for success login
+router.get('/dashboard', (req, res) => {
   const promise = Promise.all([
     Invoice.countUniqueClients(),
     Invoice.listInvoices(),
@@ -170,7 +147,7 @@ router.get('/dashboard', (req, res) => {          // redirect for success login
 // invoice routes
 // ********************************************
 
-router.get('/invoices', (req, res) => {           // list all invoices invoices home
+router.get('/invoices', (req, res) => {
   Invoice.listInvoices().then((invoices)=> {
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
@@ -184,8 +161,6 @@ router.get('/invoices', (req, res) => {           // list all invoices invoices 
 });
 
 router.get('/invoices/new', (req, res) => {
-
-// TODO: what happened to the validation ?
 
   const promise = Promise.all([
     Invoice.newestInvoiceNumber(),
@@ -211,51 +186,9 @@ router.get('/invoices/new', (req, res) => {
   })
 });
 
-router.post('/invoices', [
-    check('clientId')
-      .exists()
-      .isMongoId()
-      .withMessage('Select Client')
-      .custom(id => {
-        return Client.findById(id).then(client => {
-          if (!client) {
-            return Promise.reject('Client not in DB');
-          } else {
-            return true
-          }
-        })
-      }),
+router.post('/invoices', validate.invoice, (req, res) => {
 
-    check('invDate')
-      .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
-      .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier'),
-
-    check('invNo')
-      .isInt().withMessage('check invoice number'),
-
-    check('message')
-      .isLength({ min: 1 }).withMessage('include a message'),
-
-    check('items')
-      .isLength({ min: 1 })
-      .withMessage("Need at least one item"),
-
-    check('items.*.date')
-      .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
-      .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier YYYY-MM-DD'),
-
-    check('items.*.desc')
-      .isLength({ min: 1 })
-      .withMessage('Include details for the item'),
-
-    check('items.*.fee')
-      .isNumeric().withMessage('fee must be a number')
-
-                          ], (req, res) => {
+  console.log(req.body)
 
     const errors = validationResult(req)
 
@@ -456,9 +389,6 @@ router.patch('/invoices/unpaid', (req, res) => {
   });
 });
 
-
-// TODO: should this be get rather than post...
-
 router.post('/invoices/edit',  (req, res) => {
   let id = req.body.id;
 
@@ -512,51 +442,7 @@ router.post('/invoices/edit',  (req, res) => {
   });
 });
 
-router.patch('/invoices/:id',[
-    check('clientId')
-      .exists()
-      .isMongoId()
-      .withMessage('Select Client')
-      .custom(id => {
-        return Client.findById(id).then(client => {
-          if (!client) {
-            return Promise.reject('Client not in DB');
-          } else {
-            return true
-          }
-        })
-      }),
-
-    check('invDate')
-      .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
-      .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier'),
-
-    check('invNo')
-      .isInt().withMessage('check invoice number'),
-
-    check('message')
-      .isLength({ min: 1 }).withMessage('include a message'),
-
-    check('items')
-      .isLength({ min: 1 })
-      .withMessage("Need at least one item"),
-
-    check('items.*.date')
-      .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
-      .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier YYYY-MM-DD'),
-
-    check('items.*.desc')
-      .isLength({ min: 1 })
-      .withMessage('Include details for the item'),
-
-    check('items.*.fee')
-      .isNumeric().withMessage('fee must be a number')
-
-    ],(req, res) => {
+router.patch('/invoices/:id', validate.invoice ,(req, res) => {
 
   const errors = validationResult(req)
 
@@ -629,7 +515,6 @@ router.patch('/invoices/:id',[
   }
 });
 
-
 router.delete('/invoices', (req, res) => {
   const { id, number, name } = req.body;
 
@@ -659,9 +544,8 @@ router.delete('/invoices', (req, res) => {
 // client routes
 // ********************************************
 
-router.get('/clients', (req, res) => {            // list all clients
-let clients = Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
-    console.log(clients);
+router.get('/clients', (req, res) => {
+  let clients = Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
     res.render('clients/clients', {
         pageTitle       : "Client List",
         pageDescription : "Clients.",
@@ -672,7 +556,7 @@ let clients = Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
   })
 });
 
-router.get('/clients/new', (req, res) => {        // new client form
+router.get('/clients/new', (req, res) => {
   res.render('clients/newclient', {
     data            : {},
     errors          : {},
@@ -682,15 +566,7 @@ router.get('/clients/new', (req, res) => {        // new client form
   });
 });
 
-router.post('/clients',[  check('name')
-                          .isLength({ min: 1 })
-                          .withMessage("Client name too short!")
-                          .trim(),
-                          check('email')
-                          .isEmail()
-                          .withMessage('That email doesn‘t look right')
-                          .trim()
-                          .normalizeEmail()], (req, res) => {
+router.post('/clients', validate.client, (req, res) => {
 
       const errors = validationResult(req)
 
@@ -769,7 +645,7 @@ router.get('/clients/:id',  (req, res) => {
 // user routes
 // ********************************************
 
-router.get('/users', (req, res) => {              // list all users
+router.get('/users', (req, res) => {
   let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {
     console.log(users);
     res.render('users/users', {
@@ -782,7 +658,7 @@ router.get('/users', (req, res) => {              // list all users
   });
 });
 
-router.get('/users/new', (req, res) => {          // new user form
+router.get('/users/new', (req, res) => {
   res.render('users/newuser', {
     data            : {},
     errors          : {},
@@ -792,37 +668,7 @@ router.get('/users/new', (req, res) => {          // new user form
   });
 });
 
-router.post('/users', [                           // create user
-  check('firstName')
-    .isLength({ min: 1 })
-    .withMessage("first name too short!")
-    .isAlpha()
-    .withMessage("only letters")
-    .trim(),
-  check('lastName')
-    .isLength({ min: 1 })
-    .withMessage("last name too short!")
-    .isAlpha()
-    .withMessage("only letters")
-    .trim(),
-  check('email')
-    .isEmail()
-    .withMessage('That email doesn‘t look right')
-    .trim()
-    .normalizeEmail(),
-  check('password')
-    .isLength({ min: 7 })
-    .withMessage("password too short!")
-    .trim(),
-  check('passwordConfirmation')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-            return false;
-          } else {
-            return value;
-          }
-    }).withMessage("Passwords don't match")
-    ], (req, res) => {
+router.post('/users', validate.user, (req, res) => {
         // console.log(req.body)
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -887,5 +733,10 @@ router.get('/users/:id', (req, res) => {
 // PATCH/users/:id
 
 // DELETE/users/:id  (can't delete yourself)
+
+
+// ********************************************
+// detail routes
+// ********************************************
 
 module.exports = router
