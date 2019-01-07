@@ -64,7 +64,7 @@ router.get('/login', (req, res) => {
 })
 
 // ********************************************
-// protected routes
+// protected routes below....
 // ********************************************
 
 router.post('/login', validate.login, (req, res) => {
@@ -472,19 +472,12 @@ router.patch('/invoices/:id', validate.invoice ,(req, res) => {
     });
   });
   } else {
-
-    console.log('on the success path')
-    console.log(req.params)
-    console.log(req.body)
-
     const promise = Promise.all([
       Invoice.findOne({_id : req.params.id}),
       Client.findOne({_id: req.body.clientId})
     ]);
 
     promise.then(([invoice, client]) => {
-      console.log('here we aree',invoice);
-
       return invoice.updateOne({
         $set:
         {
@@ -626,6 +619,7 @@ router.get('/clients/:id',  (req, res) => {
     res.render('clients/client', {
         pageTitle       : "Client",
         pageDescription : "Client.",
+        csrfToken       : req.csrfToken(),
         client,
         itemsList,
         total
@@ -639,7 +633,121 @@ router.get('/clients/:id',  (req, res) => {
   });
 });
 
-// PATCH/clients/:id
+router.post('/clients/edit',  (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  console.log('id ok')
+
+  Client.findOne({_id: req.body.id})
+  .then((client) => {
+    console.log(client)
+    if (!client ) {
+      req.flash('alert', "Can't find that client...");
+      return res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Can't find that client"
+      });
+    }
+
+    let { _id, name, email, phone} = client;
+
+    res.render('clients/editclient', {
+      data: { _id, name, email, phone},
+      errors: {},
+      csrfToken: req.csrfToken(),  // generate a csrf token
+      pageTitle       : "Edit Client",
+      pageDescription : "edit client."
+    })
+  }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+
+router.patch('/clients/:id', validate.client ,(req, res) => {
+
+  if (!ObjectID.isValid(req.params.id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.render('clients/editclient', {
+        data            : req.body,
+        errors          : errors.mapped(),
+        csrfToken       : req.csrfToken(),
+        pageTitle       : "Edit Client",
+        pageDescription : "Give it another shot.",
+    });
+  } else {
+    Client.findOne({_id : req.params.id})
+    .then((client) => {
+      return client.updateOne({
+        $set:
+         {
+            name    : req.body.name,
+            phone  : req.body.phone,
+            email  : req.body.email,
+          }
+        })
+      })
+      .then((client) => {
+        req.flash('success', `Invoice ${req.body.name} updated!`);
+        res.redirect(`/clients`);
+      })
+      .catch((e) => {
+        req.flash('alert', `${e.message}`);
+        res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Invalid resource",
+        });
+      });
+  }
+});
+
+router.delete('/clients', (req, res) => {
+  const { id, name, billed } = req.body;
+
+  if (!ObjectID.isValid(id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  if (billed > 0) {
+    req.flash('alert', "Can't delete a billed client.");
+    res.redirect(`/dashboard`);
+  }
+
+  Client.deleteOne({ _id : id })
+  .then((client) => {
+     req.flash('success', `Client ${req.body.name} deleted!`);
+     res.redirect("/dashboard");
+   }).catch((e) => {
+    req.flash('alert', `${e.message}`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
 
 // ********************************************
 // user routes

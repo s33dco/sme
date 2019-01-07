@@ -1,0 +1,19 @@
+<div class="form-header">
+  <% if (Object.keys(errors).length === 0) { %>
+    <h2>Editing <%= data.name %>.</h2>
+  <% } else { %>
+    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <ul class="errors-list">
+      <% Object.values(errors).forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
+
+<form method="post" action="/clients/<%= data._id%>?_method=patch" novalidate>
+    <% include ../partials/clientfields %>
+    <div class="form-actions">
+      <button class="btn" type="submit">Update</button>
+    </div>
+</form>
