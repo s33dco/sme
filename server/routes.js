@@ -727,6 +727,8 @@ router.patch('/clients/:id', validate.client ,(req, res) => {
 router.delete('/clients', (req, res) => {
   const { id, name, billed } = req.body;
 
+  console.log(billed)
+
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
@@ -735,7 +737,7 @@ router.delete('/clients', (req, res) => {
     });
   }
 
-  if (billed) {
+  if (billed > 0) {
     req.flash('alert', "Can't delete a billed client.");
     return res.redirect(`/dashboard`);
   }
