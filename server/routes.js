@@ -67,8 +67,6 @@ router.get('/login', (req, res) => {
 // protected routes below....
 // ********************************************
 
-// TODO: changing passwords saving with bcrypt..
-
 router.post('/login', validate.login, (req, res) => {
 
     const errors = validationResult(req)
@@ -88,7 +86,7 @@ router.post('/login', validate.login, (req, res) => {
     // User.findByCredentials(email, password)
     // .then((user) => { // success case returns user
     //   return user.generateAuthToken().then((token) => {    // generate token on validated user keep promise chaining incase of errors
-    //     res.header('x-auth',token).send(user);      //respond by setting x-auth token in header and send user back
+    //     res.header('x-auth',token);      //respond by setting x-auth token in header and send user back
         req.flash('success', `Welcome back ${email}!`)
         res.redirect('/dashboard')
     //   });
@@ -521,7 +519,6 @@ router.delete('/invoices', (req, res) => {
         pageDescription : "Invalid resource",
     });
   }
-
   if (paid === 'true')  {
     req.flash('alert', "Can't delete a paid invoice.");
     return res.redirect("/dashboard");
@@ -938,26 +935,31 @@ router.patch('/users/:id', validate.useredit ,(req, res) => {
 
 router.delete('/users', (req, res) => {
   const { id, name, billed } = req.body;
+
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
     res.redirect("/dashboard");
   }
-  User.countDocuments()
-  .then((users) => {
-    if (users === 1) {
+
+  const promise = Promise.all([
+    User.findOne({ _id : id }),
+    User.count()
+  ]);
+
+  promise.then(([user, count]) => {
+    if (count === 1) {
       return Promise.reject(new Error('Must be atleast one user'));
+    } else {
+      user.remove()
     }
   })
   .then(() => {
-    User.deleteOne({ _id : id })
-  })
-  .then((user) => {
        req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
        res.redirect("/dashboard");
   })
   .catch((e) => {
       req.flash('alert', `${e.message}`);
-      res.redirect("/dashboard");
+      res.redirect("/users");
   });
 });
 
