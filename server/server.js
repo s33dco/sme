@@ -1,20 +1,20 @@
 require('./config/config');
 
-const fs            = require('fs')                 // logging
-const path          = require('path')
-const rfs           = require('rotating-file-stream')
-const morgan        = require('morgan')
-const express       = require('express')
-const layout        = require('express-layout')     // ejs
-const bodyParser    = require('body-parser')
-const validator     = require('express-validator')
+const fs              = require('fs')                 // logging
+const path            = require('path')
+const rfs             = require('rotating-file-stream')
+const morgan          = require('morgan')
+const express         = require('express')
+const layout          = require('express-layout')     // ejs
+const bodyParser      = require('body-parser')
+const validator       = require('express-validator')
 const methodOverride  = require('method-override')
-const cookieParser  = require('cookie-parser')      // for flash messaging
-const session       = require('express-session')    //
-const flash         = require('express-flash')      //
-const helmet        = require('helmet')             // prevent tampering with headers
-const csrf          = require('csurf')              // protect against csrf
-const port 				  = process.env.PORT;
+const cookieParser    = require('cookie-parser')      // for flash messaging
+const session         = require('express-session')    //
+const flash           = require('express-flash')      //
+const helmet          = require('helmet')             // prevent tampering with headers
+const csrf            = require('csurf')              // protect against csrf
+const port 				    = process.env.PORT;
 
 const routes        = require('./routes')
 const app           = express();

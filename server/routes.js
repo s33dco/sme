@@ -2,7 +2,6 @@ const express           = require('express');
 const router            = express.Router();
 const bodyParser        = require('body-parser');
 const moment            = require('moment');
-const methodOverride    = require('method-override');
 const {validationResult}= require('express-validator/check');
 const validate          = require('./validators')
 const {mongoose}        = require('./db/mongoose');
@@ -11,6 +10,7 @@ const {Invoice}         = require("./models/invoice");
 const {User}            = require("./models/user");
 const {Client}          = require("./models/client");
 const {Detail}          = require("./models/detail");
+const {authenticate}    = require('./middleware/authenticate');
 
 // ********************************************
 // public routes
@@ -67,6 +67,8 @@ router.get('/login', (req, res) => {
 // protected routes below....
 // ********************************************
 
+// TODO: changing passwords saving with bcrypt..
+
 router.post('/login', validate.login, (req, res) => {
 
     const errors = validationResult(req)
@@ -82,15 +84,18 @@ router.post('/login', validate.login, (req, res) => {
     };
 
     let {email, password} = req.body;
-    console.log(email, password);
-
-        // check email and password with db and generate x-token
-        // send back user object
-
-
-        // set flash message and redirect
-      req.flash('success', `Welcome back ${email}!`)
-      res.redirect('/dashboard')
+    //
+    // User.findByCredentials(email, password)
+    // .then((user) => { // success case returns user
+    //   return user.generateAuthToken().then((token) => {    // generate token on validated user keep promise chaining incase of errors
+    //     res.header('x-auth',token).send(user);      //respond by setting x-auth token in header and send user back
+        req.flash('success', `Welcome back ${email}!`)
+        res.redirect('/dashboard')
+    //   });
+    // }).catch((e) => {
+    //   req.flash('alert', `access denied!`)
+    //   res.redirect('/index')
+    // })
 });
 
 router.get('/logout', (req, res, next) => {
@@ -101,6 +106,7 @@ router.get('/logout', (req, res, next) => {
     res.redirect('/');});
 
 router.get('/dashboard', (req, res) => {
+
   const promise = Promise.all([
     Invoice.countUniqueClients(),
     Invoice.listInvoices(),
@@ -108,6 +114,7 @@ router.get('/dashboard', (req, res) => {
     Invoice.sumOfOwedInvoices(),
     Invoice.listUnpaidInvoices()
   ]);
+
   promise.then(([billedClients, allInvoices, totalPaid, totalOwed, unpaidInvoiceList]) => {
 
     let uniqueClients = billedClients[0].count;
@@ -119,6 +126,7 @@ router.get('/dashboard', (req, res) => {
     let paid = totalPaid.length == 0 ? 0 : totalPaid[0].total;
     let tradingDays = moment(Date.now()).diff(moment(firstDate), 'days');
     let avWeekEarnings = (paid / tradingDays) * 7;
+
 
 
     res.render('dashboard', {
@@ -135,11 +143,8 @@ router.get('/dashboard', (req, res) => {
       avWeekEarnings
     })
   }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource"
-    });
+    req.flash('alert', `No data available`);
+    res.redirect("/invoices");
   });
 });
 
@@ -506,10 +511,10 @@ router.patch('/invoices/:id', validate.invoice ,(req, res) => {
 });
 
 router.delete('/invoices', (req, res) => {
-  const { id, number, name } = req.body;
+  console.log(req.body)
+  const { id, number, name, paid } = req.body;
 
   if (!ObjectID.isValid(id)) {
-    console.log('invalid id', id);
     req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
@@ -517,10 +522,15 @@ router.delete('/invoices', (req, res) => {
     });
   }
 
+  if (paid === 'true')  {
+    req.flash('alert', "Can't delete a paid invoice.");
+    return res.redirect("/dashboard");
+  }
+
   Invoice.deleteOne({ _id : id })
   .then((invoice) => {
      req.flash('alert', `Invoice ${number} for ${name} deleted!`);
-     res.redirect("/dashboard");
+     return res.redirect("/dashboard");
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
@@ -728,9 +738,9 @@ router.delete('/clients', (req, res) => {
     });
   }
 
-  if (billed > 0) {
+  if (billed) {
     req.flash('alert', "Can't delete a billed client.");
-    res.redirect(`/dashboard`);
+    return res.redirect(`/dashboard`);
   }
 
   Client.deleteOne({ _id : id })
@@ -872,7 +882,7 @@ router.post('/users/edit',  validate.user, (req, res) => {
   });
 });
 
-// TODO: saving passwords when editing user
+// TODO: changing passwords saving with bcrypt..
 
 router.patch('/users/:id', validate.user ,(req, res) => {
 
@@ -883,8 +893,6 @@ router.patch('/users/:id', validate.user ,(req, res) => {
         pageDescription : "Invalid resource",
     });
   }
-
-  console.log(req.body)
 
   const errors = validationResult(req)
 
@@ -909,57 +917,49 @@ router.patch('/users/:id', validate.user ,(req, res) => {
           }
         })
       })
-
-// TODO: something about passwords........
-
-      .then((user) => {
-        req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
-        res.redirect(`/users`);
-      })
-      .catch((e) => {
-        req.flash('alert', `${e.message}`);
-        res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Invalid resource",
-        });
+    .then((user) => {
+      req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
+      res.redirect(`/users`);
+    })
+    .catch((e) => {
+      req.flash('alert', `${e.message}`);
+      res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
       });
+    });
   }
 });
 
 router.delete('/users', (req, res) => {
-
-console.log(req.body)
-
   const { id, name, billed } = req.body;
-
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
+    res.redirect("/dashboard");
   }
-
-  User.deleteOne({ _id : id })
-  .then((user) => {
-     req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
-     res.redirect("/dashboard");
-   }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
+  User.countDocuments().then((users) => {
+    if (users === 1) {
+      return Promise.reject(new Error('Must be atleast one user'));
+    }
+  }).then(() => {
+    User.deleteOne({ _id : id })
+  }).then((user) => {
+       req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
+       res.redirect("/dashboard");
+  })
+  .catch((e) => {
+      req.flash('alert', `${e.message}`);
+      res.redirect("/dashboard");
   });
 });
-//
-
-
 
 // ********************************************
 // detail routes
 // ********************************************
 
+// router.get('/details', (req, res) => {})
+// router.get('/details/edit', (req, res) => {})
+// router.patch('/details/edit', (req, res) => {})
 
 // full set of detail routes........
 module.exports = router

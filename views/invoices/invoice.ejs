@@ -88,6 +88,7 @@
   <input type="hidden" name="id" value="<%= invoice._id %>">
   <input type="hidden" name="number" value="<%= invoice.invNo %>">
   <input type="hidden" name="name" value="<%= invoice.client.name %>">
+  <input type="hidden" name="paid" value="<%= invoice.paid %>">
   <div class="form-actions">
     <button class="btn danger" type="submit">Delete</button>
   </div>

@@ -1,9 +1,18 @@
 <h1>Dashboard</h1>
 <div class="summary">
+
+<% if (noInvoicesProduced === null) { %>
+  <p>No Details do some work.</p>
+
+<% } else { %>
+
   <p><%= noInvoicesProduced %> invoices.</p>
   <p><%= uniqueClients %> clients.</p>
   <p>Ave weekly income £<%= avWeekEarnings %>.</p>
   <p>£<%= paid %> received.</p>
+
+<% } %>
+
 
 <% if (unpaidInvoiceList.length > 0) { %>
   <p>£<%= owed %> outstanding.</p>
