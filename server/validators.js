@@ -115,7 +115,8 @@ module.exports = {
             } else {
               return value;
             }
-      }).withMessage("Passwords don't match")
+      })
+      .withMessage("Passwords don't match")
     ],
   detail: [
     check('farewell')
@@ -149,5 +150,38 @@ module.exports = {
     check('terms')
       .matches(/(\w(\s)?)+/)
       .withMessage('just words')
-    ]
+    ],
+  useredit: [
+      check('firstName')
+        .isLength({ min: 1 })
+        .withMessage("first name too short!")
+        .isAlpha()
+        .withMessage("only letters")
+        .trim(),
+      check('lastName')
+        .isLength({ min: 1 })
+        .withMessage("last name too short!")
+        .isAlpha()
+        .withMessage("only letters")
+        .trim(),
+      check('email')
+        .isEmail()
+        .withMessage('That email doesn‘t look right')
+        .trim()
+        .normalizeEmail(),
+      check('password')
+        .optional({checkFalsy:true}).isLength({ min: 7 })
+        .withMessage("password too short!")
+        .trim(),
+      check('passwordConfirmation')
+        .optional({checkFalsy:true})
+        .custom((value, { req }) => {
+          if (value !== req.body.password) {
+                return false;
+              } else {
+                return value;
+              }
+        })
+        .withMessage("Passwords don't match")
+      ]
 }

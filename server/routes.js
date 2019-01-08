@@ -843,7 +843,7 @@ router.get('/users/:id', (req, res) => {
   });
 });
 
-router.post('/users/edit',  validate.user, (req, res) => {
+router.post('/users/edit',  validate.useredit, (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -881,9 +881,7 @@ router.post('/users/edit',  validate.user, (req, res) => {
   });
 });
 
-// TODO: changing passwords saving with bcrypt..
-
-router.patch('/users/:id', validate.user ,(req, res) => {
+router.patch('/users/:id', validate.useredit ,(req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -906,16 +904,24 @@ router.patch('/users/:id', validate.user ,(req, res) => {
   } else {
     User.findOne({_id : req.params.id})
     .then((user) => {
-      return user.updateOne({
-        $set:
-         {
-            firstName : req.body.firstName,
-            lastName  : req.body.lastName,
-            email     : req.body.email,
-            password  : req.body.password
-          }
-        })
-      })
+        user.firstName = req.body.firstName;
+        user.lastName  = req.body.lastName;
+        user.email     = req.body.email;
+        user.password  = req.body.password;
+        user.save();
+
+
+
+      // return user.updateOne({
+      //   $set:
+      //    {
+      //       firstName : req.body.firstName,
+      //       lastName  : req.body.lastName,
+      //       email     : req.body.email,
+      //       password  : req.body.password
+      //     }
+      //   })
+    })
     .then((user) => {
       req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
       res.redirect(`/users`);
@@ -959,8 +965,6 @@ router.delete('/users', (req, res) => {
 // detail routes
 // ********************************************
 
-// TODO: validate.detail .....
-
 router.get('/details', (req, res) => {
   Detail.findOne()
   .then((detail) => {
@@ -1000,7 +1004,7 @@ router.get('/details/edit', validate.detail, (req, res) => {
     });
   });
 });
-//
+
 router.patch('/details', validate.detail, (req, res) => {
 
   const errors = validationResult(req)
@@ -1044,10 +1048,5 @@ router.patch('/details', validate.detail, (req, res) => {
       });
   }
 });
-//
-
-
-// router.patch('/details/edit', (req, res) => {})
-
 
 module.exports = router
