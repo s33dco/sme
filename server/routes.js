@@ -762,7 +762,6 @@ router.delete('/clients', (req, res) => {
 
 router.get('/users', (req, res) => {
   let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {
-    console.log(users);
     res.render('users/users', {
         pageTitle       : "Users",
         pageDescription : "People with access.",
@@ -937,13 +936,16 @@ router.delete('/users', (req, res) => {
     req.flash('alert', "Not possible invalid ID, this may update.");
     res.redirect("/dashboard");
   }
-  User.countDocuments().then((users) => {
+  User.countDocuments()
+  .then((users) => {
     if (users === 1) {
       return Promise.reject(new Error('Must be atleast one user'));
     }
-  }).then(() => {
+  })
+  .then(() => {
     User.deleteOne({ _id : id })
-  }).then((user) => {
+  })
+  .then((user) => {
        req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
        res.redirect("/dashboard");
   })
@@ -957,9 +959,95 @@ router.delete('/users', (req, res) => {
 // detail routes
 // ********************************************
 
-// router.get('/details', (req, res) => {})
-// router.get('/details/edit', (req, res) => {})
+// TODO: validate.detail .....
+
+router.get('/details', (req, res) => {
+  Detail.findOne()
+  .then((detail) => {
+    console.log(detail);
+    res.render('details/details', {
+        pageTitle       : "Invoice Details",
+        pageDescription : "Basic Invoice Details",
+        csrfToken       : req.csrfToken(),
+        detail
+    })
+  })
+  .catch((e) => {
+    req.flash('alert', `details not available`);
+    res.redirect("/dashboard");
+  })
+});
+
+router.get('/details/edit', validate.detail, (req, res) => {
+  Detail.findOne()
+  .then((detail) => {
+    let {utr, email, phone, bank, sortcode,
+      accountNo, terms, contact, farewell} = detail;
+
+    res.render('details/editdetails', {
+      data            : {utr, email, phone, bank, sortcode,
+                          accountNo, terms, contact, farewell},
+      errors          : {},
+      csrfToken       : req.csrfToken(),
+      pageTitle       : "Edit Inv Info",
+      pageDescription : "edit Inv Info."
+    })
+  }).catch((e) => {
+    req.flash('alert', `Can't Connect`);
+    res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  });
+});
+//
+router.patch('/details', validate.detail, (req, res) => {
+
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.render('details/editdetails', {
+        data            : req.body,
+        errors          : errors.mapped(),
+        csrfToken       : req.csrfToken(),
+        pageTitle       : "Edit Inv Info",
+        pageDescription : "Give it another shot.",
+    });
+  } else {
+    Detail.findOne()
+    .then((detail) => {
+      return detail.updateOne({
+        $set:
+         {
+            utr      : req.body.utr,
+            email    : req.body.email,
+            phone    : req.body.phone,
+            bank     : req.body.bank,
+            sortcode : req.body.sortcode,
+            accountNo: req.body.accountNo,
+            terms    : req.body.terms,
+            contact  : req.body.contact,
+            farewell : req.body.farewell
+          }
+        })
+      })
+      .then((detail) => {
+        req.flash('success', `Invoice Information updated!`);
+        res.redirect(`/invoices`);
+      })
+      .catch((e) => {
+        req.flash('alert', `${e.message}`);
+        res.render('404', {
+          pageTitle       : "404",
+          pageDescription : "Invalid resource",
+        });
+      });
+  }
+});
+//
+
+
 // router.patch('/details/edit', (req, res) => {})
 
-// full set of detail routes........
+
 module.exports = router

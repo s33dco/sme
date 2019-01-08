@@ -116,5 +116,38 @@ module.exports = {
               return value;
             }
       }).withMessage("Passwords don't match")
-      ]
+    ],
+  detail: [
+    check('farewell')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('contact')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('email')
+      .isEmail().withMessage('email address looks wrong'),
+    check('phone')
+      .matches(/^\d+$/)
+      .withMessage("phone digits only")
+      .isLength({ min: 11 })
+      .withMessage("too short!")
+      .isLength({ max: 16 })
+      .withMessage("too long!"),
+    check('utr')
+      .matches(/[0-9]{10}/)
+      .withMessage('tax reference 10 digits only'),
+    check('bank')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('bank name just words'),
+    check('sortcode')
+      .matches(/^(\d){2}-(\d){2}-(\d){2}$/)
+      .withMessage("sort code format XX-XX-XX only"),
+    check('accountNo')
+      .trim()
+      .matches(/^(\d){8}$/)
+      .withMessage('account number 8 digits only'),
+    check('terms')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words')
+    ]
 }

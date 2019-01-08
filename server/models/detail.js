@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 
 let DetailSchema = new mongoose.Schema({
-    utr       : {type: String},
+    utr       : {type:String},
     email     : {type:String},
     phone     : {type:String},
     bank      : {type:String},
     sortcode  : {type:String},
     accountNo : {type:String},
     terms     : {type:String},
+    farewell  : {type:String},
     contact   : {type:String}
   });
 
