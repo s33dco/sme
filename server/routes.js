@@ -63,10 +63,6 @@ router.get('/login', (req, res) => {
   })
 })
 
-// ********************************************
-// protected routes below....
-// ********************************************
-
 router.post('/login', validate.login, (req, res) => {
 
     const errors = validationResult(req)
@@ -82,28 +78,35 @@ router.post('/login', validate.login, (req, res) => {
     };
 
     let {email, password} = req.body;
-    //
-    // User.findByCredentials(email, password)
-    // .then((user) => { // success case returns user
-    //   return user.generateAuthToken().then((token) => {    // generate token on validated user keep promise chaining incase of errors
-    //     res.header('x-auth',token);      //respond by setting x-auth token in header and send user back
-        req.flash('success', `Welcome back ${email}!`)
-        res.redirect('/dashboard')
-    //   });
-    // }).catch((e) => {
-    //   req.flash('alert', `access denied!`)
-    //   res.redirect('/index')
-    // })
+
+    console.log(email, password);
+
+    User.findByCredentials(email, password)
+    .then((user) => {
+
+      console.log(user);
+
+      user.generateAuthToken()
+      .then((token) => {    // generate token on validated user keep promise chaining incase of errors
+        res.set('x-auth', token);
+        req.flash('success', `Welcome back!`)
+        res.render('index', {
+          pageTitle: "Welcome to SME",
+          pageDescription: "Static website with invoicing backend.",
+          token
+        })
+      });
+    }).catch((e) => {
+      req.flash('alert', e.message)
+      res.redirect('/index')
+    })
 });
 
-router.get('/logout', (req, res, next) => {
-    // if user then
-    // delete tokens and send flash else just redirect to /
+// ********************************************
+// protected routes below....
+// ********************************************
 
-    req.flash('alert', "You've logged out - come back soon.")
-    res.redirect('/');});
-
-router.get('/dashboard', (req, res) => {
+router.get('/dashboard',(req, res) => {
 
   const promise = Promise.all([
     Invoice.countUniqueClients(),
@@ -125,8 +128,6 @@ router.get('/dashboard', (req, res) => {
     let tradingDays = moment(Date.now()).diff(moment(firstDate), 'days');
     let avWeekEarnings = (paid / tradingDays) * 7;
 
-
-
     res.render('dashboard', {
       pageTitle: "Dashboard",
       pageDescription: "Let's get paid!.",
@@ -146,11 +147,19 @@ router.get('/dashboard', (req, res) => {
   });
 });
 
+router.get('/logout',(req, res, next) => {
+    // if user then
+    // delete tokens and send flash else just redirect to /
+
+    req.flash('alert', "You've logged out - come back soon.")
+    res.redirect('/');
+  });
+
 // ********************************************
 // invoice routes
 // ********************************************
 
-router.get('/invoices', (req, res) => {
+router.get('/invoices',  (req, res) => {
   Invoice.listInvoices().then((invoices)=> {
       res.render('invoices/invoices', {
       pageTitle: "Invoices",
@@ -189,7 +198,7 @@ router.get('/invoices/new', (req, res) => {
   })
 });
 
-router.post('/invoices', validate.invoice, (req, res) => {
+router.post('/invoices',  validate.invoice, (req, res) => {
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -389,7 +398,7 @@ router.patch('/invoices/unpaid', (req, res) => {
   });
 });
 
-router.post('/invoices/edit',  (req, res) => {
+router.post('/invoices/edit', (req, res) => {
   let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
@@ -442,7 +451,7 @@ router.post('/invoices/edit',  (req, res) => {
   });
 });
 
-router.patch('/invoices/:id', validate.invoice ,(req, res) => {
+router.patch('/invoices/:id',  validate.invoice,(req, res) => {
 
   const errors = validationResult(req)
 
@@ -588,7 +597,7 @@ router.post('/clients', validate.client, (req, res) => {
   });
 });
 
-router.get('/clients/:id',  (req, res) => {
+router.get('/clients/:id', (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -637,7 +646,7 @@ router.get('/clients/:id',  (req, res) => {
   });
 });
 
-router.post('/clients/edit',  (req, res) => {
+router.post('/clients/edit', (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -678,7 +687,7 @@ router.post('/clients/edit',  (req, res) => {
   });
 });
 
-router.patch('/clients/:id', validate.client ,(req, res) => {
+router.patch('/clients/:id', validate.client,(req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -759,7 +768,7 @@ router.delete('/clients', (req, res) => {
 // user routes
 // ********************************************
 
-router.get('/users', (req, res) => {
+router.get('/users',(req, res) => {
   let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {
     res.render('users/users', {
         pageTitle       : "Users",
@@ -781,7 +790,7 @@ router.get('/users/new', (req, res) => {
   });
 });
 
-router.post('/users', validate.user, (req, res) => {
+router.post('/users',  validate.user , (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -808,7 +817,7 @@ router.post('/users', validate.user, (req, res) => {
   });
 });
 
-router.get('/users/:id', (req, res) => {
+router.get('/users/:id',(req, res) => {
   let id = req.params.id;
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -842,7 +851,7 @@ router.get('/users/:id', (req, res) => {
   });
 });
 
-router.post('/users/edit',  validate.useredit, (req, res) => {
+router.post('/users/edit', validate.useredit, (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -986,7 +995,7 @@ router.get('/details', (req, res) => {
   })
 });
 
-router.get('/details/edit', validate.detail, (req, res) => {
+router.get('/details/edit',validate.detail , (req, res) => {
   Detail.findOne()
   .then((detail) => {
     let {utr, email, phone, bank, sortcode,
@@ -1009,7 +1018,7 @@ router.get('/details/edit', validate.detail, (req, res) => {
   });
 });
 
-router.patch('/details', validate.detail, (req, res) => {
+router.patch('/details', validate.detail , (req, res) => {
 
   const errors = validationResult(req)
 

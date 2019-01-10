@@ -39,7 +39,7 @@ let UserSchema = new mongoose.Schema({
   }]
 });
 
-
+// prob should not store tokens on db
 
 UserSchema.methods.generateAuthToken  = function () {
   let user = this;
@@ -81,7 +81,8 @@ UserSchema.statics.findByToken        = function (token) {
 
 UserSchema.statics.findByCredentials  = function (email, password) {
   let User = this;
-  return User.findOne({email}).then((user) => {   // find user with matching email
+  return User.findOne({email})
+  .then((user) => {   // find user with matching email
     if (!user) {                                  // return rejected promise if user doesn't exist
       return Promise.reject();
     }
@@ -98,22 +99,8 @@ UserSchema.statics.findByCredentials  = function (email, password) {
   });
 };
 
+
 UserSchema.pre('save', function (next) {
-  let user = this;
-
-  if (user.isModified('password') ) {
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        user.password = hash;
-        next();
-      });
-    });
-  } else {
-    next();
-  }
-});
-
-UserSchema.pre('update', function (next) {
   let user = this;
 
   if (user.isModified('password') ) {

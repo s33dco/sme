@@ -33,7 +33,7 @@ let accessLogStream = rfs('access.log', {
 
 app.locals.title    = process.env.SME_TITLE;
 app.locals.email    = process.env.SME_EMAIL;
-app.locals.moment = require('moment');
+app.locals.moment   = require('moment');
 
 app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'ejs')
@@ -45,7 +45,6 @@ const middlewares = [
   layout(),
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
-  bodyParser.json(),
   validator(),
   cookieParser(),
   session({
@@ -61,7 +60,17 @@ const middlewares = [
 
 app.use(middlewares)
 
+// app.use((req, res, next) => {
+//   console.log(req.headers)
+//   // req.headers['myheader'] = 1234;
+//   console.log(res.headers)
+// 	next();
+// });
+
 app.use('/', routes)
+
+
+
 
 app.use((req, res, next) => {
   res.status(404).render('404', {
@@ -71,8 +80,11 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).send("Something broke big time.")
+  res.status(500).render('500', {
+    err,
+    pageTitle: "500",
+    pageDescription: "Err, What?"
+  });
 });
 
 app.listen(port, () => {
