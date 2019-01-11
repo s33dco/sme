@@ -193,7 +193,7 @@ router.get('/invoices/new', (req, res) => {
 
     let now = moment().toISOString();
     let items = [];
-    let data;
+    let data = {};
 
     res.render('invoices/newinvoice', {
       data            : { invDate : now, invNo : nextInvNo, items},
