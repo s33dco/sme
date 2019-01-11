@@ -185,7 +185,7 @@ router.get('/invoices/new', (req, res) => {
 
     let nextInvNo;
 
-    if (lastInvoiceNo === undefined ){
+    if (lastInvoiceNo === null ){
       nextInvNo = 1;
     } else {
       nextInvNo = lastInvoiceNo[0].invNo + 1;
