@@ -14,12 +14,17 @@
     </header>
 
     <main>
+    <% if (typeof messages !== 'undefined') { %>
+
       <% if (messages.success) { %>
         <div class="flash flash-success"><%= messages.success %></div>
       <% } %>
       <% if (messages.alert) { %>
         <div class="flash flash-alert"><%= messages.alert %></div>
       <% } %>
+
+    <% } %>
+
       <section>
         <%- body %>
       </section>
