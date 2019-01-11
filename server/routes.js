@@ -180,7 +180,7 @@ router.get('/invoices/new', (req, res) => {
   ]);
 
   promise.then(([lastInvoiceNo, clients]) => {
-
+    console.log('lastInvoiceNo');
     console.log(lastInvoiceNo)
 
     let now = moment().toISOString();
