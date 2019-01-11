@@ -181,13 +181,21 @@ router.get('/invoices/new', (req, res) => {
 
   promise.then(([lastInvoiceNo, clients]) => {
 
+    console.log(lastInvoiceNo);
+
+    let checkInvoice = ((invArray) => {
+      if(invArray.length < 1) {
+        return 1;
+      } else {
+        return lastInvoiceNo[0].invNo + 1;
+      }
+    });
+
     let now = moment().toISOString();
-    let nextInvNo = lastInvoiceNo[0].invNo + 1;
-    if (nextInvNo === undefined) { nextInvNo = 1 }; 
     let items = [];
 
     res.render('invoices/newinvoice', {
-      data            : { invDate : now, invNo : nextInvNo, items},
+      data            : { invDate : now, invNo : checkInvoice(lastInvoiceNo), items},
       errors          : {},
       csrfToken       : req.csrfToken(),
       pageTitle       : "Add an Invoice",
@@ -538,7 +546,7 @@ router.delete('/invoices', (req, res) => {
   Invoice.deleteOne({ _id : id })
   .then((invoice) => {
      req.flash('alert', `Invoice ${number} for ${name} deleted!`);
-     return res.redirect("/dashboard");
+     return res.redirect("/invoices");
    }).catch((e) => {
     req.flash('alert', `${e.message}`);
     res.render('404', {
