@@ -181,6 +181,8 @@ router.get('/invoices/new', (req, res) => {
 
   promise.then(([lastInvoiceNo, clients]) => {
 
+    console.log(lastInvoiceNo)
+
     let now = moment().toISOString();
     let nextInvNo = lastInvoiceNo[0].invNo + 1;
     let items = [];
@@ -195,7 +197,7 @@ router.get('/invoices/new', (req, res) => {
     });
   }).catch((e) => {
     req.flash('alert', `${e.message}`);
-    res.redirect("/dashboard");
+    res.redirect("/invoices");
   })
 });
 
