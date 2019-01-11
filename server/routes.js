@@ -183,8 +183,15 @@ router.get('/invoices/new', (req, res) => {
     console.log('lastInvoiceNo');
     console.log(lastInvoiceNo)
 
+    let nextInvNo;
+
+    if (lastInvoiceNo === undefined ){
+      nextInvNo = 1;
+    } else {
+      nextInvNo = lastInvoiceNo[0].invNo + 1;
+    }
+
     let now = moment().toISOString();
-    let nextInvNo = lastInvoiceNo[0].invNo + 1;
     let items = [];
 
     res.render('invoices/newinvoice', {
