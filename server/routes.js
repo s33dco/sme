@@ -758,7 +758,7 @@ router.delete('/clients', (req, res) => {
 
   if (billed > 0) {
     req.flash('alert', "Can't delete a billed client.");
-    return res.redirect(`/dashboard`);
+    return res.redirect(`/clients`);
   }
 
   Client.deleteOne({ _id : id })
@@ -976,7 +976,7 @@ router.delete('/users', (req, res) => {
   })
   .then(() => {
        req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
-       res.redirect("/dashboard");
+       res.redirect("/users");
   })
   .catch((e) => {
       req.flash('alert', `${e.message}`);
