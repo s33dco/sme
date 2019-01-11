@@ -1,9 +1,10 @@
-<h2><%=client.name%></h2>
+<header>
+  <h2><%=client.name%></h2>
+  <h4><%=client.phone%></h4>
+  <h4><%=client.email%></h4>
+  <h2>£<%= total %> previously billed.</h2>
+</header>
 
-<h4><%=client.phone%></h4>
-<h4><%=client.email%></h4>
-
-<h2>£<%= total %> previously billed.</h2>
 
 <% itemsList.forEach((item) => { %>
   <div class="item">

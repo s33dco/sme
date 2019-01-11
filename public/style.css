@@ -7,6 +7,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100%;
+  min-width: 100%;
   margin: 0;
   background: #fff;
   font-family: -apple-system, 'Segoe UI', sans-serif;
@@ -22,12 +23,12 @@ h2 {
 
 .form-header {
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
 }
 form {
   width: 100%;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   padding: 20px;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,.1);
@@ -124,22 +125,30 @@ label {
   color: #721c24;
 }
 
-.topnav {
+ul {
   list-style: none;
+
 }
 
 .topnav li {
-  padding: .25vh;
-  margin: .5vh 0;
-  text-align: center;
+
+  padding : .25vh 0;
+  margin : .25vh 0;
+
 }
 
 .topnav a {
     text-decoration: none;
+
 }
 
 .topnav a:hover,
 .topnav a:focus {
   outline: none;
   color: #2AA172;
+}
+
+section header
+{
+  text-align: center;
 }
