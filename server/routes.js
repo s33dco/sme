@@ -180,20 +180,10 @@ router.get('/invoices/new', (req, res) => {
   ]);
 
   promise.then(([lastInvoiceNo, clients]) => {
-    console.log('lastInvoiceNo');
-    console.log(lastInvoiceNo)
-
-    let nextInvNo;
-
-    if (lastInvoiceNo === null ){
-      nextInvNo = 1;
-    } else {
-      nextInvNo = lastInvoiceNo[0].invNo + 1;
-    }
 
     let now = moment().toISOString();
+    let nextInvNo = 1;
     let items = [];
-    let data = {};
 
     res.render('invoices/newinvoice', {
       data            : { invDate : now, invNo : nextInvNo, items},
