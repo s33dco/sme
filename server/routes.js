@@ -194,7 +194,8 @@ router.get('/invoices/new', (req, res) => {
       clients
     });
   }).catch((e) => {
-    res.sendStatus(400);
+    req.flash('alert', `${e.message}`);
+    res.redirect("/dashboard");
   })
 });
 

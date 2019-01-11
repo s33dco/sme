@@ -43,11 +43,16 @@ InvoiceSchema.statics.countUniqueClients = function () {
 }
 
 InvoiceSchema.statics.newestInvoiceNumber = function () {
-  return this.aggregate([
-    {"$project" : {_id:0, invNo :1}},
-    {"$sort"    : {invNo : -1 }},
-    {"$limit"   : 1}
-  ]);
+  if (this.count() === 0 ) {
+    return 1;
+  } else {
+    return this.aggregate([
+      {"$project" : {_id:0, invNo :1}},
+      {"$sort"    : {invNo : -1 }},
+      {"$limit"   : 1}
+    ]);
+  }
+
 };
 
 InvoiceSchema.statics.listInvoices = function () {
