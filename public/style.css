@@ -14,6 +14,7 @@ body {
 * {
   box-sizing: border-box;
 }
+
 h2 {
   margin: 0 0 1em;
   font-size: 20px;
@@ -121,4 +122,24 @@ label {
   background-color: #f8d7da;
   border-color: #f5c6cb;
   color: #721c24;
+}
+
+.topnav {
+  list-style: none;
+}
+
+.topnav li {
+  padding: .25vh;
+  margin: .5vh 0;
+  text-align: center;
+}
+
+.topnav a {
+    text-decoration: none;
+}
+
+.topnav a:hover,
+.topnav a:focus {
+  outline: none;
+  color: #2AA172;
 }

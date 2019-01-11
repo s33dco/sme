@@ -25,7 +25,7 @@
   </div>
 
   <div class="form-field <%= errors.invDate ? 'form-field-invalid' : '' %>">
-    <label for="invDate">Invoice Date add date picker ot IsoString</label>
+    <label for="invDate">Invoice Date</label>
     <input class="input" name="invDate" type="date" value="<%=moment(data.invDate).format('YYYY-MM-DD')%>" />
     <% if (errors.invDate) { %>
       <div class="error"><%= errors.invDate.msg %></div>

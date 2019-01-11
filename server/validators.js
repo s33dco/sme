@@ -5,7 +5,7 @@ module.exports = {
   invoice: [
     check('clientId')
       .isMongoId()
-      .withMessage('Select Client')
+      .withMessage('Select a Client')
       .custom(id => {
         return Client.findById(id).then(client => {
           if (!client) {
@@ -18,9 +18,9 @@ module.exports = {
 
     check('invDate')
       .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
+      .withMessage('date is wrong')
       .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier'),
+      .withMessage('dates must be today or earlier'),
 
     check('invNo')
       .isInt().withMessage('check invoice number'),
@@ -34,9 +34,9 @@ module.exports = {
 
     check('items.*.date')
       .isISO8601()
-      .withMessage('date is wrong YYYY-MM-DD')
+      .withMessage('date is wrong')
       .isBefore(new Date().toISOString())
-      .withMessage('must be today or earlier YYYY-MM-DD'),
+      .withMessage('dates must be today or earlier'),
 
     check('items.*.desc')
       .isLength({ min: 1 })
