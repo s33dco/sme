@@ -16,8 +16,8 @@ const helmet          = require('helmet')             // prevent tampering with 
 const csrf            = require('csurf')              // protect against csrf
 const port 				    = process.env.PORT;
 
-const routes        = require('./routes')
-const app           = express();
+const routes          = require('./routes')
+const app             = express();
 
 // set up logger....
 const logDirectory  = path.join(__dirname, '/../log')
@@ -68,9 +68,6 @@ app.use(middlewares)
 // });
 
 app.use('/', routes)
-
-
-
 
 app.use((req, res, next) => {
   res.status(404).render('404', {

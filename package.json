@@ -8,8 +8,8 @@
     "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js --exit",
     "test-watch": "nodemon --exec 'npm test'"
   },
-  "engines" : {
-    "node" : "10.10.0"
+  "engines": {
+    "node": "10.10.0"
   },
   "repository": {
     "type": "git",
@@ -31,20 +31,21 @@
     "express-flash": "^0.0.2",
     "express-layout": "^0.1.0",
     "express-session": "^1.15.6",
-    "express-validator": "^4.3.0",
+    "express-validator": "^5.3.1",
     "helmet": "^3.15.0",
     "jsonwebtoken": "^8.4.0",
     "method-override": "^3.0.0",
-    "moment": "^2.23.0",
-    "mongodb": "^3.1.10",
-    "mongoose": "^5.4.0",
+    "moment": "^2.24.0",
+    "mongodb": "^3.1.12",
+    "mongoose": "^5.4.5",
     "morgan": "^1.9.1",
-    "rotating-file-stream": "^1.3.9"
+    "rotating-file-stream": "^1.4.0"
   },
   "devDependencies": {
     "expect": "^23.6.0",
+    "jshint": "^2.9.7",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.9",
-    "supertest": "^3.3.0"
+    "supertest": "^3.4.2"
   }
 }
