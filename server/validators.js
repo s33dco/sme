@@ -43,9 +43,11 @@ module.exports = {
       .withMessage('Include details for the item'),
 
     check('items.*.fee')
-      .isDecimal({force_decimal: true, decimal_digits: '1,', locale: 'en-UK'})
+      .isInt()
+      // .isDecimal({force_decimal: true, decimal_digits: '1,', locale: 'en-UK'})
       .withMessage('check fee xx.xx')
     ],
+
   email: [
     check('message')
       .isLength({ min: 1 })
@@ -57,6 +59,7 @@ module.exports = {
       .trim()
       .normalizeEmail()
   ],
+
   login: [
     check('email')
       .isEmail()
@@ -68,6 +71,7 @@ module.exports = {
       .withMessage("password too short!")
       .trim()
   ],
+
   client: [
     check('name')
       .isLength({ min: 1 })
@@ -86,6 +90,7 @@ module.exports = {
       .isLength({ max: 16 })
       .withMessage("too long!")
   ],
+
   user: [
     check('firstName')
       .isLength({ min: 1 })
@@ -118,6 +123,7 @@ module.exports = {
       })
       .withMessage("Passwords don't match")
     ],
+
   detail: [
     check('farewell')
       .matches(/(\w(\s)?)+/)
@@ -151,6 +157,7 @@ module.exports = {
       .matches(/(\w(\s)?)+/)
       .withMessage('just words')
     ],
+
   useredit: [
       check('firstName')
         .isLength({ min: 1 })

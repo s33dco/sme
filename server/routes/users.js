@@ -1,13 +1,11 @@
-const express           = require('express');
-const router            = express.Router();
-const bodyParser        = require('body-parser');
-const moment            = require('moment');
-const {validationResult}= require('express-validator/check');
-const validate          = require('../validators')
-const {mongoose}        = require('../db/mongoose');
-const {ObjectID}        = require('mongodb');
-const {User}            = require("../models/user");
-const {authenticate}    = require('../middleware/authenticate');
+const express             = require('express');
+const router              = express.Router();
+const {validationResult}  = require('express-validator/check');
+const validate            = require('../validators')
+const {mongoose}          = require('../db/mongoose');
+const {ObjectID}          = require('mongodb');
+const {User}              = require("../models/user");
+const {authenticate}      = require('../middleware/authenticate');
 
 router.get('/',(req, res) => {
   let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {

@@ -1,7 +1,5 @@
 const express           = require('express');
 const router            = express.Router();
-const bodyParser        = require('body-parser');
-const moment            = require('moment');
 const {validationResult}= require('express-validator/check');
 const validate          = require('../validators')
 const {mongoose}        = require('../db/mongoose');

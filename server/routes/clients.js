@@ -1,7 +1,5 @@
 const express           = require('express');
 const router            = express.Router();
-const bodyParser        = require('body-parser');
-const moment            = require('moment');
 const {validationResult}= require('express-validator/check');
 const validate          = require('../validators')
 const {mongoose}        = require('../db/mongoose');
@@ -46,6 +44,8 @@ router.post('/', validate.client, (req, res) => {
   };
 
   const { name, email, phone} = req.body;
+
+
   let client = new Client({name, email, phone});
 
   client.save().then(() => {

@@ -5,28 +5,44 @@ let InvoiceSchema = new mongoose.Schema({
   invDate     : { type: Date, default: Date.now},
 
   client      : {
-      _id     : { type: mongoose.Schema.Types.ObjectId},
-      name    : { type: String},
-      phone   : { type: String},
-      email   : { type: String}},
+      _id     : { type: mongoose.Schema.Types.ObjectId,
+                  required: true},
+      name    : { type: String,
+                  required: true},
+      phone   : { type: String,
+                  required: true},
+      email   : { type: String,
+                  required: true}
+                },
 
   message     : { type: String},
 
   details     : {
-    utr       : { type: String},
-    email     : { type: String},
-    phone     : { type: String},
-    bank      : { type: String},
-    sortcode  : { type: String},
-    accountNo : { type: String},
-    contact   : { type: String},
-    terms     : { type: String}},
+    utr       : { type: String,
+                  required: true},
+    email     : { type: String,
+                  required: true},
+    phone     : { type: String,
+                  required: true},
+    bank      : { type: String,
+                  required: true},
+    sortcode  : { type: String,
+                  required: true},
+    accountNo : { type: String,
+                  required: true},
+    contact   : { type: String,
+                  required: true},
+    terms     : { type: String,
+                  required: true}
+              },
 
   paid        : { type: Boolean },
   datePaid    : { type: Date },
-  items       : [{  date: {type: Date},
-                    desc: {type: String},
-                    fee : {type: Number} }]
+  items       : [
+                {  date: {type: Date, required: true},
+                  desc: {type: String,required: true},
+                  fee : {type: Number, required: true}}
+                ]
 });
 
 InvoiceSchema.methods.totalInvoiceValue = function () {

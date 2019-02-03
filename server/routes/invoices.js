@@ -1,21 +1,14 @@
-const express           = require('express');
-const router            = express.Router();
-const bodyParser        = require('body-parser');
-const moment            = require('moment');
-const {validationResult}= require('express-validator/check');
-const validate          = require('../validators')
-const {mongoose}        = require('../db/mongoose');
-const {ObjectID}        = require('mongodb');
-const {Invoice}         = require("../models/invoice");
-const {Client}          = require("../models/client");
-const {Detail}          = require("../models/detail");
-const {authenticate}    = require('../middleware/authenticate');
-
-
-
-// ********************************************
-// invoice routes
-// ********************************************
+const express             = require('express');
+const router              = express.Router();
+const moment              = require('moment');
+const {validationResult}  = require('express-validator/check');
+const validate            = require('../validators')
+const {mongoose}          = require('../db/mongoose');
+const {ObjectID}          = require('mongodb');
+const {Invoice}           = require("../models/invoice");
+const {Client}            = require("../models/client");
+const {Detail}            = require("../models/detail");
+const {authenticate}      = require('../middleware/authenticate');
 
 router.get('/',  (req, res) => {
   Invoice.listInvoices().then((invoices)=> {
