@@ -14,7 +14,8 @@ router.get('/', [auth, admin], async (req, res) => {
   res.render('users/users', {
       pageTitle       : "Users",
       pageDescription : "People with access.",
-      users
+      users,
+      admin : req.user.isAdmin
   });
 });
 
@@ -199,6 +200,11 @@ router.delete('/', [auth, admin], (req, res) => {
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
     res.redirect("/dashboard");
+  }
+
+  if ( req.user._id === req.body.id) {
+    req.flash('alert', `You can't delete yourself!`);
+    return res.redirect('/dashboard');
   }
 
   const promise = Promise.all([

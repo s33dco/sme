@@ -18,7 +18,8 @@ router.get('/',  auth, async (req, res) => {
   res.render('invoices/invoices', {
     pageTitle: "Invoices",
     pageDescription: "Invoice Admin.",
-    invoices
+    invoices,
+    admin : req.user.isAdmin
   })
 });
 
@@ -134,7 +135,7 @@ router.get('/:id',  auth, async (req, res) => {
     req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Invalid resource"
     });
   }
 
@@ -155,7 +156,8 @@ router.get('/:id',  auth, async (req, res) => {
       pageDescription : "invoice.",
       total,
       invoice,
-      csrfToken       : req.csrfToken()
+      csrfToken       : req.csrfToken(),
+      admin : req.user.isAdmin
   });
 });
 

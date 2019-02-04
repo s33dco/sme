@@ -14,7 +14,8 @@ router.get('/', auth , async (req, res) => {
   res.render('clients/clients', {
       pageTitle       : "Client List",
       pageDescription : "Clients.",
-      clients
+      clients,
+      admin : req.user.isAdmin
   });
 });
 
@@ -88,7 +89,8 @@ router.get('/:id', auth, (req, res) => {
         csrfToken       : req.csrfToken(),
         client,
         itemsList,
-        total
+        total,
+        admin : req.user.isAdmin
     });
   }).catch((e) => {
     req.flash('alert', `${e.message}`);

@@ -4,14 +4,13 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => {
 
     const token = req.cookies.token;
-    if (!token) {
 
-      req.flash('alert', `Wrong Credentials`)
+    if (!token) {
+      req.flash('alert', `You need to log in.`)
       return res.render('index', {
         pageTitle: "Welcome to SME",
         pageDescription: "Static website with invoicing backend.",
       });
-
     }
 
     try {

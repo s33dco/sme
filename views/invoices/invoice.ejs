@@ -1,5 +1,5 @@
 <header>
-  <h1>Invoice <%= invoice.invNo %>.</h1>  
+  <h1>Invoice <%= invoice.invNo %>.</h1>
 </header>
 
 
@@ -54,45 +54,47 @@
   </div>
 </form>
 
-<form method="post" action="/invoices/edit?_method=post" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="hidden" name="id" value="<%= invoice._id %>">
-  <div class="form-actions">
-    <button class="btn" type="submit">Edit Invoice</button>
-  </div>
-</form>
-
-<% if (invoice.datePaid){ %>
-  <form method="post" action="/invoices/unpaid?_method=PATCH" novalidate>
+<% if (admin) { %>
+  <form method="post" action="/invoices/edit?_method=post" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="hidden" name="id" value="<%= invoice._id %>">
     <div class="form-actions">
-      <button class="btn" type="submit">Mark as Unpaid</button>
+      <button class="btn" type="submit">Edit Invoice</button>
     </div>
   </form>
 
-<% console.log(invoice._id)%>
-<% } else { %>
-
-  <form method="post" action="/invoices/paid?_method=PATCH" novalidate>
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <input type="hidden" name="id" value="<%= invoice._id %>">
-    <div class="form-actions">
-      <button class="btn" type="submit">Mark as Paid</button>
-    </div>
-  </form>
+  <% if (invoice.datePaid){ %>
+    <form method="post" action="/invoices/unpaid?_method=PATCH" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= invoice._id %>">
+      <div class="form-actions">
+        <button class="btn" type="submit">Mark as Unpaid</button>
+      </div>
+    </form>
 
   <% console.log(invoice._id)%>
+  <% } else { %>
 
+    <form method="post" action="/invoices/paid?_method=PATCH" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= invoice._id %>">
+      <div class="form-actions">
+        <button class="btn" type="submit">Mark as Paid</button>
+      </div>
+    </form>
+
+    <% console.log(invoice._id)%>
+
+  <% } %>
+
+  <form method="post" action="/invoices?_method=DELETE" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="id" value="<%= invoice._id %>">
+    <input type="hidden" name="number" value="<%= invoice.invNo %>">
+    <input type="hidden" name="name" value="<%= invoice.client.name %>">
+    <input type="hidden" name="paid" value="<%= invoice.paid %>">
+    <div class="form-actions">
+      <button class="btn danger" type="submit">Delete</button>
+    </div>
+  </form>
 <% } %>
-
-<form method="post" action="/invoices?_method=DELETE" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="hidden" name="id" value="<%= invoice._id %>">
-  <input type="hidden" name="number" value="<%= invoice.invNo %>">
-  <input type="hidden" name="name" value="<%= invoice.client.name %>">
-  <input type="hidden" name="paid" value="<%= invoice.paid %>">
-  <div class="form-actions">
-    <button class="btn danger" type="submit">Delete</button>
-  </div>
-</form>
