@@ -1,5 +1,4 @@
 const mongoose  = require('mongoose');
-const rfs       = require('rotating-file-stream')
 
 mongoose.set('useCreateIndex', true);
 

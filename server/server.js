@@ -1,8 +1,6 @@
 require('./config/config');
 
-const fs              = require('fs')                 // logging
 const path            = require('path')
-const rfs             = require('rotating-file-stream')
 const morgan          = require('morgan')
 const express         = require('express')
 const layout          = require('express-layout')     // ejs
@@ -26,18 +24,6 @@ const contact         = require('./routes/contact');
 const login           = require('./routes/login');
 const dashboard       = require('./routes/dashboard');
 
-// set up logger....
-const logDirectory  = path.join(__dirname, '/../log')
-
-fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
-
-let accessLogStream = rfs('access.log', {
-                        size:     '10M', // rotate every 10 MegaBytes written
-                        interval: '1d',  // rotate daily
-                        compress: 'gzip', // compress rotated files
-                        path: logDirectory
-                      });
-
 app.locals.title  = process.env.SME_TITLE;
 app.locals.email  = process.env.SME_EMAIL;
 app.locals.moment = require('moment');
@@ -59,7 +45,7 @@ const middlewares = [
     key: process.env.SUPER_SECRET_COOKIE,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 }
+    cookie: { maxAge: 3600000 }
   }),
   flash(),
   csrf({ cookie: true })

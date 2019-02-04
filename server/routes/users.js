@@ -5,9 +5,11 @@ const validate            = require('../validators')
 const {mongoose}          = require('../db/mongoose');
 const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
-const {authenticate}      = require('../middleware/authenticate');
+const auth                = require("../middleware/auth");
+const admin               = require("../middleware/admin");
 
-router.get('/', async (req, res) => {
+
+router.get('/', [auth, admin], async (req, res) => {
   const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});
   res.render('users/users', {
       pageTitle       : "Users",
@@ -16,7 +18,7 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', [auth, admin], (req, res) => {
   res.render('users/newuser', {
     data            : {},
     errors          : {},
@@ -26,7 +28,7 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/',  validate.user , async (req, res) => {
+router.post('/', [auth, admin,validate.user] , async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -40,14 +42,14 @@ router.post('/',  validate.user , async (req, res) => {
   };
 
   const { firstName, lastName, email, password } = req.body;
-  let user = new User({ firstName, lastName, email, password });
+  let newUser = new User({ firstName, lastName, email, password });
 
-  await user.save()
-  req.flash('success', `${user.firstName} ${user.lastName} created !`)
-  res.header('x-auth', token).redirect('/dashboard')
+  await newUser.save() // uses .pre('save') to encrypt password
+  req.flash('success', `${newUser.firstName} ${newUser.lastName} created !`)
+  res.redirect('/dashboard')
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', [auth, admin], async (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -58,9 +60,9 @@ router.get('/:id', async (req, res) => {
     });
   }
 
-  const user = await User.findOne({_id: id,});
+  const viewUser = await User.findOne({_id: id});
 
-  if (!user) {
+  if (!viewUser) {
     req.flash('alert', "Can't find that client, maybe try later.");
     return res.render('404', {
         pageTitle       : "404",
@@ -72,11 +74,11 @@ router.get('/:id', async (req, res) => {
       pageTitle       : "Users",
       pageDescription : "People with access.",
       csrfToken: req.csrfToken(),
-      user
+      user : viewUser
   });
 });
 
-router.post('/edit', validate.useredit, async (req, res) => {
+router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -86,9 +88,9 @@ router.post('/edit', validate.useredit, async (req, res) => {
     });
   }
 
-  const user = await User.findOne({_id: req.body.id});
+  const editUser = await User.findOne({_id: req.body.id});
 
-  if (!user ) {
+  if (!editUser ) {
     req.flash('alert', "Can't find that user...");
     return res.render('404', {
         pageTitle       : "404",
@@ -96,7 +98,7 @@ router.post('/edit', validate.useredit, async (req, res) => {
     });
   }
 
-  let { _id, firstName, lastName, email} = user;
+  let { _id, firstName, lastName, email} = editUser;
 
   res.render('users/edituser', {
     data: { _id, firstName, lastName, email },
@@ -107,7 +109,52 @@ router.post('/edit', validate.useredit, async (req, res) => {
   })
 });
 
-router.patch('/:id', validate.useredit , async (req, res) => {
+router.post('/upgrade', [auth, admin], async (req, res) => {
+
+  console.log(req.body.id)
+
+  if (!ObjectID.isValid(req.body.id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  const user = await User.findOneAndUpdate(
+     { _id : req.body.id },
+     {$set: {isAdmin : true}},
+     {new : true });
+
+  req.flash('success', `${user.firstName} can now change data`);
+  res.redirect('/dashboard');
+});
+
+router.post('/downgrade', [auth, admin], async (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    req.flash('alert', "Not possible invalid ID, this may update.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
+    });
+  }
+
+  if ( req.user._id === req.body.id) {
+    req.flash('alert', `You can't give up admin rights!`);
+    return res.redirect('/dashboard');
+  }
+
+  const user = await User.findOneAndUpdate(
+     { _id : req.body.id },
+     {$set: {isAdmin : false}},
+     {new : true });
+
+  req.flash('success', `${user.firstName} can only view data`);
+  res.redirect('/dashboard');
+});
+
+router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -131,12 +178,14 @@ router.patch('/:id', validate.useredit , async (req, res) => {
 
 // this is about the pre.save
 
-    let user = await User.findOne({_id : req.params.id});
-    user.firstName = req.body.firstName;
-    user.lastName  = req.body.lastName;
-    user.email     = req.body.email;
-    user.password  = req.body.password;
-    await user.save();
+    let updateUser = await User.findOne({_id : req.params.id});
+    updateUser.firstName = req.body.firstName;
+    updateUser.lastName  = req.body.lastName;
+    updateUser.email     = req.body.email;
+    // TODO: leave password empty and not fail validation.....
+    // if (password){user.password  = req.body.password};
+
+    await updateUser.save();
 
     req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
     res.redirect(`/users`);
@@ -144,7 +193,7 @@ router.patch('/:id', validate.useredit , async (req, res) => {
   }
 });
 
-router.delete('/', (req, res) => {
+router.delete('/', [auth, admin], (req, res) => {
   const { id, name, billed } = req.body;
 
   if (!ObjectID.isValid(id)) {
@@ -157,11 +206,11 @@ router.delete('/', (req, res) => {
     User.count()
   ]);
 
-  promise.then(([user, count]) => {
+  promise.then(([xUser, count]) => {
     if (count === 1) {
       return Promise.reject(new Error('Must be atleast one user'));
     } else {
-      user.remove()
+      xUser.remove();
     }
   })
   .then(() => {

@@ -8,9 +8,11 @@ const {ObjectID}          = require('mongodb');
 const {Invoice}           = require("../models/invoice");
 const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
-const {authenticate}      = require('../middleware/authenticate');
+const auth                = require("../middleware/auth");
+const admin               = require("../middleware/admin");
 
-router.get('/',  async (req, res) => {
+
+router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
 
   res.render('invoices/invoices', {
@@ -20,7 +22,7 @@ router.get('/',  async (req, res) => {
   })
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', [auth, admin], (req, res) => {
 
   const promise = Promise.all([
     Invoice.newestInvoiceNumber(),
@@ -56,23 +58,23 @@ router.get('/new', (req, res) => {
   })
 });
 
-router.post('/',  validate.invoice, (req, res) => {
+router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
 
-      Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
-          let selected;
-        if (req.body.clientId) {
-          selected = clients.find(c => c._id == req.body.clientId);
-          if (!selected){
-            clients
-          } else {
-            clients = clients.filter((c) => c._id != selected._id);
-          }
-        } else {
+      const clients = await Client.find({}, {name:1}).sort({name: 1});
+      let selected;
+      if (req.body.clientId) {
+        selected = clients.find(c => c._id == req.body.clientId);
+        if (!selected){
           clients
+        } else {
+          clients = clients.filter((c) => c._id != selected._id);
         }
+      } else {
+        clients
+      }
 
       return res.render('invoices/newinvoice', {
           data            : req.body,
@@ -83,7 +85,7 @@ router.post('/',  validate.invoice, (req, res) => {
           clients,
           selected
       });
-    });
+
     } else {
 
       const promise = Promise.all([
@@ -125,7 +127,7 @@ router.post('/',  validate.invoice, (req, res) => {
     };
   });
 
-router.get('/:id',  async (req, res) => {
+router.get('/:id',  auth, async (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -157,7 +159,7 @@ router.get('/:id',  async (req, res) => {
   });
 });
 
-router.post('/email', async (req, res) => {
+router.post('/email', auth, async (req, res) => {
 
   let id = req.body.id;
 
@@ -185,7 +187,7 @@ router.post('/email', async (req, res) => {
   res.redirect('/dashboard')
 });
 
-router.patch('/paid', async (req, res) => {
+router.patch('/paid', [auth, admin], async (req, res) => {
   let id = req.body.id
   if (!ObjectID.isValid(id)) {
     console.log('invalid id');
@@ -205,7 +207,7 @@ router.patch('/paid', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-router.patch('/unpaid', async (req, res) => {
+router.patch('/unpaid', [auth, admin], async (req, res) => {
   let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
@@ -226,7 +228,7 @@ router.patch('/unpaid', async (req, res) => {
   res.redirect("/dashboard");
 });
 
-router.post('/edit', (req, res) => {
+router.post('/edit', [auth, admin], (req, res) => {
   let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
@@ -279,24 +281,24 @@ router.post('/edit', (req, res) => {
   });
 });
 
-router.patch('/:id',  validate.invoice,(req, res) => {
+router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
 
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
 
-    Client.find({}, {name:1}).sort({name: 1}).then((clients) => {
-        let selected;
-      if (req.body.clientId) {
-        selected = clients.find(c => c._id == req.body.clientId);
-        if (!selected){
-          clients
-        } else {
-          clients = clients.filter((c) => c._id != selected._id);
-        }
-      } else {
+    const clients = await Client.find({}, {name:1}).sort({name: 1});
+    let selected;
+    if (req.body.clientId) {
+      selected = clients.find(c => c._id == req.body.clientId);
+      if (!selected){
         clients
+      } else {
+        clients = clients.filter((c) => c._id != selected._id);
       }
+    } else {
+      clients
+    }
 
     return res.render('invoices/editinvoice', {
         data            : req.body,
@@ -307,7 +309,7 @@ router.patch('/:id',  validate.invoice,(req, res) => {
         clients,
         selected
     });
-  });
+
   } else {
     const promise = Promise.all([
       Invoice.findOne({_id : req.params.id}),
@@ -345,7 +347,7 @@ router.patch('/:id',  validate.invoice,(req, res) => {
   }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/', [auth, admin], async (req, res) => {
   console.log(req.body)
   const { id, number, name, paid } = req.body;
 

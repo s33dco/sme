@@ -1,3 +1,4 @@
+const bcrypt            = require('bcryptjs');
 const express           = require('express');
 const router            = express.Router();
 const bodyParser        = require('body-parser');
@@ -6,7 +7,6 @@ const {validationResult}= require('express-validator/check');
 const validate          = require('../validators')
 const {mongoose}        = require('../db/mongoose');
 const {User}            = require("../models/user");
-
 
 router.get('/', (req, res) => {
   res.render('login', {
@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
   })
 })
 
-router.post('/', validate.login, (req, res) => {
+router.post('/', validate.login, async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -34,25 +34,33 @@ router.post('/', validate.login, (req, res) => {
 
   let {email, password} = req.body;
 
-    User.findByCredentials(email, password)
-    .then((user) => {
+  let user = await User.findOne({email : req.body.email });
 
-      console.log(user);
+  if (!user) {
+    req.flash('alert', `Wrong Credentials`)
+    return res.render('index', {
+      pageTitle: "Welcome to SME",
+      pageDescription: "Static website with invoicing backend.",
+    });
+  };
 
-      user.generateAuthToken()
-      .then((token) => {    // generate token on validated user keep promise chaining incase of errors
-        res.set('x-auth', token);
-        req.flash('success', `Welcome back!`)
-        res.render('index', {
-          pageTitle: "Welcome to SME",
-          pageDescription: "Static website with invoicing backend.",
-          token
-        })
-      });
-    }).catch((e) => {
-      req.flash('alert', e.message)
-      res.redirect('/index')
-    })
+  const validPassword = await bcrypt.compare(req.body.password, user.password);
+
+  if (!validPassword) {
+    req.flash('alert', `Wrong Credentials`)
+    return res.render('index', {
+      pageTitle: "Welcome to SME",
+      pageDescription: "Static website with invoicing backend.",
+    });
+  };
+
+  const token = user.generateAuthToken();
+
+  // store token in local storage
+
+  req.flash('success', `Welcome back ${user.firstName}`)
+  res.cookie('token', token);
+  res.redirect('/dashboard');
 });
 
 module.exports = router

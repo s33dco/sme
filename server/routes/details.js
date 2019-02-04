@@ -5,9 +5,11 @@ const validate          = require('../validators')
 const {mongoose}        = require('../db/mongoose');
 const {ObjectID}        = require('mongodb');
 const {Detail}          = require("../models/detail");
-const {authenticate}    = require('../middleware/authenticate');
+const auth              = require("../middleware/auth");
+const admin              = require("../middleware/admin");
 
-router.get('/', async (req, res) => {
+
+router.get('/', [auth, admin], async (req, res) => {
   const detail = await Detail.findOne();
   res.render('details/details', {
       pageTitle       : "Invoice Details",
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
   })
 });
 
-router.get('/edit',validate.detail , async (req, res) => {
+router.get('/edit', [auth, admin, validate.detail] , async (req, res) => {
   let detail = await Detail.findOne();
 
   let {utr, email, phone, bank, sortcode,
@@ -34,7 +36,7 @@ router.get('/edit',validate.detail , async (req, res) => {
 
 });
 
-router.patch('/', validate.detail , async (req, res) => {
+router.patch('/', [auth, admin, validate.detail] , async (req, res) => {
 
   const errors = validationResult(req)
 

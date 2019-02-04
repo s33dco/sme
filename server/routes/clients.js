@@ -6,8 +6,10 @@ const {mongoose}        = require('../db/mongoose');
 const {ObjectID}        = require('mongodb');
 const {Client}          = require("../models/client");
 const {Invoice}         = require("../models/invoice");
+const auth              = require("../middleware/auth");
+const admin              = require("../middleware/admin");
 
-router.get('/', async (req, res) => {
+router.get('/', auth , async (req, res) => {
   const clients = await Client.find({}, {name:1}).sort({name: 1});
   res.render('clients/clients', {
       pageTitle       : "Client List",
@@ -16,7 +18,7 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', [auth, admin], (req, res) => {
   res.render('clients/newclient', {
     data            : {},
     errors          : {},
@@ -26,7 +28,7 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/', validate.client, async (req, res) => {
+router.post('/', [auth, admin, validate.client], async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -48,7 +50,7 @@ router.post('/', validate.client, async (req, res) => {
   res.redirect('/clients')
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', auth, (req, res) => {
   const id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -97,7 +99,7 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', [auth, admin], async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -128,7 +130,7 @@ router.post('/edit', async (req, res) => {
   })
 });
 
-router.patch('/:id', validate.client, async (req, res) => {
+router.patch('/:id', [auth, admin, validate.client], async (req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -157,7 +159,7 @@ router.patch('/:id', validate.client, async (req, res) => {
   }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/', [auth, admin], async (req, res) => {
   const { id, name, billed } = req.body;
 
   if (!ObjectID.isValid(id)) {
