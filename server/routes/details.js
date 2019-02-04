@@ -7,47 +7,34 @@ const {ObjectID}        = require('mongodb');
 const {Detail}          = require("../models/detail");
 const {authenticate}    = require('../middleware/authenticate');
 
-router.get('/', (req, res) => {
-  Detail.findOne()
-  .then((detail) => {
-    console.log(detail);
-    res.render('details/details', {
-        pageTitle       : "Invoice Details",
-        pageDescription : "Basic Invoice Details",
-        csrfToken       : req.csrfToken(),
-        detail
-    })
-  })
-  .catch((e) => {
-    req.flash('alert', `details not available`);
-    res.redirect("/dashboard");
-  })
-});
-
-router.get('/edit',validate.detail , (req, res) => {
-  Detail.findOne()
-  .then((detail) => {
-    let {utr, email, phone, bank, sortcode,
-      accountNo, terms, contact, farewell} = detail;
-
-    res.render('details/editdetails', {
-      data            : {utr, email, phone, bank, sortcode,
-                          accountNo, terms, contact, farewell},
-      errors          : {},
+router.get('/', async (req, res) => {
+  const detail = await Detail.findOne();
+  res.render('details/details', {
+      pageTitle       : "Invoice Details",
+      pageDescription : "Basic Invoice Details",
       csrfToken       : req.csrfToken(),
-      pageTitle       : "Edit Inv Info",
-      pageDescription : "edit Inv Info."
-    })
-  }).catch((e) => {
-    req.flash('alert', `Can't Connect`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  });
+      detail
+  })
 });
 
-router.patch('/', validate.detail , (req, res) => {
+router.get('/edit',validate.detail , async (req, res) => {
+  let detail = await Detail.findOne();
+
+  let {utr, email, phone, bank, sortcode,
+    accountNo, terms, contact, farewell} = detail;
+
+  res.render('details/editdetails', {
+    data            : {utr, email, phone, bank, sortcode,
+                        accountNo, terms, contact, farewell},
+    errors          : {},
+    csrfToken       : req.csrfToken(),
+    pageTitle       : "Edit Inv Info",
+    pageDescription : "edit Inv Info."
+  })
+
+});
+
+router.patch('/', validate.detail , async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -60,9 +47,8 @@ router.patch('/', validate.detail , (req, res) => {
         pageDescription : "Give it another shot.",
     });
   } else {
-    Detail.findOne()
-    .then((detail) => {
-      return detail.updateOne({
+    let detail = await Detail.findOne();
+    await detail.updateOne({
         $set:
          {
             utr      : req.body.utr,
@@ -76,18 +62,9 @@ router.patch('/', validate.detail , (req, res) => {
             farewell : req.body.farewell
           }
         })
-      })
-      .then((detail) => {
-        req.flash('success', `Invoice Information updated!`);
-        res.redirect(`/invoices`);
-      })
-      .catch((e) => {
-        req.flash('alert', `${e.message}`);
-        res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Invalid resource",
-        });
-      });
+
+    req.flash('success', `Invoice Information updated!`);
+    res.redirect(`/invoices`);
   }
 });
 

@@ -7,15 +7,12 @@ const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
 const {authenticate}      = require('../middleware/authenticate');
 
-router.get('/',(req, res) => {
-  let users = User.find({},{firstName:1, lastName:1}).sort({firstName: 1}).then((users) => {
-    res.render('users/users', {
-        pageTitle       : "Users",
-        pageDescription : "People with access.",
-        users
-    });
-  }).catch((e) => {
-    res.send(400);
+router.get('/', async (req, res) => {
+  const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});
+  res.render('users/users', {
+      pageTitle       : "Users",
+      pageDescription : "People with access.",
+      users
   });
 });
 
@@ -29,7 +26,7 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/',  validate.user , (req, res) => {
+router.post('/',  validate.user , async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -45,19 +42,14 @@ router.post('/',  validate.user , (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   let user = new User({ firstName, lastName, email, password });
 
-    // TODO: why auth token this should be on login only
-  user.save().then(() => {
-    return user.generateAuthToken();
-  }).then((token) => {
-    req.flash('success', `${user.firstName} ${user.lastName} created !`)
-    res.header('x-auth', token).redirect('/dashboard') // create custom header 'x-auth' with value of token
-  }).catch((e) => {
-    res.status(400).send(e);
-  });
+  await user.save()
+  req.flash('success', `${user.firstName} ${user.lastName} created !`)
+  res.header('x-auth', token).redirect('/dashboard')
 });
 
-router.get('/:id',(req, res) => {
+router.get('/:id', async (req, res) => {
   let id = req.params.id;
+
   if (!ObjectID.isValid(id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
     return res.render('404', {
@@ -65,32 +57,26 @@ router.get('/:id',(req, res) => {
         pageDescription : "Invalid resource",
     });
   }
-  User.findOne({
-    _id: id,
-  }).then((user) => {
-    if (!user) {
-      req.flash('alert', "Can't find that client, maybe try later.");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that client",
-      });
-    }
-    res.render('users/user', {
-        pageTitle       : "Users",
-        pageDescription : "People with access.",
-        csrfToken: req.csrfToken(),
-        user
-    });
-  }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
+
+  const user = await User.findOne({_id: id,});
+
+  if (!user) {
+    req.flash('alert', "Can't find that client, maybe try later.");
+    return res.render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Can't find that client",
     });
+  }
+
+  res.render('users/user', {
+      pageTitle       : "Users",
+      pageDescription : "People with access.",
+      csrfToken: req.csrfToken(),
+      user
   });
 });
 
-router.post('/edit', validate.useredit, (req, res) => {
+router.post('/edit', validate.useredit, async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -100,35 +86,28 @@ router.post('/edit', validate.useredit, (req, res) => {
     });
   }
 
-  User.findOne({_id: req.body.id})
-  .then((user) => {
-    if (!user ) {
-      req.flash('alert', "Can't find that user...");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that user"
-      });
-    }
+  const user = await User.findOne({_id: req.body.id});
 
-    let { _id, firstName, lastName, email} = user;
-
-    res.render('users/edituser', {
-      data: { _id, firstName, lastName, email },
-      errors: {},
-      csrfToken: req.csrfToken(),
-      pageTitle       : "Edit user",
-      pageDescription : "edit user."
-    })
-  }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
+  if (!user ) {
+    req.flash('alert', "Can't find that user...");
+    return res.render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Can't find that user"
     });
-  });
+  }
+
+  let { _id, firstName, lastName, email} = user;
+
+  res.render('users/edituser', {
+    data: { _id, firstName, lastName, email },
+    errors: {},
+    csrfToken: req.csrfToken(),
+    pageTitle       : "Edit user",
+    pageDescription : "edit user."
+  })
 });
 
-router.patch('/:id', validate.useredit ,(req, res) => {
+router.patch('/:id', validate.useredit , async (req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -149,37 +128,19 @@ router.patch('/:id', validate.useredit ,(req, res) => {
         pageDescription : "Give it another shot.",
     });
   } else {
-    User.findOne({_id : req.params.id})
-    .then((user) => {
-        user.firstName = req.body.firstName;
-        user.lastName  = req.body.lastName;
-        user.email     = req.body.email;
-        user.password  = req.body.password;
-        user.save();
 
+// this is about the pre.save
 
+    let user = await User.findOne({_id : req.params.id});
+    user.firstName = req.body.firstName;
+    user.lastName  = req.body.lastName;
+    user.email     = req.body.email;
+    user.password  = req.body.password;
+    await user.save();
 
-      // return user.updateOne({
-      //   $set:
-      //    {
-      //       firstName : req.body.firstName,
-      //       lastName  : req.body.lastName,
-      //       email     : req.body.email,
-      //       password  : req.body.password
-      //     }
-      //   })
-    })
-    .then((user) => {
-      req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
-      res.redirect(`/users`);
-    })
-    .catch((e) => {
-      req.flash('alert', `${e.message}`);
-      res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-      });
-    });
+    req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
+    res.redirect(`/users`);
+
   }
 });
 

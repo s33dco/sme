@@ -4,7 +4,6 @@ const moment      = require('moment');
 const {mongoose}  = require('../db/mongoose');
 const {Invoice}   = require("../models/invoice");
 
-
 router.get('/', (req, res) => {
 
   const promise = Promise.all([

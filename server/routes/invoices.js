@@ -10,16 +10,13 @@ const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
 const {authenticate}      = require('../middleware/authenticate');
 
-router.get('/',  (req, res) => {
-  Invoice.listInvoices().then((invoices)=> {
-      res.render('invoices/invoices', {
-      pageTitle: "Invoices",
-      pageDescription: "Invoice Admin.",
-      invoices
-    })
-  }).catch((e) => {
-    console.log(e.message);
-    res.sendStatus(400);
+router.get('/',  async (req, res) => {
+  const invoices = await Invoice.listInvoices();
+
+  res.render('invoices/invoices', {
+    pageTitle: "Invoices",
+    pageDescription: "Invoice Admin.",
+    invoices
   })
 });
 
@@ -128,7 +125,7 @@ router.post('/',  validate.invoice, (req, res) => {
     };
   });
 
-router.get('/:id',  (req, res) => {
+router.get('/:id',  async (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -139,36 +136,28 @@ router.get('/:id',  (req, res) => {
     });
   }
 
-  Invoice.findOne({
-    _id: id,
-  }).then((invoice) => {
-    if (!invoice) {
-      req.flash('alert', "Can't find that invoice, maybe try later.");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that client"
-      });
-    }
+  const invoice = await Invoice.findOne({ _id: id});
 
-    let total = invoice.totalInvoiceValue();
-
-    res.render('invoices/invoice', {
-        pageTitle       : "Invoice",
-        pageDescription : "invoice.",
-        total,
-        invoice,
-        csrfToken       : req.csrfToken()
-    });
-  }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
+  if (!invoice) {
+    req.flash('alert', "Can't find that invoice, maybe try later.");
+    return res.render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Can't find that client"
     });
+  }
+
+  let total = invoice.totalInvoiceValue();
+
+  res.render('invoices/invoice', {
+      pageTitle       : "Invoice",
+      pageDescription : "invoice.",
+      total,
+      invoice,
+      csrfToken       : req.csrfToken()
   });
 });
 
-router.post('/email', (req, res) => {
+router.post('/email', async (req, res) => {
 
   let id = req.body.id;
 
@@ -179,31 +168,24 @@ router.post('/email', (req, res) => {
         pageDescription : "Invalid resource",
     });
   }
-  Invoice.findOne({  _id: id }).then((invoice) => {
 
-    if (!invoice) {
-      req.flash('alert', "Can't find that invoice, maybe try later.");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that client"
-      });
-    }
+  const invoice = await Invoice.findOne({  _id: id });
+
+  if (!invoice) {
+    req.flash('alert', "Can't find that invoice, maybe try later.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Can't find that client"
+    });
+  }
 
     // send the email....
 
-    req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
-    res.redirect('/dashboard')
-  })
-  .catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource"
-    })
-  })
+  req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
+  res.redirect('/dashboard')
 });
 
-router.patch('/paid', (req, res) => {
+router.patch('/paid', async (req, res) => {
   let id = req.body.id
   if (!ObjectID.isValid(id)) {
     console.log('invalid id');
@@ -214,24 +196,16 @@ router.patch('/paid', (req, res) => {
     });
   }
 
-  Invoice.findOneAndUpdate(
-   { _id : id },
-   {$set: {paid:true},$currentDate: { datePaid: true}},
-   {new : true })
-  .then((invoice) => {
-     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
-     res.redirect('/dashboard');
-   })
-  .catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-      pageTitle       : "404",
-      pageDescription : "Invalid resource",
-    });
-  });
+  const invoice = await Invoice.findOneAndUpdate(
+     { _id : id },
+     {$set: {paid:true},$currentDate: { datePaid: true}},
+     {new : true });
+
+  req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
+  res.redirect('/dashboard');
 });
 
-router.patch('/unpaid', (req, res) => {
+router.patch('/unpaid', async (req, res) => {
   let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
@@ -243,20 +217,13 @@ router.patch('/unpaid', (req, res) => {
     });
   };
 
-  Invoice.findOneAndUpdate(
+  const invoice = await Invoice.findOneAndUpdate(
      { _id : id },
      {$set: {paid:false}, $unset: {datePaid:1}},
-     {new : true })
-  .then((invoice) => {
-     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
-     res.redirect("/dashboard");
-   }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-      pageTitle       : "404",
-      pageDescription : "Invalid resource",
-    });
-  });
+     {new : true });
+
+  req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
+  res.redirect("/dashboard");
 });
 
 router.post('/edit', (req, res) => {
@@ -378,7 +345,7 @@ router.patch('/:id',  validate.invoice,(req, res) => {
   }
 });
 
-router.delete('/', (req, res) => {
+router.delete('/', async (req, res) => {
   console.log(req.body)
   const { id, number, name, paid } = req.body;
 
@@ -394,17 +361,10 @@ router.delete('/', (req, res) => {
     return res.redirect("/dashboard");
   }
 
-  Invoice.deleteOne({ _id : id })
-  .then((invoice) => {
-     req.flash('alert', `Invoice ${number} for ${name} deleted!`);
-     return res.redirect("/invoices");
-   }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  });
+  const invoice = await Invoice.deleteOne({ _id : id });
+
+  req.flash('alert', `Invoice ${number} for ${name} deleted!`);
+  return res.redirect("/invoices");
 });
 
 module.exports = router
