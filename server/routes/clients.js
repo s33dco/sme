@@ -7,7 +7,7 @@ const {ObjectID}        = require('mongodb');
 const {Client}          = require("../models/client");
 const {Invoice}         = require("../models/invoice");
 const auth              = require("../middleware/auth");
-const admin              = require("../middleware/admin");
+const admin             = require("../middleware/admin");
 
 router.get('/', auth , async (req, res) => {
   const clients = await Client.find({}, {name:1}).sort({name: 1});
@@ -70,7 +70,6 @@ router.get('/:id', auth, (req, res) => {
     } else {
       total = '0'
     }
-
     res.render('clients/client', {
         pageTitle       : "Client",
         pageDescription : "Client.",
@@ -79,6 +78,13 @@ router.get('/:id', auth, (req, res) => {
         itemsList,
         total,
         admin : req.user.isAdmin
+    });
+  })
+  .catch((e) => {
+    req.flash('alert', "We can't get that for you.");
+    return res.render('404', {
+        pageTitle       : "404",
+        pageDescription : "Invalid resource",
     });
   })
 });

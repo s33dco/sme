@@ -6,10 +6,7 @@ module.exports = (req, res, next) => {
 
     if (!token) {
       req.flash('alert', `You need to log in.`)
-      return res.render('index', {
-        pageTitle: "Welcome to SME",
-        pageDescription: "Static website with invoicing backend.",
-      });
+      res.redirect('login');
     }
 
     try {

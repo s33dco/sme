@@ -1,6 +1,5 @@
 require('./config/config');
 require('express-async-errors');
-const error           = require('./middleware/error');
 const path            = require('path')
 const express         = require('express')
 const layout          = require('express-layout')     // ejs
@@ -13,9 +12,11 @@ const flash           = require('express-flash')      //
 const helmet          = require('helmet')             // prevent tampering with headers
 const csrf            = require('csurf')              // protect against csrf
 const moment          = require('moment');
+const mongoose        = require('mongoose');
 const port 				    = process.env.PORT;
 const app             = express();
-const mongoose        = require('mongoose');
+const error           = require('./middleware/error');
+
 
 const invoices        = require('./routes/invoices');
 const users           = require('./routes/users');

@@ -1,7 +1,7 @@
 module.exports = ((err, req, res, next) => {
 
   if (err.message === 'Wrong Credentials') {
-    req.flash('alert', "The details rean't right...")
+    req.flash('alert', "those details are wrong...")
     return res.render('index', {
       pageTitle: "Welcome to SME",
       pageDescription: "Static website with invoicing backend.",
