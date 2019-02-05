@@ -7,20 +7,21 @@ const {ObjectID}        = require('mongodb');
 const {Detail}          = require("../models/detail");
 const auth              = require("../middleware/auth");
 const admin              = require("../middleware/admin");
-const asyncMiddleware = require('../middleware/async');
 
-
-router.get('/', [auth, admin], asyncMiddleware(async (req, res) => {
+router.get('/', [auth, admin], async (req, res) => {
   const detail = await Detail.findOne();
+
+  if (!detail){throw Error("No find")};
+
   res.render('details/details', {
       pageTitle       : "Invoice Details",
       pageDescription : "Basic Invoice Details",
       csrfToken       : req.csrfToken(),
       detail
   })
-}));
+});
 
-router.get('/edit', [auth, admin, validate.detail] , asyncMiddleware(async (req, res) => {
+router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
   let detail = await Detail.findOne();
 
   let {utr, email, phone, bank, sortcode,
@@ -35,9 +36,9 @@ router.get('/edit', [auth, admin, validate.detail] , asyncMiddleware(async (req,
     pageDescription : "edit Inv Info."
   })
 
-}));
+});
 
-router.patch('/', [auth, admin, validate.detail] , asyncMiddleware(async (req, res) => {
+router.patch('/', [auth, admin, validate.detail] , async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -69,6 +70,6 @@ router.patch('/', [auth, admin, validate.detail] , asyncMiddleware(async (req, r
     req.flash('success', `Invoice Information updated!`);
     res.redirect(`/invoices`);
   }
-}));
+});
 
 module.exports = router

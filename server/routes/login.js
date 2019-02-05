@@ -36,27 +36,13 @@ router.post('/', validate.login, async (req, res) => {
 
   let user = await User.findOne({email : req.body.email });
 
-  if (!user) {
-    req.flash('alert', `Wrong Credentials`)
-    return res.render('index', {
-      pageTitle: "Welcome to SME",
-      pageDescription: "Static website with invoicing backend.",
-    });
-  };
+  if (!user) { throw Error(`Wrong Credentials`)};
 
   const validPassword = await bcrypt.compare(req.body.password, user.password);
 
-  if (!validPassword) {
-    req.flash('alert', `Wrong Credentials`)
-    return res.render('index', {
-      pageTitle: "Welcome to SME",
-      pageDescription: "Static website with invoicing backend.",
-    });
-  };
+  if (!validPassword) { throw Error(`Wrong Credentials`)};
 
   const token = user.generateAuthToken();
-
-  // store token in local storage
 
   req.flash('success', `Welcome back ${user.firstName}`)
   res.cookie('token', token);

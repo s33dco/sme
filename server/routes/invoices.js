@@ -10,10 +10,8 @@ const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
-const asyncMiddleware = require('../middleware/async');
 
-
-router.get('/',  auth, asyncMiddleware(async (req, res) => {
+router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
 
   res.render('invoices/invoices', {
@@ -22,7 +20,7 @@ router.get('/',  auth, asyncMiddleware(async (req, res) => {
     invoices,
     admin : req.user.isAdmin
   })
-}));
+});
 
 router.get('/new', [auth, admin], (req, res) => {
 
@@ -60,7 +58,7 @@ router.get('/new', [auth, admin], (req, res) => {
   })
 });
 
-router.post('/',  [auth, admin, validate.invoice], asyncMiddleware(async (req, res) => {
+router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -127,28 +125,16 @@ router.post('/',  [auth, admin, validate.invoice], asyncMiddleware(async (req, r
           res.status(400);
       });
     };
-  }));
+  });
 
-router.get('/:id',  auth, asyncMiddleware(async (req, res) => {
+router.get('/:id',  auth, async (req, res) => {
   let id = req.params.id;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource"
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const invoice = await Invoice.findOne({ _id: id});
 
-  if (!invoice) {
-    req.flash('alert', "Can't find that invoice, maybe try later.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Can't find that client"
-    });
-  }
+  if (!invoice) {throw Error("No find")}
 
   let total = invoice.totalInvoiceValue();
 
@@ -160,46 +146,27 @@ router.get('/:id',  auth, asyncMiddleware(async (req, res) => {
       csrfToken       : req.csrfToken(),
       admin : req.user.isAdmin
   });
-}));
+});
 
-router.post('/email', auth, asyncMiddleware(async (req, res) => {
+router.post('/email', auth, async (req, res) => {
 
   let id = req.body.id;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible to email this invoice.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const invoice = await Invoice.findOne({  _id: id });
 
-  if (!invoice) {
-    req.flash('alert', "Can't find that invoice, maybe try later.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Can't find that client"
-    });
-  }
+  if (!invoice) {throw Error("No find")}
 
     // send the email....
 
   req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
   res.redirect('/dashboard')
-}));
+});
 
-router.patch('/paid', [auth, admin], asyncMiddleware(async (req, res) => {
+router.patch('/paid', [auth, admin], async (req, res) => {
   let id = req.body.id
-  if (!ObjectID.isValid(id)) {
-    console.log('invalid id');
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const invoice = await Invoice.findOneAndUpdate(
      { _id : id },
@@ -208,19 +175,12 @@ router.patch('/paid', [auth, admin], asyncMiddleware(async (req, res) => {
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
   res.redirect('/dashboard');
-}));
+});
 
-router.patch('/unpaid', [auth, admin], asyncMiddleware(async (req, res) => {
+router.patch('/unpaid', [auth, admin], async (req, res) => {
   let id = req.body.id;
 
-  if (!ObjectID.isValid(id)) {
-    console.log('invalid id', id);
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  };
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const invoice = await Invoice.findOneAndUpdate(
      { _id : id },
@@ -229,18 +189,12 @@ router.patch('/unpaid', [auth, admin], asyncMiddleware(async (req, res) => {
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
   res.redirect("/dashboard");
-}));
+});
 
 router.post('/edit', [auth, admin], (req, res) => {
   let id = req.body.id;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const promise = Promise.all([
     Invoice.findOne({  _id: id }),
@@ -249,13 +203,7 @@ router.post('/edit', [auth, admin], (req, res) => {
 
   promise.then(([invoice, clients]) => {
 
-    if (!invoice ) {
-      req.flash('alert', "Can't find that invoice...");
-      return res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Can't find that client"
-      });
-    }
+    if (!invoice ) {throw Error("No find")}
 
     if (invoice.paid ) {
       req.flash('alert', "can't edit a paid invoice!");
@@ -284,7 +232,7 @@ router.post('/edit', [auth, admin], (req, res) => {
   });
 });
 
-router.patch('/:id',  [auth, admin, validate.invoice], asyncMiddleware(async (req, res) => {
+router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -348,19 +296,13 @@ router.patch('/:id',  [auth, admin, validate.invoice], asyncMiddleware(async (re
       });
     });
   }
-}));
+});
 
-router.delete('/', [auth, admin], asyncMiddleware(async (req, res) => {
+router.delete('/', [auth, admin], async (req, res) => {
   console.log(req.body)
   const { id, number, name, paid } = req.body;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
   if (paid === 'true')  {
     req.flash('alert', "Can't delete a paid invoice.");
     return res.redirect("/dashboard");
@@ -370,6 +312,6 @@ router.delete('/', [auth, admin], asyncMiddleware(async (req, res) => {
 
   req.flash('alert', `Invoice ${number} for ${name} deleted!`);
   return res.redirect("/invoices");
-}));
+});
 
 module.exports = router

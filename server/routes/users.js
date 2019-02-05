@@ -7,10 +7,8 @@ const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
-const asyncMiddleware = require('../middleware/async');
 
-
-router.get('/', [auth, admin], asyncMiddleware(async (req, res) => {
+router.get('/', [auth, admin], async (req, res) => {
   const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});
   res.render('users/users', {
       pageTitle       : "Users",
@@ -18,7 +16,7 @@ router.get('/', [auth, admin], asyncMiddleware(async (req, res) => {
       users,
       admin : req.user.isAdmin
   });
-}));
+});
 
 router.get('/new', [auth, admin], (req, res) => {
   res.render('users/newuser', {
@@ -30,7 +28,7 @@ router.get('/new', [auth, admin], (req, res) => {
   });
 });
 
-router.post('/', [auth, admin,validate.user] , asyncMiddleware(async (req, res) => {
+router.post('/', [auth, admin,validate.user], async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -49,28 +47,16 @@ router.post('/', [auth, admin,validate.user] , asyncMiddleware(async (req, res) 
   await newUser.save() // uses .pre('save') to encrypt password
   req.flash('success', `${newUser.firstName} ${newUser.lastName} created !`)
   res.redirect('/dashboard')
-}));
+});
 
-router.get('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
+router.get('/:id', [auth, admin], async (req, res) => {
   let id = req.params.id;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const viewUser = await User.findOne({_id: id});
 
-  if (!viewUser) {
-    req.flash('alert', "Can't find that client, maybe try later.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Can't find that client",
-    });
-  }
+  if (!viewUser) {throw Error("No find")}
 
   res.render('users/user', {
       pageTitle       : "Users",
@@ -78,27 +64,15 @@ router.get('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
       csrfToken: req.csrfToken(),
       user : viewUser
   });
-}));
+});
 
-router.post('/edit', [auth, admin, validate.useredit], asyncMiddleware(async (req, res) => {
+router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(req.body.id)) {throw Error("No find")}
 
   const editUser = await User.findOne({_id: req.body.id});
 
-  if (!editUser ) {
-    req.flash('alert', "Can't find that user...");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Can't find that user"
-    });
-  }
+  if (!editUser ) {throw Error("No find")}
 
   let { _id, firstName, lastName, email} = editUser;
 
@@ -109,19 +83,13 @@ router.post('/edit', [auth, admin, validate.useredit], asyncMiddleware(async (re
     pageTitle       : "Edit user",
     pageDescription : "edit user."
   })
-}));
+});
 
-router.post('/upgrade', [auth, admin], asyncMiddleware(async (req, res) => {
+router.post('/upgrade', [auth, admin], async (req, res) => {
 
   console.log(req.body.id)
 
-  if (!ObjectID.isValid(req.body.id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(req.body.id)) {throw Error("No find")}
 
   const user = await User.findOneAndUpdate(
      { _id : req.body.id },
@@ -130,17 +98,11 @@ router.post('/upgrade', [auth, admin], asyncMiddleware(async (req, res) => {
 
   req.flash('success', `${user.firstName} can now change data`);
   res.redirect('/dashboard');
-}));
+});
 
-router.post('/downgrade', [auth, admin], asyncMiddleware(async (req, res) => {
+router.post('/downgrade', [auth, admin], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(req.body.id)){throw Error("No find")}
 
   if ( req.user._id === req.body.id) {
     req.flash('alert', `You can't give up admin rights!`);
@@ -154,17 +116,11 @@ router.post('/downgrade', [auth, admin], asyncMiddleware(async (req, res) => {
 
   req.flash('success', `${user.firstName} can only view data`);
   res.redirect('/dashboard');
-}));
+});
 
-router.patch('/:id', [auth, admin, validate.useredit], asyncMiddleware(async (req, res) => {
+router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 
-  if (!ObjectID.isValid(req.params.id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    return res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
-    });
-  }
+  if (!ObjectID.isValid(req.params.id)) {throw Error("No find")}
 
   const errors = validationResult(req)
 
@@ -193,15 +149,12 @@ router.patch('/:id', [auth, admin, validate.useredit], asyncMiddleware(async (re
     res.redirect(`/users`);
 
   }
-}));
+});
 
 router.delete('/', [auth, admin], (req, res) => {
   const { id, name, billed } = req.body;
 
-  if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
-    res.redirect("/dashboard");
-  }
+  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   if ( req.user._id === req.body.id) {
     req.flash('alert', `You can't delete yourself!`);

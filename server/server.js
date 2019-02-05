@@ -1,4 +1,5 @@
 require('./config/config');
+require('express-async-errors');
 const error           = require('./middleware/error');
 const path            = require('path')
 const express         = require('express')
@@ -15,6 +16,7 @@ const moment          = require('moment');
 const port 				    = process.env.PORT;
 const app             = express();
 const mongoose        = require('mongoose');
+
 const invoices        = require('./routes/invoices');
 const users           = require('./routes/users');
 const clients         = require('./routes/clients');
