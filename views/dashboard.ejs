@@ -33,9 +33,11 @@
         <p>£<%= invoice.total%> due <%= moment(invoice._id.date).fromNow()%>.</p>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       	<input type="hidden" name="id" value="<%= invoice._id.invoice_id %>">
+        <% if (fullAdmin) { %>
         <div class="form-actions">
           <button class="btn" type="submit">Mark as Paid</button>
         </div>
+        <% } %>
       </form>
     <% }); %>
 

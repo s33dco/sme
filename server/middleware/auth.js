@@ -16,6 +16,7 @@ module.exports = (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
       res.locals.loggedIn = req.user;
+      res.locals.fullAdmin = req.user.isAdmin;
       next();
     }
     catch (e) {

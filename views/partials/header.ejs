@@ -19,14 +19,18 @@
       <a href="/invoices">invoices</a>
     </li>
     <li>
-      <a href="/details">your info</a>
-    </li>
-    <li>
       <a href="/clients">clients</a>
     </li>
-    <li>
-      <a href="/users">users</a>
-    </li>
+
+    <% if (fullAdmin) { %>
+      <li>
+        <a href="/details">your info</a>
+      </li>
+      <li>
+        <a href="/users">users</a>
+      </li>
+    <% } %>
+
     <li>
       <a href="/logout">log out</a>
     </li>
