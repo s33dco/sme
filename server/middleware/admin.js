@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
   // 403 forbidden
 
   if (!req.user.isAdmin) {
-    req.flash('alert', `You can't change data, only view.`);
+    req.flash('alert', `You can only view.`);
     return res.redirect('/dashboard');
     };
   next();

@@ -53,18 +53,7 @@ const middlewares = [
 ];
 
 
-
 app.use(middlewares)
-
-
-// app.use((req, res, next)=> {
-//   if (req.user){
-//   res.locals.loggedIn = true;
-// } else {
-//   res.locals.loggedIn = false;
-// }
-//   next();
-// });
 
 app.use('/invoices', invoices);
 app.use('/clients', clients);
@@ -74,7 +63,6 @@ app.use('/contact', contact);
 app.use('/login', login);
 app.use('/dashboard', dashboard);
 app.use('/logout', logout);
-
 
 
 app.get('/', (req, res) => {
@@ -98,8 +86,6 @@ app.use((err, req, res, next) => {
     pageDescription: "Err, What?"
   });
 });
-
-
 
 app.listen(port, () => {
 	console.log(`server running on ${port}`);

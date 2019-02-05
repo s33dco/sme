@@ -2,19 +2,16 @@
   <ul class= 'topnav'>
 
 
-
+<% if (typeof loggedIn === "undefined") { %>
     <li>
       <a href="/">home</a>
     </li>
     <li>
       <a href="/contact">contact</a>
     </li>
-    <li>
-      <a href="/login">login</a>
-    </li>
 
 
-
+<% } else { %>
     <li>
       <a href="/dashboard">dashboard</a>
     </li>
@@ -33,8 +30,7 @@
     <li>
       <a href="/logout">log out</a>
     </li>
-
-
+<% } %>
 
 
 
