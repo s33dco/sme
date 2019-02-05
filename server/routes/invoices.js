@@ -10,9 +10,10 @@ const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
+const asyncMiddleware = require('../middleware/async');
 
 
-router.get('/',  auth, async (req, res) => {
+router.get('/',  auth, asyncMiddleware(async (req, res) => {
   const invoices = await Invoice.listInvoices();
 
   res.render('invoices/invoices', {
@@ -21,7 +22,7 @@ router.get('/',  auth, async (req, res) => {
     invoices,
     admin : req.user.isAdmin
   })
-});
+}));
 
 router.get('/new', [auth, admin], (req, res) => {
 
@@ -59,7 +60,7 @@ router.get('/new', [auth, admin], (req, res) => {
   })
 });
 
-router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
+router.post('/',  [auth, admin, validate.invoice], asyncMiddleware(async (req, res) => {
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -126,9 +127,9 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           res.status(400);
       });
     };
-  });
+  }));
 
-router.get('/:id',  auth, async (req, res) => {
+router.get('/:id',  auth, asyncMiddleware(async (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -159,9 +160,9 @@ router.get('/:id',  auth, async (req, res) => {
       csrfToken       : req.csrfToken(),
       admin : req.user.isAdmin
   });
-});
+}));
 
-router.post('/email', auth, async (req, res) => {
+router.post('/email', auth, asyncMiddleware(async (req, res) => {
 
   let id = req.body.id;
 
@@ -187,9 +188,9 @@ router.post('/email', auth, async (req, res) => {
 
   req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
   res.redirect('/dashboard')
-});
+}));
 
-router.patch('/paid', [auth, admin], async (req, res) => {
+router.patch('/paid', [auth, admin], asyncMiddleware(async (req, res) => {
   let id = req.body.id
   if (!ObjectID.isValid(id)) {
     console.log('invalid id');
@@ -207,9 +208,9 @@ router.patch('/paid', [auth, admin], async (req, res) => {
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
   res.redirect('/dashboard');
-});
+}));
 
-router.patch('/unpaid', [auth, admin], async (req, res) => {
+router.patch('/unpaid', [auth, admin], asyncMiddleware(async (req, res) => {
   let id = req.body.id;
 
   if (!ObjectID.isValid(id)) {
@@ -228,7 +229,7 @@ router.patch('/unpaid', [auth, admin], async (req, res) => {
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
   res.redirect("/dashboard");
-});
+}));
 
 router.post('/edit', [auth, admin], (req, res) => {
   let id = req.body.id;
@@ -283,7 +284,7 @@ router.post('/edit', [auth, admin], (req, res) => {
   });
 });
 
-router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
+router.patch('/:id',  [auth, admin, validate.invoice], asyncMiddleware(async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -347,9 +348,9 @@ router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
       });
     });
   }
-});
+}));
 
-router.delete('/', [auth, admin], async (req, res) => {
+router.delete('/', [auth, admin], asyncMiddleware(async (req, res) => {
   console.log(req.body)
   const { id, number, name, paid } = req.body;
 
@@ -369,6 +370,6 @@ router.delete('/', [auth, admin], async (req, res) => {
 
   req.flash('alert', `Invoice ${number} for ${name} deleted!`);
   return res.redirect("/invoices");
-});
+}));
 
 module.exports = router

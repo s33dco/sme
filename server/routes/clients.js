@@ -6,10 +6,11 @@ const {mongoose}        = require('../db/mongoose');
 const {ObjectID}        = require('mongodb');
 const {Client}          = require("../models/client");
 const {Invoice}         = require("../models/invoice");
+const asyncMiddleware = require('../middleware/async');
 const auth              = require("../middleware/auth");
 const admin              = require("../middleware/admin");
 
-router.get('/', auth , async (req, res) => {
+router.get('/', auth , asyncMiddleware(async (req, res) => {
   const clients = await Client.find({}, {name:1}).sort({name: 1});
   res.render('clients/clients', {
       pageTitle       : "Client List",
@@ -17,7 +18,7 @@ router.get('/', auth , async (req, res) => {
       clients,
       admin : req.user.isAdmin
   });
-});
+}));
 
 router.get('/new', [auth, admin], (req, res) => {
   res.render('clients/newclient', {
@@ -29,7 +30,7 @@ router.get('/new', [auth, admin], (req, res) => {
   });
 });
 
-router.post('/', [auth, admin, validate.client], async (req, res) => {
+router.post('/', [auth, admin, validate.client], asyncMiddleware(async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -49,13 +50,13 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
   await client.save();
   req.flash('success', `${client.name} created !`)
   res.redirect('/clients')
-});
+}));
 
 router.get('/:id', auth, (req, res) => {
   const id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
+    req.flash('alert', "Invalid client ID.");
     return res.render('404', {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
@@ -70,7 +71,7 @@ router.get('/:id', auth, (req, res) => {
   promise.then(([client, itemsList]) => {
 
     if (!client) {
-      req.flash('alert', "Can't find that client, maybe try later.");
+      req.flash('alert', "Can't find that client.");
       return res.render('404', {
           pageTitle       : "404",
           pageDescription : "Can't find that client",
@@ -101,7 +102,7 @@ router.get('/:id', auth, (req, res) => {
   });
 });
 
-router.post('/edit', [auth, admin], async (req, res) => {
+router.post('/edit', [auth, admin], asyncMiddleware(async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -130,9 +131,9 @@ router.post('/edit', [auth, admin], async (req, res) => {
     pageTitle       : "Edit Client",
     pageDescription : "edit client."
   })
-});
+}));
 
-router.patch('/:id', [auth, admin, validate.client], async (req, res) => {
+router.patch('/:id', [auth, admin, validate.client], asyncMiddleware(async (req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -159,13 +160,13 @@ router.patch('/:id', [auth, admin, validate.client], async (req, res) => {
     req.flash('success', `Invoice ${req.body.name} updated!`);
     res.redirect(`/clients`);
   }
-});
+}));
 
-router.delete('/', [auth, admin], async (req, res) => {
+router.delete('/', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id, name, billed } = req.body;
 
   if (!ObjectID.isValid(id)) {
-    req.flash('alert', "Not possible invalid ID, this may update.");
+    req.flash('alert', "Invalid ID, this may update.");
     return res.render('404', {
         pageTitle       : "404",
         pageDescription : "Invalid resource",
@@ -181,6 +182,6 @@ router.delete('/', [auth, admin], async (req, res) => {
 
   req.flash('alert', `${req.body.name} deleted!`);
   res.redirect("/dashboard");
-});
+}));
 
 module.exports = router

@@ -7,9 +7,10 @@ const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
+const asyncMiddleware = require('../middleware/async');
 
 
-router.get('/', [auth, admin], async (req, res) => {
+router.get('/', [auth, admin], asyncMiddleware(async (req, res) => {
   const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});
   res.render('users/users', {
       pageTitle       : "Users",
@@ -17,7 +18,7 @@ router.get('/', [auth, admin], async (req, res) => {
       users,
       admin : req.user.isAdmin
   });
-});
+}));
 
 router.get('/new', [auth, admin], (req, res) => {
   res.render('users/newuser', {
@@ -29,7 +30,7 @@ router.get('/new', [auth, admin], (req, res) => {
   });
 });
 
-router.post('/', [auth, admin,validate.user] , async (req, res) => {
+router.post('/', [auth, admin,validate.user] , asyncMiddleware(async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -48,9 +49,9 @@ router.post('/', [auth, admin,validate.user] , async (req, res) => {
   await newUser.save() // uses .pre('save') to encrypt password
   req.flash('success', `${newUser.firstName} ${newUser.lastName} created !`)
   res.redirect('/dashboard')
-});
+}));
 
-router.get('/:id', [auth, admin], async (req, res) => {
+router.get('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -77,9 +78,9 @@ router.get('/:id', [auth, admin], async (req, res) => {
       csrfToken: req.csrfToken(),
       user : viewUser
   });
-});
+}));
 
-router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
+router.post('/edit', [auth, admin, validate.useredit], asyncMiddleware(async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -108,9 +109,9 @@ router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
     pageTitle       : "Edit user",
     pageDescription : "edit user."
   })
-});
+}));
 
-router.post('/upgrade', [auth, admin], async (req, res) => {
+router.post('/upgrade', [auth, admin], asyncMiddleware(async (req, res) => {
 
   console.log(req.body.id)
 
@@ -129,9 +130,9 @@ router.post('/upgrade', [auth, admin], async (req, res) => {
 
   req.flash('success', `${user.firstName} can now change data`);
   res.redirect('/dashboard');
-});
+}));
 
-router.post('/downgrade', [auth, admin], async (req, res) => {
+router.post('/downgrade', [auth, admin], asyncMiddleware(async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -153,9 +154,9 @@ router.post('/downgrade', [auth, admin], async (req, res) => {
 
   req.flash('success', `${user.firstName} can only view data`);
   res.redirect('/dashboard');
-});
+}));
 
-router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
+router.patch('/:id', [auth, admin, validate.useredit], asyncMiddleware(async (req, res) => {
 
   if (!ObjectID.isValid(req.params.id)) {
     req.flash('alert', "Not possible invalid ID, this may update.");
@@ -192,7 +193,7 @@ router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
     res.redirect(`/users`);
 
   }
-});
+}));
 
 router.delete('/', [auth, admin], (req, res) => {
   const { id, name, billed } = req.body;
