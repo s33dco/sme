@@ -18,6 +18,7 @@ module.exports = (req, res, next) => {
     }
     catch (e) {
       res.clearCookie("token");
-      res.status(403).send(`Invalid token - ${e.message}`)
+      req.flash('alert', `Invalid token - ${e.message}`)
+      res.redirect('/');
     }
 }

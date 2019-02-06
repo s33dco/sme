@@ -52,11 +52,16 @@ router.post('/', [auth, admin,validate.user], async (req, res) => {
 router.get('/:id', [auth, admin], async (req, res) => {
   let id = req.params.id;
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
+  if (!ObjectID.isValid(id)) {
+    res.status(400);
+    throw Error("No find");
+  }
 
   const viewUser = await User.findOne({_id: id});
 
-  if (!viewUser) {throw Error("No find")}
+  if (!viewUser) {
+    res.status(404);
+    throw Error("No find")}
 
   res.render('users/user', {
       pageTitle       : "Users",
@@ -68,11 +73,17 @@ router.get('/:id', [auth, admin], async (req, res) => {
 
 router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)) {throw Error("No find")}
+  if (!ObjectID.isValid(req.body.id)) {
+    res.status(400);
+    throw Error("No find")
+  }
 
   const editUser = await User.findOne({_id: req.body.id});
 
-  if (!editUser ) {throw Error("No find")}
+  if (!editUser ) {
+      res.status(404);
+      throw Error("No find")
+      }
 
   let { _id, firstName, lastName, email} = editUser;
 
@@ -89,7 +100,9 @@ router.post('/upgrade', [auth, admin], async (req, res) => {
 
   console.log(req.body.id)
 
-  if (!ObjectID.isValid(req.body.id)) {throw Error("No find")}
+  if (!ObjectID.isValid(req.body.id)) {
+    res.status(400);
+    throw Error("No find")}
 
   const user = await User.findOneAndUpdate(
      { _id : req.body.id },
@@ -102,7 +115,10 @@ router.post('/upgrade', [auth, admin], async (req, res) => {
 
 router.post('/downgrade', [auth, admin], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)){throw Error("No find")}
+  if (!ObjectID.isValid(req.body.id)){
+    res.status(400);
+    throw Error("No find");
+  }
 
   if ( req.user._id === req.body.id) {
     req.flash('alert', `You can't give up admin rights!`);
@@ -120,7 +136,9 @@ router.post('/downgrade', [auth, admin], async (req, res) => {
 
 router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 
-  if (!ObjectID.isValid(req.params.id)) {throw Error("No find")}
+  if (!ObjectID.isValid(req.params.id)) {
+    res.status(400);
+    throw Error("No find")}
 
   const errors = validationResult(req)
 

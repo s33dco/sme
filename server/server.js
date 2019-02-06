@@ -12,10 +12,9 @@ const flash           = require('express-flash')      //
 const helmet          = require('helmet')             // prevent tampering with headers
 const csrf            = require('csurf')              // protect against csrf
 const moment          = require('moment');
-const mongoose        = require('mongoose');
 const port 				    = process.env.PORT;
 const app             = express();
-const winston         = require('./config/winston');
+const logger          = require('./config/winston');
 const morgan          = require('morgan');
 const error           = require('./middleware/error');
 
@@ -30,6 +29,18 @@ const dashboard       = require('./routes/dashboard');
 const logout          = require('./routes/logout');
 const home            = require('./routes/home');
 
+process.on('uncaughtException', (e) => {
+  logger.error(`${e.name}, ${e.message}, ${e.stack}`);
+  process.exit(1);
+})
+
+process.on('unhandledRejection', (e) => {
+  logger.error(`${e.name}, ${e.message}, ${e.stack}`);
+  process.exit(1);
+})
+
+
+
 app.locals.title  = process.env.SME_TITLE;
 app.locals.email  = process.env.SME_EMAIL;
 app.locals.moment = require('moment');
@@ -41,7 +52,7 @@ const middlewares = [
   methodOverride('_method'),
   helmet(),
   layout(),
-  morgan('dev', { stream: winston.stream }),
+  morgan('dev', { stream: logger.stream }), // TODO: make default logger dependent on environment
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
   validator(),
@@ -58,7 +69,6 @@ const middlewares = [
 ];
 
 app.use(middlewares)
-
 app.use('/invoices', invoices);
 app.use('/clients', clients);
 app.use('/users', users);
@@ -68,9 +78,14 @@ app.use('/login', login);
 app.use('/dashboard', dashboard);
 app.use('/logout', logout);
 app.use('/', home);
-
 app.use(error);
 
+// throw new Error('something is wrong - unhandled handleExceptions');
+// 
+// const p = Promise.reject(new Error('breaking promises'))
+// p.then(()=>console.log('done'));
+
+
 app.listen(port, () => {
-	console.log(`server running on ${port}`);
+	logger.info(`** server running on  ${port}   **\n`);
 });

@@ -2,7 +2,8 @@ const logger = require('../config/winston')
 
 module.exports = ((err, req, res, next) => {
 
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`, err);
+
+  logger.error(`${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip} - ${err}`, err);
 
   if (err.message === 'Wrong Credentials') {
     req.flash('alert', "those details are wrong...")
@@ -20,12 +21,10 @@ module.exports = ((err, req, res, next) => {
     });
 
   } else {
-
     res.status(500).render('500', {
       err,
       pageTitle: "500",
       pageDescription: "Err, What?"
     });
   }
-
 });

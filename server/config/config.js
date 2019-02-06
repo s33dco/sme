@@ -1,4 +1,5 @@
 const env = process.env.NODE_ENV || 'development';
+const logger         = require('./winston');
 
 if (env === 'development' || env === 'test') {
   let config = require('./config.json'); //json parsed into js object directly
@@ -16,4 +17,4 @@ process.env.SME_EMAIL           = 'sme@sme.com'
 }
 
 
-console.log('env *****', env);
+logger.info(`** starting in  ${env}  **\n`);

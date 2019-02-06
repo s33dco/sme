@@ -8,6 +8,7 @@ const {ObjectID}          = require('mongodb');
 const {Invoice}           = require("../models/invoice");
 const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
+const logger              = require('../config/winston');
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
 
@@ -30,8 +31,6 @@ router.get('/new', [auth, admin], (req, res) => {
   ]);
 
   promise.then(([lastInvoiceNo, clients]) => {
-
-    console.log(lastInvoiceNo);
 
     let checkInvoice = ((invArray) => {
       if(invArray.length < 1) {
@@ -121,8 +120,8 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
           res.redirect(`invoices/${invoice._id}`);
       }).catch((e) => {
-          console.log(e.message);
-          res.status(400);
+          logger.error(e.message);
+          res.status(500);
       });
     };
   });
@@ -299,7 +298,7 @@ router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
 });
 
 router.delete('/', [auth, admin], async (req, res) => {
-  console.log(req.body)
+
   const { id, number, name, paid } = req.body;
 
   if (!ObjectID.isValid(id)) {throw Error("No find")}
