@@ -3,8 +3,8 @@ const router            = express.Router();
 const bodyParser        = require('body-parser');
 const moment            = require('moment');
 const {validationResult}= require('express-validator/check');
-const validate          = require('../validators')
-const {mongoose}        = require('../db/mongoose');
+const validate          = require('../middleware/validators')
+const logger              = require('../startup/logger');
 
 router.get('/', (req, res) => {
   res.render('contact', {

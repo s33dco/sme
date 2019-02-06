@@ -1,4 +1,4 @@
 log/
 node_modules/
 package-lock.json
-server/config/config.json
+server/startup/config/config.json

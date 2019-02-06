@@ -2,13 +2,12 @@ const express             = require('express');
 const router              = express.Router();
 const moment              = require('moment');
 const {validationResult}  = require('express-validator/check');
-const validate            = require('../validators')
-const {mongoose}          = require('../db/mongoose');
+const validate            = require('../middleware/validators')
 const {ObjectID}          = require('mongodb');
 const {Invoice}           = require("../models/invoice");
 const {Client}            = require("../models/client");
 const {Detail}            = require("../models/detail");
-const logger              = require('../config/winston');
+const logger              = require('../startup/logger');
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
 

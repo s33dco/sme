@@ -1,9 +1,9 @@
 const express     = require('express');
 const router      = express.Router();
 const moment      = require('moment');
-const {mongoose}  = require('../db/mongoose');
 const {Invoice}   = require("../models/invoice");
 const auth        = require("../middleware/auth")
+const logger              = require('../startup/logger');
 
 router.get('/', auth, (req, res) => {
   const promise = Promise.all([

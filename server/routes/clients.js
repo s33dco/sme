@@ -1,13 +1,13 @@
 const express           = require('express');
 const router            = express.Router();
 const {validationResult}= require('express-validator/check');
-const validate          = require('../validators')
-const {mongoose}        = require('../db/mongoose');
+const validate          = require('../middleware/validators')
 const {ObjectID}        = require('mongodb');
 const {Client}          = require("../models/client");
 const {Invoice}         = require("../models/invoice");
 const auth              = require("../middleware/auth");
 const admin             = require("../middleware/admin");
+const logger              = require('../startup/logger');
 
 router.get('/', auth , async (req, res) => {
   const clients = await Client.find({}, {name:1}).sort({name: 1});

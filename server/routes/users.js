@@ -1,12 +1,12 @@
 const express             = require('express');
 const router              = express.Router();
 const {validationResult}  = require('express-validator/check');
-const validate            = require('../validators')
-const {mongoose}          = require('../db/mongoose');
+const validate            = require('../middleware/validators')
 const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
 const auth                = require("../middleware/auth");
 const admin               = require("../middleware/admin");
+const logger              = require('../startup/logger');
 
 router.get('/', [auth, admin], async (req, res) => {
   const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});

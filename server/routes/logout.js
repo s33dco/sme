@@ -1,5 +1,6 @@
 const express           = require('express');
 const router            = express.Router();
+const logger              = require('../startup/logger');
 
 
 router.get('/', (req, res) => {

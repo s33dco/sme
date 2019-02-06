@@ -1,5 +1,5 @@
 const {check}     = require('express-validator/check');
-const {Client}    = require("./models/client");
+const {Client}    = require("../models/client");
 
 module.exports = {
   invoice: [

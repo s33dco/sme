@@ -1,3 +1,5 @@
+const path            = require('path')
+const express         = require('express')
 const methodOverride  = require('method-override')
 const helmet          = require('helmet')
 const layout          = require('express-layout')
@@ -8,23 +10,25 @@ const cookieParser    = require('cookie-parser')
 const session         = require('express-session')
 const flash           = require('express-flash')
 const csrf            = require('csurf')
-const error           = require('./middleware/error');
-const invoices        = require('./routes/invoices');
-const users           = require('./routes/users');
-const clients         = require('./routes/clients');
-const details         = require('./routes/details');
-const contact         = require('./routes/contact');
-const login           = require('./routes/login');
-const dashboard       = require('./routes/dashboard');
-const logout          = require('./routes/logout');
-const home            = require('./routes/home');
+const moment          = require('moment');
+const error           = require('../middleware/error');
+const invoices        = require('../routes/invoices');
+const users           = require('../routes/users');
+const clients         = require('../routes/clients');
+const details         = require('../routes/details');
+const contact         = require('../routes/contact');
+const login           = require('../routes/login');
+const dashboard       = require('../routes/dashboard');
+const logout          = require('../routes/logout');
+const home            = require('../routes/home');
+const logger          = require('./logger');
 
-module.exports = () => {
+module.exports = (app) => {
 
   app.locals.title  = process.env.SME_TITLE;
   app.locals.email  = process.env.SME_EMAIL;
   app.locals.moment = require('moment');
-  app.set('views', path.join(__dirname, '../views'))
+  app.set('views', path.join(__dirname, '../../views'))
   app.set('view engine', 'ejs')
 
   const middlewares = [
@@ -32,7 +36,7 @@ module.exports = () => {
     helmet(),
     layout(),
     morgan('dev', { stream: logger.stream }), // TODO: make default logger dependent on environment
-    express.static(path.join(__dirname, '/../public')),
+    express.static(path.join(__dirname, '../../public')),
     bodyParser.urlencoded({ extended: true }),
     validator(),
     cookieParser(),
@@ -46,7 +50,7 @@ module.exports = () => {
     flash(),
     csrf({ cookie: true })
   ];
-  
+
   app.use(middlewares)
   app.use('/invoices', invoices);
   app.use('/clients', clients);
