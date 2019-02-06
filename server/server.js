@@ -15,6 +15,8 @@ const moment          = require('moment');
 const mongoose        = require('mongoose');
 const port 				    = process.env.PORT;
 const app             = express();
+const winston         = require('./config/winston');
+const morgan          = require('morgan');
 const error           = require('./middleware/error');
 
 
@@ -35,14 +37,11 @@ app.locals.moment = require('moment');
 app.set('views', path.join(__dirname, '../views'))
 app.set('view engine', 'ejs')
 
-if (app.get('env') === 'development'){
-  mongoose.set('debug', true);
-};
-
 const middlewares = [
   methodOverride('_method'),
   helmet(),
   layout(),
+  morgan('dev', { stream: winston.stream }),
   express.static(path.join(__dirname, '/../public')),
   bodyParser.urlencoded({ extended: true }),
   validator(),

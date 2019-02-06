@@ -1,4 +1,8 @@
+const logger = require('../config/winston')
+
 module.exports = ((err, req, res, next) => {
+
+  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`, err);
 
   if (err.message === 'Wrong Credentials') {
     req.flash('alert', "those details are wrong...")
