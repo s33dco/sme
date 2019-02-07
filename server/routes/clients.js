@@ -31,7 +31,7 @@ router.get('/new', [auth, admin], (req, res) => {
 
 router.post('/', [auth, admin, validate.client], async (req, res) => {
 
-  const errors = validationResult(req)
+  let errors = validationResult(req)
 
   if (!errors.isEmpty()) {
     return res.render('clients/newclient', {

@@ -57,11 +57,11 @@ router.get('/new', [auth, admin], (req, res) => {
 });
 
 router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
-    const errors = validationResult(req)
+    let errors = validationResult(req)
 
     if (!errors.isEmpty()) {
 
-      const clients = await Client.find({}, {name:1}).sort({name: 1});
+      let clients = await Client.find({}, {name:1}).sort({name: 1});
       let selected;
       if (req.body.clientId) {
         selected = clients.find(c => c._id == req.body.clientId);

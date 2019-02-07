@@ -41,7 +41,8 @@ const logger = createLogger({
         format.printf(
           info => `${info.level}: ${info.message}` // not printing timestamp to console
         )
-      )
+      ),
+      prettyPrint: true
     }),
 
     new transports.MongoDB({
@@ -67,7 +68,7 @@ logger.stream = {                                 // stream for morgan
 };
 
 process.on('unhandledRejection', (e) => {
-    logger.error(`Unhandled Rejection : ${e.message} ${e.stack}`);
+    logger.error(`Unhandled Rejection : ${e.message}`);
     throw Error(`from unhandled rejection ${e.stack}`);
 });
 
