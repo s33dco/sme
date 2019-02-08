@@ -16,7 +16,7 @@ module.exports = () => {
 
   mongoose.connect(mongoDatabase, { useNewUrlParser: true })
     .then(() => {
-      logger.info(`** connected to ${mongoDatabase}  >;-) **\n`);
+      logger.info(`** connected to ${mongoDatabase}   >;-)\n`);
     })
     .catch((e) => logger.error(`** Could not connect to DB :-( **\n ${e.message} `));
 

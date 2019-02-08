@@ -3,35 +3,39 @@ const logger  = require('./logger');
 
 module.exports = function() {
 
-  logger.info(`** reading config values...  **\n`);
+  logger.info(`** reading config values..... **`);
 
-  if (!config.get('JWT_SECRET')) {
-    throw new Error('FATAL ERROR: JWT_SECRET is not defined.');
+  try {
+
+    if (!config.get('JWT_SECRET')) {
+      throw new Error('FATAL ERROR: JWT_SECRET is not defined.');
+    }
+    if (!config.get('MONGODB_URI')) {
+      throw new Error('FATAL ERROR: MONGODB_URI is not defined.');
+    }
+    if (!config.get('PORT')) {
+      throw new Error('FATAL ERROR: PORT is not defined.');
+    }
+
+    if (!config.get('SUPER_SECRET_KEY')) {
+      throw new Error('FATAL ERROR: SUPER_SECRET_KEY is not defined.');
+    }
+    if (!config.get('SUPER_SECRET_COOKIE')) {
+      throw new Error('FATAL ERROR: SUPER_SECRET_COOKIE is not defined.');
+    }
+    if (!config.get('SME_TITLE')) {
+      throw new Error('FATAL ERROR: SME_TITLE is not defined.');
+    }
+    if (!config.get('SME_EMAIL')) {
+      throw new Error('FATAL ERROR: SME_EMAIL is not defined.');
+    }
+    logger.info(`** successfully read !....... **`);
+    logger.info(`** starting in ${config.util.getEnv('NODE_ENV')}... **`)
   }
 
-  if (!config.get('MONGODB_URI')) {
-    throw new Error('FATAL ERROR: MONGODB_URI is not defined.');
+  catch(e){
+    logger.error(e.message);
+    process.exit(1);
   }
-  if (!config.get('PORT')) {
-    throw new Error('FATAL ERROR: PORT is not defined.');
-  }
-
-  if (!config.get('SUPER_SECRET_KEY')) {
-    throw new Error('FATAL ERROR: SUPER_SECRET_KEY is not defined.');
-  }
-
-  if (!config.get('SUPER_SECRET_COOKIE')) {
-    throw new Error('FATAL ERROR: SUPER_SECRET_COOKIE is not defined.');
-  }
-
-  if (!config.get('SME_TITLE')) {
-    throw new Error('FATAL ERROR: SME_TITLE is not defined.');
-  }
-
-  if (!config.get('SME_EMAIL')) {
-    throw new Error('FATAL ERROR: SME_EMAIL is not defined.');
-  }
-
-  logger.info(`** successfully read ! >;-) **\n`);
 
 }

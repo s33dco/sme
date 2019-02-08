@@ -6,7 +6,7 @@ const { createLogger, format, transports } = require('winston');
 const fs = require('fs');
 const path = require('path');
 const database = config.get('MONGODB_URI')
-const env = process.env.NODE_ENV || 'development';
+const env = config.util.getEnv('NODE_ENV');
 const logDir = 'log';
 
 // Create the log directory if it does not exist
