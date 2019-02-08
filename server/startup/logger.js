@@ -1,13 +1,13 @@
 require('winston-daily-rotate-file');
 require('winston-mongodb');
 require('express-async-errors');
+const config   = require('config');
 const { createLogger, format, transports } = require('winston');
 const fs = require('fs');
 const path = require('path');
-const database = process.env.MONGODB_URI;
+const database = config.get('MONGODB_URI')
 const env = process.env.NODE_ENV || 'development';
 const logDir = 'log';
-
 
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDir)) {
@@ -48,7 +48,7 @@ const logger = createLogger({
     new transports.MongoDB({
       handleExceptions: true,
       exitOnError: true,
-      db: "mongodb://localhost:27017/sme",
+      db: database,
       collection: 'log',
       level: 'error',                            // send errors to db
       storeHost: true,
@@ -71,6 +71,5 @@ process.on('unhandledRejection', (e) => {
     logger.error(`Unhandled Rejection : ${e.message}`);
     throw Error(`from unhandled rejection ${e.stack}`);
 });
-
 
 module.exports = logger;

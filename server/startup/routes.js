@@ -1,3 +1,4 @@
+const config          = require('config');
 const path            = require('path')
 const express         = require('express')
 const methodOverride  = require('method-override')
@@ -25,8 +26,8 @@ const logger          = require('./logger');
 
 module.exports = (app) => {
 
-  app.locals.title  = process.env.SME_TITLE;
-  app.locals.email  = process.env.SME_EMAIL;
+  app.locals.title  = config.get('SME_TITLE');
+  app.locals.email  = config.get('SME_EMAIL');
   app.locals.moment = require('moment');
   app.set('views', path.join(__dirname, '../../views'))
   app.set('view engine', 'ejs')
@@ -35,14 +36,14 @@ module.exports = (app) => {
     methodOverride('_method'),
     helmet(),
     layout(),
-    morgan('dev', { stream: logger.stream }), // TODO: make default logger dependent on environment
+    morgan('dev', { stream: logger.stream }),
     express.static(path.join(__dirname, '../../public')),
     bodyParser.urlencoded({ extended: true }),
     validator(),
     cookieParser(),
     session({
-      secret: process.env.SUPER_SECRET_KEY,
-      key: process.env.SUPER_SECRET_COOKIE,
+      secret: config.get('SUPER_SECRET_KEY'),
+      key: config.get('SUPER_SECRET_COOKIE'),
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 3600000 }
