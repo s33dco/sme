@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "website with invoicing backend",
   "main": "index.js",
+  "jest": {
+  "testEnvironment": "node"
+  },
   "scripts": {
     "start": "node index.js",
-    "test": "jest --watchAll",
+    "test": "jest --watchAll --verbose --coverage",
     "restart": "nodemon index.js"
   },
   "engines": {
@@ -48,6 +51,7 @@
   "devDependencies": {
     "eslint": "^5.13.0",
     "jest": "^24.1.0",
-    "nodemon": "^1.18.9"
+    "nodemon": "^1.18.9",
+    "supertest": "^3.4.2"
   }
 }

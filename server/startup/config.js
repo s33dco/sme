@@ -1,9 +1,9 @@
 const config = require('config');
 const logger  = require('./logger');
 
-module.exports = function() {
+module.exports = () => {
 
-  logger.info(`** reading config values..... **`);
+  logger.info(`** reading config values..... 🤞🏼`);
 
   try {
 
@@ -16,7 +16,6 @@ module.exports = function() {
     if (!config.get('PORT')) {
       throw new Error('FATAL ERROR: PORT is not defined.');
     }
-
     if (!config.get('SUPER_SECRET_KEY')) {
       throw new Error('FATAL ERROR: SUPER_SECRET_KEY is not defined.');
     }
@@ -29,12 +28,12 @@ module.exports = function() {
     if (!config.get('SME_EMAIL')) {
       throw new Error('FATAL ERROR: SME_EMAIL is not defined.');
     }
-    logger.info(`** successfully read !....... **`);
-    logger.info(`** starting in ${config.util.getEnv('NODE_ENV')}... **`)
+    logger.info(`** successfully read......... 👍🏻`);
+    logger.info(`** starting in ${config.util.getEnv('NODE_ENV')}... 👉🏻`)
   }
 
   catch(e){
-    logger.error(e.message);
+    logger.error(`Missing config setting\n${e.message}\n${e.stack}`);
     process.exit(1);
   }
 
