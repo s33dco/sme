@@ -8,6 +8,14 @@ const path = require('path');
 const database = config.get('MONGODB_URI')
 const env = config.util.getEnv('NODE_ENV');
 const logDir = 'log';
+let logLevel = () => {
+  if (env === 'development' ){ return 'debug'};
+  if (env === 'test') {
+    return 'info';
+  } else {
+    return 'info';
+  }
+};
 
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDir)) {
@@ -23,7 +31,7 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
 
 const logger = createLogger({
   // change level if in dev environment versus production
-  level: env === 'development' ? 'debug' : 'info',
+  level: logLevel(),
   format: format.combine(
     format.timestamp({
       format: 'DD-MM-YY HH:mm:ss'

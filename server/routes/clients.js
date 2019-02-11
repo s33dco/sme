@@ -2,14 +2,15 @@ const express           = require('express');
 const router            = express.Router();
 const {validationResult}= require('express-validator/check');
 const validate          = require('../middleware/validators')
+const validateId        = require('../middleware/validateId')
 const {ObjectID}        = require('mongodb');
 const {Client}          = require("../models/client");
 const {Invoice}         = require("../models/invoice");
 const auth              = require("../middleware/auth");
 const admin             = require("../middleware/admin");
-const logger              = require('../startup/logger');
+const logger            = require('../startup/logger');
 
-router.get('/', auth , async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const clients = await Client.find({}, {name:1}).sort({name: 1});
   res.render('clients/clients', {
       pageTitle       : "Client List",
@@ -51,10 +52,8 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
   res.redirect('/clients')
 });
 
-router.get('/:id', auth, (req, res) => {
+router.get('/:id', [auth, validateId ], (req, res) => {
   const id = req.params.id;
-
-  if (!ObjectID.isValid(id)){throw Error("No find")}
 
   const promise = Promise.all([
     Client.findOne({_id: id}),
@@ -63,7 +62,13 @@ router.get('/:id', auth, (req, res) => {
 
   promise.then(([client, itemsList]) => {
 
-    if (!client) { throw Error("We can't find that.")}
+    if (!client) {
+      req.flash('alert', "We can't find that for you.");
+      return res.status(404).render('404', {
+          pageTitle       : "404",
+          pageDescription : "Cannot be found",
+      });
+    }
 
     if (itemsList.length > 0){
       total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee)
@@ -81,10 +86,10 @@ router.get('/:id', auth, (req, res) => {
     });
   })
   .catch((e) => {
-    req.flash('alert', "We can't get that for you.");
-    return res.render('404', {
+    req.flash('alert', "We can't find that for you.");
+    return res.status(404).render('404', {
         pageTitle       : "404",
-        pageDescription : "Invalid resource",
+        pageDescription : "Cannot be found",
     });
   })
 });

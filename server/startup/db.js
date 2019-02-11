@@ -18,6 +18,8 @@ module.exports = () => {
     .then(() => {
       logger.info(`** connected to ${mongoDatabase} 😁\n`);
     })
-    .catch((e) => logger.error(`** Could not connect to DB :-( **\n ${e.message} `));
-
+    .catch((e) => {
+    logger.error(`** Could not connect to DB :-( **\n ${e.message} `)
+    res.status(500);
+  });
 };
