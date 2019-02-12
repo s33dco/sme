@@ -22,6 +22,7 @@ const login           = require('../routes/login');
 const dashboard       = require('../routes/dashboard');
 const logout          = require('../routes/logout');
 const home            = require('../routes/home');
+const otherwise       = require('../routes/otherwise');
 const logger          = require('./logger');
 
 module.exports = (app) => {
@@ -62,5 +63,6 @@ module.exports = (app) => {
   app.use('/dashboard', dashboard);
   app.use('/logout', logout);
   app.use('/', home);
+  app.use('*', otherwise);
   app.use(error);
 }

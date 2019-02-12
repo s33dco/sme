@@ -63,10 +63,10 @@ router.get('/:id', [auth, validateId ], (req, res) => {
   promise.then(([client, itemsList]) => {
 
     if (!client) {
-      req.flash('alert', "We can't find that for you.");
-      return res.status(404).render('404', {
-          pageTitle       : "404",
-          pageDescription : "Cannot be found",
+      throw ({
+        tag : 'No longer available.',
+        message : "The resource you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+        statusCode : 404
       });
     }
 
@@ -86,10 +86,15 @@ router.get('/:id', [auth, validateId ], (req, res) => {
     });
   })
   .catch((e) => {
+    logger.error(`${e.statusCode} - ${e.tag} - ${e.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     req.flash('alert', "We can't find that for you.");
-    return res.status(404).render('404', {
-        pageTitle       : "404",
-        pageDescription : "Cannot be found",
+    res.status(404);
+    res.render('error', {
+      errorCode: e.statusCode,
+      errorTag: e.tag,
+      errorMessage : e.message,
+      pageTitle: e.statusCode,
+      pageDescription: `${e.tag}`
     });
   })
 });
@@ -136,10 +141,9 @@ router.patch('/:id', [auth, admin, validate.client], async (req, res) => {
   }
 });
 
-router.delete('/', [auth, admin], async (req, res) => {
+router.delete('/', [auth, admin, validateId], async (req, res) => {
   const { id, name, billed } = req.body;
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   if (billed > 0) {
     req.flash('alert', "Can't delete a billed client.");

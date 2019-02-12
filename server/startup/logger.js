@@ -11,7 +11,7 @@ const logDir = 'log';
 let logLevel = () => {
   if (env === 'development' ){ return 'debug'};
   if (env === 'test') {
-    return 'info';
+    return 'error';
   } else {
     return 'info';
   }

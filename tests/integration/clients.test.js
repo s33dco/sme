@@ -1,6 +1,7 @@
 const request   = require('supertest');
 const {User}    = require('../../server/models/user');
 const {Client}  = require('../../server/models/client');
+const {Invoice} = require('../../server/models/invoice');
 const mongoose  = require('mongoose');
 
 let server;
@@ -25,6 +26,7 @@ beforeEach( async () => {
 afterEach( async () => {
   await server.close();
   await Client.deleteMany();
+  await Invoice.deleteMany();
   await User.deleteMany();
 });
 
@@ -83,6 +85,8 @@ describe('/clients', () => {
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.text).toMatch(/Client One/);
+      expect(res.text).toMatch(/client1@example.com/);
+      expect(res.text).toMatch(/01234567890/);
     });
 
     it('should return no 404 for invalid id', async () => {
@@ -103,20 +107,42 @@ describe('/clients', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 403 when logged in but not isAdmin:true', async () => {
-      notAdmin = await new User({
-        firstName: "Another",
-        lastName: "Nonadmin",
-        email: "email@example.com",
-        password: "password",
-        isAdmin : false
-      }).save();
-      await notAdmin.save();
-      token = await notAdmin.generateAuthToken();
+    it('should display the previous items billed to client id', async () => {
+      invoice = new Invoice({
+                invNo      : 1,
+                invDate    : Date.now(),
+                message    : "thanks",
+                client     : {
+                    _id         : id,
+                    name        : clients[0].name,
+                    email       : clients[0].email,
+                    phone       : clients[0].phone
+                },
+                items      : [{date: Date.now(), desc:'working very hard', fee:20},
+                              {date: Date.now(), desc:'working very hard', fee:20}],
+                details    : {
+                    utr         : "1234567891",
+                    email       : "myemail@email.com",
+                    phone       : "07865356742",
+                    bank        : "the bank",
+                    sortcode    : "00-00-00",
+                    accountNo   : "12345678",
+                    terms       : "cash is king",
+                    contact     : "myemail@example.com"
+                },
+                paid        : false
+              });
+      await invoice.save();
       const res = await exec();
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/Invoice 1/);
     });
 
+    it('should display when nothing previously billed to client id', async () => {
+        const res = await exec();
+        expect(res.status).toBe(200);
+        expect(res.text).toMatch(/0 previously billed/);
+    });
   });
 
 });
