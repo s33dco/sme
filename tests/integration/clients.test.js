@@ -2,16 +2,13 @@ const request   = require('supertest');
 const {User}    = require('../../server/models/user');
 const {Client}  = require('../../server/models/client');
 const {Invoice} = require('../../server/models/invoice');
+const app       = require('../../app');
 const mongoose  = require('mongoose');
+const cheerio   = require('cheerio');
 
-let server;
-let user;
-let clients;
-let token;
-let id;
+let server, user, clients, token, id, name;
 
 beforeEach( async () => {
-  server  = require('../../index.js');
   clients = [
               {  name: "Client One",
                 email: "client1@example.com",
@@ -24,7 +21,6 @@ beforeEach( async () => {
 });
 
 afterEach( async () => {
-  await server.close();
   await Client.deleteMany();
   await Invoice.deleteMany();
   await User.deleteMany();
@@ -46,7 +42,7 @@ describe('/clients', () => {
     });
 
     const exec = async () => {
-      return await request(server).get('/clients').set('Cookie', `token=${token}`);
+      return await request(app).get('/clients').set('Cookie', `token=${token}`);
     };
 
     it('should return all the clients when logged in', async () => {
@@ -73,12 +69,12 @@ describe('/clients', () => {
         password: "password",
         isAdmin : true
       }).save();
-      token = user.generateAuthToken();
+      token = await user.generateAuthToken();
       id = clients[0]._id
     });
 
     const exec = async () => {
-      return await request(server).get(`/clients/${id}`).set('Cookie', `token=${token}`);
+      return await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
     };
 
     it('should return the id record when logged in', async () => {
@@ -138,7 +134,7 @@ describe('/clients', () => {
       expect(res.text).toMatch(/Invoice 1/);
     });
 
-    it('should display when nothing previously billed to client id', async () => {
+    it('should display when nothing previously billed for client iwth no invoices', async () => {
         const res = await exec();
         expect(res.status).toBe(200);
         expect(res.text).toMatch(/0 previously billed/);

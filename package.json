@@ -4,12 +4,12 @@
   "description": "website with invoicing backend",
   "main": "index.js",
   "jest": {
-  "testEnvironment": "node"
+    "testEnvironment": "node"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node ./server/server.js",
     "test": "jest --watchAll --verbose --coverage",
-    "restart": "nodemon index.js"
+    "restart": "nodemon app.js"
   },
   "engines": {
     "node": "10.10.0"
@@ -49,6 +49,7 @@
     "winston-mongodb": "^4.0.3"
   },
   "devDependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "eslint": "^5.13.0",
     "jest": "^24.1.0",
     "nodemon": "^1.18.9",

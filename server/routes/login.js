@@ -6,7 +6,7 @@ const moment            = require('moment');
 const {validationResult}= require('express-validator/check');
 const validate          = require('../middleware/validators')
 const {User}            = require("../models/user");
-const logger              = require('../startup/logger');
+const logger            = require('../startup/logger');
 
 router.get('/', (req, res) => {
   res.render('login', {
@@ -36,7 +36,11 @@ router.post('/', validate.login, async (req, res) => {
 
   let user = await User.findOne({email : req.body.email });
 
-  if (!user) { throw Error(`Wrong Credentials`)};
+  if (!user) { throw ({
+        tag : "Access Denied !",
+        message : "The email address and password you've given do not match up, you can give it another go or if you're sure you're using the correct credentials get in touch with the administrator.",
+        statusCode : 401
+      })};
 
   const validPassword = await bcrypt.compare(req.body.password, user.password);
 
