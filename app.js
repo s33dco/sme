@@ -7,5 +7,4 @@ require('./server/startup/config')();
 require('./server/startup/db')();
 require('./server/startup/routes')(app);
 
-
 module.exports = app;

@@ -4,11 +4,14 @@ const {Client}  = require('../../server/models/client');
 const {Invoice} = require('../../server/models/invoice');
 const app       = require('../../app');
 const mongoose  = require('mongoose');
+const {disconnectDb, connectDb} = require('../utils/db');
+
 const cheerio   = require('cheerio');
 
-let server, user, clients, token, id, name;
+let user, clients, token, id, name;
 
 beforeEach( async () => {
+  await connectDb();
   clients = [
               {  name: "Client One",
                 email: "client1@example.com",
@@ -18,28 +21,27 @@ beforeEach( async () => {
                 phone: "02234567890"}
   ]
   clients = await Client.insertMany(clients);
+  user = await new User({
+    firstName: "Testy",
+    lastName: "Tester",
+    email: "email@example.com",
+    password: "password",
+    isAdmin : true
+  }).save();
+  token = user.generateAuthToken();
+  id = clients[0]._id
 });
 
 afterEach( async () => {
   await Client.deleteMany();
   await Invoice.deleteMany();
   await User.deleteMany();
+  await disconnectDb();
 });
 
 describe('/clients', () => {
 
-  describe('GET / ', () => {
-
-    beforeEach( async () => {
-      user = await new User({
-        firstName: "Testy",
-        lastName: "Tester",
-        email: "email@example.com",
-        password: "password",
-        isAdmin : true
-      }).save();
-      token = user.generateAuthToken();
-    });
+  describe('GET /', () => {
 
     const exec = async () => {
       return await request(app).get('/clients').set('Cookie', `token=${token}`);
@@ -60,18 +62,6 @@ describe('/clients', () => {
   });
 
   describe('GET / :id', () => {
-
-    beforeEach( async () => {
-      user = await new User({
-        firstName: "Testy",
-        lastName: "Tester",
-        email: "email@example.com",
-        password: "password",
-        isAdmin : true
-      }).save();
-      token = await user.generateAuthToken();
-      id = clients[0]._id
-    });
 
     const exec = async () => {
       return await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
@@ -140,5 +130,15 @@ describe('/clients', () => {
         expect(res.text).toMatch(/0 previously billed/);
     });
   });
+
+  describe.skip('GET / new', () => {});
+
+  describe.skip('POST /', () => {});
+
+  describe.skip('POST / edit', () => {});
+
+  describe.skip('PATCH / :id ', () => {});
+
+  describe.skip('DELETE /', () => {});
 
 });
