@@ -2,12 +2,10 @@ const request   = require('supertest');
 const {User}    = require('../../server/models/user');
 const app       = require('../../app');
 const cheerio   = require('cheerio');
-const {disconnectDb, connectDb} = require('../utils/db');
 
 let user, csrfToken, password, cookies;
 
 beforeEach( async () => {
-  await connectDb();
   user = await new User({
     firstName: "Name",
     lastName: "Surname",
@@ -19,7 +17,6 @@ beforeEach( async () => {
 
 afterEach( async () => {
   await User.deleteMany();
-  await disconnectDb();
 });
 
 describe('/login', () => {

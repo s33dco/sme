@@ -4,14 +4,12 @@ const {Client}  = require('../../server/models/client');
 const {Invoice} = require('../../server/models/invoice');
 const app       = require('../../app');
 const mongoose  = require('mongoose');
-const {disconnectDb, connectDb} = require('../utils/db');
 
 const cheerio   = require('cheerio');
 
 let user, clients, token, id, name;
 
 beforeEach( async () => {
-  await connectDb();
   clients = [
               {  name: "Client One",
                 email: "client1@example.com",
@@ -36,7 +34,6 @@ afterEach( async () => {
   await Client.deleteMany();
   await Invoice.deleteMany();
   await User.deleteMany();
-  await disconnectDb();
 });
 
 describe('/clients', () => {

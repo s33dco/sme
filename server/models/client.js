@@ -1,7 +1,7 @@
 const mongoose  = require('mongoose');
 
 
-let ClientSchema = new mongoose.Schema({
+let clientSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -22,17 +22,18 @@ let ClientSchema = new mongoose.Schema({
   }
 });
 
-ClientSchema.statics.isValid = function (id) {
-      return this.findById(id)
-        .then(result => {
-          if (!result) {return false} else {return id}})
-      }
+clientSchema.statics.isValid = function (id) {
+  return this.findById(id)
+    .then(result => {
+      if (!result) {return false} else {return id}})
+}
+
+clientSchema.statics.withId = function (id) {
+  return this.findOne({_id: id});
+}
 
 
-// ClientSchema.statics.listClients = function () {
-//   return this.find({},{name:0, email:0,phone:0}).then((list) => {list.map(client => client._id)});
-// }
 
-let Client = mongoose.model('Client', ClientSchema);
+let Client = mongoose.model('Client', clientSchema);
 
 module.exports = {Client};

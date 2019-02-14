@@ -20,43 +20,11 @@ router.get('/', auth, async (req, res) => {
   });
 });
 
-router.get('/new', [auth, admin], (req, res) => {
-  res.render('clients/newclient', {
-    data            : {},
-    errors          : {},
-    csrfToken       : req.csrfToken(),  // generate a csrf token
-    pageTitle       : "Add a client",
-    pageDescription : "Create a new client."
-  });
-});
-
-router.post('/', [auth, admin, validate.client], async (req, res) => {
-
-  let errors = validationResult(req)
-
-  if (!errors.isEmpty()) {
-    return res.render('clients/newclient', {
-      data            : req.body,
-      errors          : errors.mapped(),
-      csrfToken       : req.csrfToken(),  // generate new csrf token
-      pageTitle       : "Add a client",
-      pageDescription : "Give it another shot."
-    });
-  };
-
-  const { name, email, phone} = req.body;
-
-  let client = new Client({name, email, phone});
-  await client.save();
-  req.flash('success', `${client.name} created !`)
-  res.redirect('/clients')
-});
-
 router.get('/:id', [auth, validateId ], (req, res) => {
   const id = req.params.id;
 
   const promise = Promise.all([
-    Client.findOne({_id: id}),
+    Client.withId(id),
     Invoice.listItemsByClient(id)
     ]);
 
@@ -88,7 +56,6 @@ router.get('/:id', [auth, validateId ], (req, res) => {
   .catch((e) => {
     logger.error(`${e.statusCode} - ${e.tag} - ${e.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     req.flash('alert', "We can't find that for you.");
-    res.status(404);
     res.render('error', {
       errorCode: e.statusCode,
       errorTag: e.tag,
@@ -97,6 +64,38 @@ router.get('/:id', [auth, validateId ], (req, res) => {
       pageDescription: `${e.tag}`
     });
   })
+});
+
+router.get('/new', [auth, admin], (req, res) => {
+  res.render('clients/newclient', {
+    data            : {},
+    errors          : {},
+    csrfToken       : req.csrfToken(),  // generate a csrf token
+    pageTitle       : "Add a client",
+    pageDescription : "Create a new client."
+  });
+});
+
+router.post('/', [auth, admin, validate.client], async (req, res) => {
+
+  let errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.render('clients/newclient', {
+      data            : req.body,
+      errors          : errors.mapped(),
+      csrfToken       : req.csrfToken(),  // generate new csrf token
+      pageTitle       : "Add a client",
+      pageDescription : "Give it another shot."
+    });
+  };
+
+  const { name, email, phone} = req.body;
+
+  let client = new Client({name, email, phone});
+  await client.save();
+  req.flash('success', `${client.name} created !`)
+  res.redirect('/clients')
 });
 
 router.post('/edit', [auth, admin], async (req, res) => {

@@ -8,8 +8,7 @@ module.exports = {
         mongoose.Promise = global.Promise;
         mongoose.connect(mongoDatabase, { useNewUrlParser: true });
     },
-    disconnectDb: (done) => {
-        mongoose.disconnect(done);
-        logger.error(`** disconnected to ${mongoDatabase} 😁\n`);
+    disconnectDb: () => {
+        mongoose.disconnect();
     },
 };

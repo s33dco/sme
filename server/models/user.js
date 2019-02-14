@@ -33,6 +33,10 @@ let userSchema = new mongoose.Schema({
   }
 });
 
+userSchema.statics.findByEmail = function (email){
+  return this.findOne({email : email });
+}
+
 userSchema.methods.generateAuthToken = function (){
   const token = jwt.sign({_id: this._id, isAdmin: this.isAdmin, name: this.firstName}, config.get('JWT_SECRET'), { expiresIn: '1h' });
   return token;

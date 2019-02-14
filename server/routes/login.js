@@ -34,7 +34,7 @@ router.post('/', validate.login, async (req, res) => {
 
   let {email, password} = req.body;
 
-  let user = await User.findOne({email : req.body.email });
+  const user = await User.findByEmail(req.body.email);
 
   if (!user) { throw ({
         tag : "Access Denied !",
@@ -44,7 +44,11 @@ router.post('/', validate.login, async (req, res) => {
 
   const validPassword = await bcrypt.compare(req.body.password, user.password);
 
-  if (!validPassword) { throw Error(`Wrong Credentials`)};
+  if (!validPassword) { throw ({
+        tag : "Access Denied !",
+        message : "The email address and password you've given do not match up, you can give it another go or if you're sure you're using the correct credentials get in touch with the administrator.",
+        statusCode : 401
+      })};
 
   const token = user.generateAuthToken();
 

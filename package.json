@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node ./server/server.js",
     "test": "jest --watchAll --verbose --coverage",
-    "restart": "nodemon app.js"
+    "restart": "nodemon ./server/server.js"
   },
   "engines": {
     "node": "10.10.0"
