@@ -37,7 +37,7 @@ describe('/login', () => {
     });
   });
 
-  describe.skip('POST /', () => {
+  describe('POST /', () => {
 
     const getCsrfs = async () => {
       const res = await request(app).get(`/login`);

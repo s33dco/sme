@@ -130,4 +130,5 @@ InvoiceSchema.statics.listItemsByClient = function (id) {
 }
 
 let Invoice = mongoose.model('Invoice', InvoiceSchema);
+
 module.exports = {Invoice};
