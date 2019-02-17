@@ -6,13 +6,14 @@ const cheerio   = require('cheerio');
 let user, csrfToken, password, cookies;
 
 beforeEach( async () => {
-  user = await new User({
+  user = new User({
     firstName: "Name",
     lastName: "Surname",
     email: "email@example.com",
     password: "password",
     isAdmin : true
-  }).save();
+  })
+  await user.save();
 });
 
 afterEach( async () => {
@@ -34,12 +35,13 @@ describe('/login', () => {
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.text).toMatch(/Sign In/);
+      expect(csrfToken).toBeDefined();
     });
   });
 
   describe('POST /', () => {
 
-    const getCsrfs = async () => {
+    const getLoginCsrfs = async () => {
       const res = await request(app).get(`/login`);
       let $ = cheerio.load(res.text);
       csrfToken = $('[name=_csrf]').val();
@@ -47,8 +49,9 @@ describe('/login', () => {
       return res;
     };
 
-    const exec = async () => {
+    const postLogin = async () => {
       return request(app).post(`/login`)
+        .type('form')
         .set('Cookie', cookies)
         .send({ email: user.email,
                 password: password,
@@ -57,26 +60,34 @@ describe('/login', () => {
     };
 
     it('should return 401 without incorrect user info', async () => {
-      await getCsrfs();
+      await getLoginCsrfs();
       password = 'wrongpassword';
-      const res = await exec();
+      const res = await postLogin();
       expect(res.status).toBe(401)
     });
 
-    it('should return 403 without csrf token/header credentials', async () => {
-      await getCsrfs();
+    it('should return 403 without csrf token', async () => {
+      await getLoginCsrfs();
       csrfToken = '';
+      password = 'password';
+      const res = await postLogin();
+      expect(res.status).toBe(403)
+    });
+
+    it('should return 403 without csrf header', async () => {
+      await getLoginCsrfs();
       cookies = '';
       password = 'password';
-      const res = await exec();
+      const res = await postLogin();
       expect(res.status).toBe(403)
     });
 
     it('should return 200 with correct credentials', async () => {
-      await getCsrfs();
+      await getLoginCsrfs();
       password = 'password';
-      const res = await exec();
-      expect(res.status).toBe(200)
+      const res = await postLogin();
+      expect(res.status).toBe(302)
+      expect(res.text).toMatch(/dashboard/);
     });
   });
 });

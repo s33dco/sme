@@ -6,11 +6,6 @@ const app       = require('../../../app');
 let invoice;
 let clientIds = [];
 
-afterEach( async () => {
-  await Invoice.deleteMany();
-  clientIds = [];
-});
-
 describe('Invoice', () => {
 
   describe('invoice.methods', () => {
@@ -19,6 +14,11 @@ describe('Invoice', () => {
       invoice =  await makeInvoice(new mongoose.Types.ObjectId);
       await invoice.save;
     })
+
+    afterEach( async () => {
+      await Invoice.deleteMany();
+      clientIds = [];
+    });
 
     describe('saving an invoice', () => {
       it('should save an invoice with valid details', () => {
@@ -39,7 +39,7 @@ describe('Invoice', () => {
 
   describe('Invoice.statics', () => {
 
-    const generateInvoices = ( async () => {
+    beforeEach(async () => {
       // make 10 invoices, 2 per client, 30 billed items, 5 paid, 5 unpaid, each total 100.
       for(i=0; i<5; i++) {
         let clientId = new mongoose.Types.ObjectId;
@@ -49,14 +49,17 @@ describe('Invoice', () => {
       }
     })
 
+    afterEach( async () => {
+      await Invoice.deleteMany();
+      clientIds = [];
+    });
+
     it('should count number of unique clients', async () => {
-      await generateInvoices();
       const res = await Invoice.countUniqueClients();
       expect(res[0].count).toEqual(5);
     });
 
     it('should list unpaid invoices', async () => {
-      await generateInvoices();
       const res = await Invoice.listUnpaidInvoices();
       let ids = res.map( inv => inv._id.clientLink);
       expect(ids.length).toBe(5);
@@ -66,25 +69,21 @@ describe('Invoice', () => {
     });
 
     it('should list all invoices', async () => {
-      await generateInvoices();
       const res = await Invoice.listInvoices();
       expect(res.length).toBe(10);
     });
 
     it('should sum paid invoices', async () => {
-      await generateInvoices();
       const res = await Invoice.sumOfPaidInvoices();
       expect(res[0].total).toEqual(500);
     });
 
     it('should sum unpaid invoices', async () => {
-      await generateInvoices();
       const res = await Invoice.sumOfOwedInvoices();
       expect(res[0].total).toEqual(500);
     });
 
-    it('should list invoiced items by clientId', async () => {
-      await generateInvoices();
+    it('should list invoiced items by client', async () => {
       let clientId = clientIds.pop();
       const res = await Invoice.listItemsByClient(clientId);
       expect(res.length).toBe(6);
