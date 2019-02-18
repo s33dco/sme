@@ -42,6 +42,12 @@ userSchema.methods.generateAuthToken = function (){
   return token;
 };
 
+userSchema.statics.isValid = function (id) {
+  return this.findById(id)
+    .then(result => {
+      if (!result) {return false} else {return id}})
+}
+
 userSchema.pre('save',  async function (next) {
   let user = this;
 

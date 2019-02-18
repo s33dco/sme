@@ -20,6 +20,16 @@ router.get('/', auth, async (req, res) => {
   });
 });
 
+router.get('/new', [auth, admin], (req, res) => {
+  res.render('clients/newclient', {
+    data            : {},
+    errors          : {},
+    csrfToken       : req.csrfToken(),  // generate a csrf token
+    pageTitle       : "Add a client",
+    pageDescription : "Create a new client."
+  });
+});
+
 router.get('/:id', [auth, validateId ], (req, res) => {
   const id = req.params.id;
 
@@ -64,16 +74,6 @@ router.get('/:id', [auth, validateId ], (req, res) => {
       pageDescription: `${e.tag}`
     });
   })
-});
-
-router.get('/new', [auth, admin], (req, res) => {
-  res.render('clients/newclient', {
-    data            : {},
-    errors          : {},
-    csrfToken       : req.csrfToken(),  // generate a csrf token
-    pageTitle       : "Add a client",
-    pageDescription : "Create a new client."
-  });
 });
 
 router.post('/', [auth, admin, validate.client], async (req, res) => {

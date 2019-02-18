@@ -1,13 +1,13 @@
 const request   = require('supertest');
-const {User}    = require('../../server/models/user');
+const {makeUserToken, makeAdminToken}    = require('../seed/user');
+const {User}  = require('../../server/models/user');
 const {Client}  = require('../../server/models/client');
 const {Invoice} = require('../../server/models/invoice');
 const app       = require('../../app');
 const mongoose  = require('mongoose');
-
 const cheerio   = require('cheerio');
 
-let user, clients, token, id, name;
+let user, clients, token, id, name, cookies, csrfToken, properties;
 
 beforeEach( async () => {
   clients = [
@@ -17,17 +17,10 @@ beforeEach( async () => {
               { name: "Client Two",
                 email: "client2@example.com",
                 phone: "02234567890"}
-  ]
+  ];
   clients = await Client.insertMany(clients);
-  user = await new User({
-    firstName: "Testy",
-    lastName: "Tester",
-    email: "email@example.com",
-    password: "password",
-    isAdmin : true
-  }).save();
-  token = user.generateAuthToken();
-  id = clients[0]._id
+  id = clients[0]._id;
+  token = await makeAdminToken();
 });
 
 afterEach( async () => {
@@ -128,14 +121,171 @@ describe('/clients', () => {
     });
   });
 
-  describe.skip('GET / new', () => {});
+  describe('GET / new', () => {
 
-  describe.skip('POST /', () => {});
+    const exec = async () => {
+      return await request(app)
+        .get('/clients/new')
+        .set('Cookie', `token=${token}`);
+    };
 
-  describe.skip('POST / edit', () => {});
+    it('should return 200', async () => {
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/Create/);
+    });
 
-  describe.skip('PATCH / :id ', () => {});
+    it('should return 401 if no auth token', async () => {
+      token = '';
+      const res = await exec();
+      expect(res.status).toBe(401);
+    });
 
-  describe.skip('DELETE /', () => {});
+    it('should return 403 if not an admin', async () => {
+      token = await makeUserToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+  });
+
+  describe('POST /', () => {
+
+    properties = {  name: "New Client",
+                    email: "newclient@example.com",
+                    phone: "01234567890",
+                    _csrf : csrfToken};
+
+    const getForm = async () => {
+      const res = await request(app).get('/clients/new')
+                    .set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      return res;
+    };
+
+    const postForm = async () => {
+      const res = await request(app).post('/clients/')
+      .type('form')
+      .set('Cookie', cookies)
+      .send(properties);
+      return res;
+    };
+
+    const countClients = async () => {
+      return await Client.find().countDocuments();
+    };
+
+    it('should create a new client with valid properties', async () => {
+      await getForm();
+      await cookies.push(`token=${token}`);
+      properties = {  name: "New Client",
+                      email: "newclient@example.com",
+                      phone: "01234567890",
+                      _csrf : csrfToken};
+      const res = await postForm();
+      expect(res.status).toBe(302);
+      expect(res.text).toMatch(/clients/);
+      const number = await countClients();
+      expect(number).toEqual(3);
+    });
+
+    it('should not create a new client and redirect if not admin', async () => {
+      await getForm();
+      token = await makeUserToken();
+      cookies.push(`token=${token}`);
+      properties = {  name: "New Client",
+                      email: "newclient@example.com",
+                      phone: "01234567890",
+                      _csrf : csrfToken};
+      const res = await postForm();
+      expect(res.status).toBe(403);
+      expect(res.text).toMatch(/can only view/);
+      const number = await countClients();
+      expect(number).toEqual(2);
+    });
+
+    it('should not create a new client if form data invalid', async () => {
+      await getForm();
+      token = await makeAdminToken();
+      cookies.push(`token=${token}`);
+      properties = {  name: "",
+                      email: "newclient",
+                      phone: "phone",
+                      _csrf : csrfToken};
+      const res = await postForm();
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/please correct/);
+      const number = await countClients();
+      expect(number).toEqual(2);
+    });
+
+    it('should not create a new client and redirect if not admin', async () => {
+      await getForm();
+      token = await makeUserToken();
+      cookies.push(`token=${token}`);
+      properties = {  name: "New Client",
+                      email: "newclient@example.com",
+                      phone: "01234567890",
+                      _csrf : csrfToken};
+      const res = await postForm();
+      expect(res.status).toBe(403);
+      expect(res.text).toMatch(/can only view/);
+      const number = await countClients();
+      expect(number).toEqual(2);
+    });
+
+    it('should not create if csrf do not check out', async () => {
+      await getForm();
+      token = await makeAdminToken();
+      cookies.push(`token=${token}`);
+      properties = {  name: "New Client",
+                      email: "newclient@example.com",
+                      phone: "01234567890",
+                      _csrf : '5667t8gfkhgjtdk6fuyfkuy'};
+      const res = await postForm();
+      expect(res.status).toBe(403);
+      expect(res.text).toMatch(/invalid csrf token/);
+      const number = await countClients();
+      expect(number).toEqual(2);
+    });
+  });
+
+  describe('DELETE /', () => {
+
+    const exec = async () => {
+      const res = await request(app).get('/clients').set('Cookie', `token=${token}`);
+      cookies = res.headers['set-cookie'];
+      cookies.push(`token=${token}`);
+    };
+
+    const getId = async () => {
+      const res = await request(app).get(`/clients/${id}`)
+                          .set('Cookie', cookies);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.delete').find('[name=_csrf]').val();
+    };
+
+    it('it should delete a record with a valid request', async () => {
+      await exec();
+      await getId();
+      const res = await request(app).delete('/')
+          .set('Cookie', cookies)
+          .send({_id : id,
+                  name: clients[0].name,
+                  billed: 0,
+                  _csrf: csrfToken});
+      expect(res.status).toBe(302);
+      number = countClients();
+      expect(number).toEqual(1);
+    });
+  });
+
+  // describe.skip('POST / edit', () => {});
+  //
+  // describe.skip('PATCH / :id ', () => {});
+  //
+
 
 });

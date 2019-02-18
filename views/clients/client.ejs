@@ -17,22 +17,27 @@
 <% }); %>
 
 <% if (admin) { %>
-  <form method="post" action="/clients/edit?_method=post" novalidate>
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <input type="hidden" name="id" value="<%= client._id %>">
-    <div class="form-actions">
-      <button class="btn" type="submit">Edit Details</button>
-    </div>
-  </form>
+  <div class="edit">
+    <form method="post" action="/clients/edit?_method=post" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= client._id %>">
+      <div class="form-actions">
+        <button class="btn" type="submit">Edit Details</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="delete">
+    <form method="post" action="/clients?_method=DELETE" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= client._id %>">
+      <input type="hidden" name="billed" value="<%= total %>">
+      <input type="hidden" name="name" value="<%= client.name %>">
+      <div class="form-actions">
+        <button class="btn danger" type="submit">Delete</button>
+      </div>
+    </form>
+  </div>
 
 
-  <form method="post" action="/clients?_method=DELETE" novalidate>
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <input type="hidden" name="id" value="<%= client._id %>">
-    <input type="hidden" name="billed" value="<%= total %>">
-    <input type="hidden" name="name" value="<%= client.name %>">
-    <div class="form-actions">
-      <button class="btn danger" type="submit">Delete</button>
-    </div>
-  </form>
 <% } %>

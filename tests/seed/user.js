@@ -21,4 +21,16 @@ const makeAdmin = ( async () => {
   }).save();
 });
 
-module.exports = { makeUser, makeAdmin}
+
+const makeUserToken = ( async () => {
+  user = await makeUser();
+  return await user.generateAuthToken();
+});
+
+const makeAdminToken = ( async () => {
+  user = await makeAdmin();
+  return await user.generateAuthToken();
+});
+
+
+module.exports = { makeUser, makeAdmin, makeUserToken, makeAdminToken}
