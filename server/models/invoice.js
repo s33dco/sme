@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger   = require('../startup/logger');
 
 let InvoiceSchema = new mongoose.Schema({
   invNo       : { type: Number},
@@ -45,9 +46,18 @@ let InvoiceSchema = new mongoose.Schema({
                 ]
 });
 
-InvoiceSchema.methods.totalInvoiceValue = function () {
+InvoiceSchema.methods.totalInvoiceValue = function async () {
   inv = this;
   return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
+}
+
+// Invoice.withClientId
+
+InvoiceSchema.statics.withClientId = function (id) {
+  return this.aggregate([
+    {"$match" : { 'client._id' : id }},
+    {"$project" : { _id:1 , invNo:1}}
+  ]);
 }
 
 InvoiceSchema.statics.countUniqueClients = function () {
@@ -67,8 +77,7 @@ InvoiceSchema.statics.newestInvoiceNumber = function () {
 };
 
 InvoiceSchema.statics.listInvoices = function () {
-  let invoiceList =
-  this.aggregate([
+  return this.aggregate([
     {$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
     {"$unwind" : "$items"},
     {"$sort": {"items.date" : -1}},
@@ -79,12 +88,10 @@ InvoiceSchema.statics.listInvoices = function () {
     },
     {"$sort": {"_id.invoice": -1}}
   ]);
-  return invoiceList;
 }
 
 InvoiceSchema.statics.listUnpaidInvoices = function () {
-  let invoiceList =
-  this.aggregate([
+  return this.aggregate([
     {"$match" : { paid : false}},
     {"$project" : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
     {"$unwind" : "$items"},
@@ -94,7 +101,6 @@ InvoiceSchema.statics.listUnpaidInvoices = function () {
      "total": {"$sum": "$items.fee"}
     }}
   ]);
-  return invoiceList;
 }
 
 InvoiceSchema.statics.sumOfOwedInvoices = function () {

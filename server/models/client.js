@@ -25,7 +25,8 @@ let clientSchema = new mongoose.Schema({
 clientSchema.statics.isValid = function (id) {
   return this.findById(id)
     .then(result => {
-      if (!result) {return false} else {return id}})
+      if (!result) {return false} else {return id};
+    })
 }
 
 clientSchema.statics.withId = function (id) {

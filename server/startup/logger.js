@@ -33,6 +33,7 @@ const logger = createLogger({
   // change level if in dev environment versus production
   level: logLevel(),
   format: format.combine(
+    format.colorize(),
     format.timestamp({
       format: 'DD-MM-YY HH:mm:ss'
     }),

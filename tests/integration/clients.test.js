@@ -1,17 +1,19 @@
-const request   = require('supertest');
-const {makeUserToken, makeAdminToken}    = require('../seed/user');
-const {User}  = require('../../server/models/user');
-const {Client}  = require('../../server/models/client');
-const {Invoice} = require('../../server/models/invoice');
-const app       = require('../../app');
-const mongoose  = require('mongoose');
-const cheerio   = require('cheerio');
+const {makeUserToken,
+makeAdminToken}     = require('../seed/user');
+const {makeInvoice} = require('../seed/invoice');
+const request       = require('supertest');
+const {User}        = require('../../server/models/user');
+const {Client}      = require('../../server/models/client');
+const {Invoice}     = require('../../server/models/invoice');
+const app           = require('../../app');
+const mongoose      = require('mongoose');
+const cheerio       = require('cheerio');
 
-let user, clients, token, id, name, cookies, csrfToken, properties;
+let user, clients, token, id, name, cookies, newcookies, csrfToken, properties, newClient, invoice, newCsrfToken;
 
 beforeEach( async () => {
   clients = [
-              {  name: "Client One",
+              { name: "Client One",
                 email: "client1@example.com",
                 phone: "01234567890"},
               { name: "Client Two",
@@ -21,6 +23,7 @@ beforeEach( async () => {
   clients = await Client.insertMany(clients);
   id = clients[0]._id;
   token = await makeAdminToken();
+  invoice = await makeInvoice(id);
 });
 
 afterEach( async () => {
@@ -84,31 +87,6 @@ describe('/clients', () => {
     });
 
     it('should display the previous items billed to client id', async () => {
-      invoice = new Invoice({
-                invNo      : 1,
-                invDate    : Date.now(),
-                message    : "thanks",
-                client     : {
-                    _id         : id,
-                    name        : clients[0].name,
-                    email       : clients[0].email,
-                    phone       : clients[0].phone
-                },
-                items      : [{date: Date.now(), desc:'working very hard', fee:20},
-                              {date: Date.now(), desc:'working very hard', fee:20}],
-                details    : {
-                    utr         : "1234567891",
-                    email       : "myemail@email.com",
-                    phone       : "07865356742",
-                    bank        : "the bank",
-                    sortcode    : "00-00-00",
-                    accountNo   : "12345678",
-                    terms       : "cash is king",
-                    contact     : "myemail@example.com"
-                },
-                paid        : false
-              });
-      await invoice.save();
       const res = await exec();
       expect(res.status).toBe(200);
       expect(res.text).toMatch(/Invoice 1/);
@@ -254,38 +232,170 @@ describe('/clients', () => {
 
   describe('DELETE /', () => {
 
-    const exec = async () => {
-      const res = await request(app).get('/clients').set('Cookie', `token=${token}`);
-      cookies = res.headers['set-cookie'];
-      cookies.push(`token=${token}`);
-    };
-
-    const getId = async () => {
-      const res = await request(app).get(`/clients/${id}`)
-                          .set('Cookie', cookies);
+    beforeEach( async () => {
+      const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
       let $ = cheerio.load(res.text);
       csrfToken = $('.delete').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      properties = {};
+    });
+
+    const deleteID = async () => {
+      return await request(app).delete('/clients')
+          .type('form')
+          .set('Cookie', cookies)
+          .send(properties);
     };
 
-    it('it should delete a record with a valid request', async () => {
-      await exec();
-      await getId();
-      const res = await request(app).delete('/')
-          .set('Cookie', cookies)
-          .send({_id : id,
-                  name: clients[0].name,
-                  billed: 0,
-                  _csrf: csrfToken});
-      expect(res.status).toBe(302);
-      number = countClients();
+    const countClients = async () => {
+      return await Client.find().countDocuments();
+    };
+
+    it('it should delete a record with a valid request and redirect to dashboard', async () => {
+      cookies.push(`token=${token}`);
+      properties = { id : id.toHexString(), _csrf: csrfToken, billed: 0};
+      const res = await deleteID();
+      let number = await countClients();
       expect(number).toEqual(1);
+      expect(res.text).toMatch(/dashboard/);
+      expect(res.status).toBe(302);
+    });
+
+    it('have to have an admin token to delete (user token)', async () => {
+      token = await makeUserToken();
+      cookies.push(`token=${token}`);
+      properties = { id : id.toHexString(), _csrf: csrfToken, billed: 0};
+      const res = await deleteID();
+      let number = await countClients();
+      expect(number).toEqual(2);
+      expect(res.status).toBe(403);
+    });
+
+    it('have to have an admin token to delete (no token)', async () => {
+      token = '';
+      cookies.push(`token=${token}`);
+      properties = { id : id.toHexString(), _csrf: csrfToken, billed: 0};
+      const res = await deleteID();
+      let number = await countClients();
+      expect(number).toEqual(2);
+      expect(res.status).toBe(401);
+    });
+
+    it('it should not delete a client with invoices attached.', async () => {
+      cookies.push(`token=${token}`);
+      properties = { id : id.toHexString(), _csrf: csrfToken, billed: 10};
+      const res = await deleteID();
+      let number = await countClients();
+      expect(number).toEqual(2);
+      expect(res.status).toBe(400);
+    });
+
+    it('it should not delete a client with a invalid id, throw 400.', async () => {
+      cookies.push(`token=${token}`);
+      properties = { id : 'invalididstring1234', _csrf: csrfToken, billed: 0}
+      const res = await deleteID();
+      number = await countClients();
+      expect(number).toEqual(2);
+      expect(res.status).toBe(400);
+    });
+
+    it('it should not delete a client with a valid id not in db, throw 404.', async () => {
+      cookies.push(`token=${token}`);
+      properties = { id : new mongoose.Types.ObjectId().toHexString(), _csrf: csrfToken, billed: 0}
+      const res = await deleteID();
+      let number = await countClients();
+      expect(number).toEqual(2);
+      expect(res.status).toBe(404);
     });
   });
 
-  // describe.skip('POST / edit', () => {});
-  //
-  // describe.skip('PATCH / :id ', () => {});
-  //
+  describe.skip('PATCH / :id ', () => {
+
+    const getEditButton = async () => {
+      const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.edit').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      cookies.push(`token=${token}`);
+      console.log(`headers from getEditButton - ${cookies}`)
+      return res;
+    }
+
+    const getUpdateForm = async () => {
+      const res = await request(app).post('/clients/edit')
+          .type('form')
+          .set('Cookie', cookies)
+          .send({id : id.toHexString(), _csrf: csrfToken});
+      let $ = cheerio.load(res.text);
+      newCsrfToken = $('[name=_csrf]').val();
+      console.log(`headers from getUpdateForm - ${cookies}`)
+      return res;
+    };
+
+    const sendUpdate = async () => {
+      return await request(app).patch(`/clients/${id}`)
+          .type('form')
+          .set('Cookie', cookies)
+          .send(properties);
+    };
+
+    it('updates the client record with valid input', async () => {
+      properties = {id : id.toHexString(),
+                    _csrf: newCsrfToken,
+                    name: 'New Name for Client',
+                    email: 'newmemail@example.com',
+                    phone: '07777777777'};
+      let get = await getEditButton();
+      let form = await getUpdateForm();
+      const res = await sendUpdate();
+      console.log(`headers from send update - ${cookies}`)
+      expect(res.status).toBe(302);
+    });
+
+  });
+
+  describe('POST / edit', () => {
+    beforeEach( async () => {
+      const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.edit').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      properties = {};
+    });
+
+    afterEach ( async () => {
+      cookies = [];
+      properties = {};
+      token = '';
+    });
 
 
+    const editID = async () => {
+      return await request(app).post('/clients/edit')
+          .type('form')
+          .set('Cookie', cookies)
+          .send({id : id.toHexString(), _csrf: csrfToken});
+    };
+
+    it('should display the edit form with admin token', async () => {
+      cookies.push(`token=${token}`);
+      const res = await editID();
+      expect(res.status).toBe(200);
+    });
+
+    it('will not display the edit form with user token', async () => {
+      token = await makeUserToken();
+      cookies.push(`token=${token}`);
+      const res = await editID();
+      expect(res.status).toBe(403);
+    });
+
+    it('will not display the edit form with no token', async () => {
+      token = "";
+      cookies.push(`token=${token}`);
+      const res = await editID();
+      expect(res.status).toBe(401);
+    });
+
+  });
 });

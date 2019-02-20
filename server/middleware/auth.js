@@ -36,7 +36,6 @@ module.exports = async (req, res, next) => {
         next(Error);
       }
 
-
       res.locals.loggedIn = req.user;
       res.locals.fullAdmin = req.user.isAdmin;
       next();

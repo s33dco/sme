@@ -4,40 +4,31 @@
   <h4><%=client.email%></h4>
   <h2>£<%= total %> previously billed.</h2>
 </header>
-
-
 <% itemsList.forEach((item) => { %>
   <div class="item">
     <p><%= moment(item.items.date).format("Do MMMM YYYY") %>
        (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>) £<%= item.items.fee %></p>
     <p><%= item.items.desc %></p>
   </div>
-
-
 <% }); %>
-
 <% if (admin) { %>
   <div class="edit">
     <form method="post" action="/clients/edit?_method=post" novalidate>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <input type="hidden" name="id" value="<%= client._id %>">
+      <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+      <input type="hidden" name="id" value="<%=client._id%>">
       <div class="form-actions">
         <button class="btn" type="submit">Edit Details</button>
       </div>
     </form>
   </div>
-
   <div class="delete">
-    <form method="post" action="/clients?_method=DELETE" novalidate>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <input type="hidden" name="id" value="<%= client._id %>">
-      <input type="hidden" name="billed" value="<%= total %>">
-      <input type="hidden" name="name" value="<%= client.name %>">
+    <form method="post" action="/clients?_method=delete" novalidate>
+      <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+      <input type="hidden" name="id" value="<%=client._id%>">
+      <input type="hidden" name="billed" value="<%=total%>">
       <div class="form-actions">
         <button class="btn danger" type="submit">Delete</button>
       </div>
     </form>
   </div>
-
-
 <% } %>

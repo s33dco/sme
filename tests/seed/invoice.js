@@ -5,8 +5,8 @@ const moment = require('moment');
 const now = () => { return moment().format('YYYY MM DD') };
 const then = () => { return moment().subtract(30, 'days').calendar();}
 
-const makeInvoice =  (id) => {
-  return new Invoice({
+const makeInvoice =  async (id) => {
+  return  await new Invoice({
             invNo      : 1,
             invDate    : Date.now(),
             message    : "thanks",
@@ -30,7 +30,7 @@ const makeInvoice =  (id) => {
                 contact     : "myemail@example.com"
             },
             paid        : false
-          });
+          }).save();
 }
 
 const makePaidInvoice =  (id) => {
@@ -58,9 +58,7 @@ const makePaidInvoice =  (id) => {
                 contact     : "myemail@example.com"
             },
             paid        : true
-          });
+          }).save();
 }
-
-
 
 module.exports = { makeInvoice, makePaidInvoice};

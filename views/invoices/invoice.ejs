@@ -55,6 +55,7 @@
 </form>
 
 <% if (admin) { %>
+  
   <form method="post" action="/invoices/edit?_method=post" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="hidden" name="id" value="<%= invoice._id %>">
@@ -72,7 +73,6 @@
       </div>
     </form>
 
-  <% console.log(invoice._id)%>
   <% } else { %>
 
     <form method="post" action="/invoices/paid?_method=PATCH" novalidate>
@@ -82,8 +82,6 @@
         <button class="btn" type="submit">Mark as Paid</button>
       </div>
     </form>
-
-    <% console.log(invoice._id)%>
 
   <% } %>
 

@@ -1,6 +1,7 @@
 const logger = require('../startup/logger')
 
 module.exports = ((err, req, res, next) => {
+  
 
   if (!err.statusCode){
       req.flash('alert', "Ouch!");
@@ -18,6 +19,6 @@ module.exports = ((err, req, res, next) => {
     errorTag: err.tag,
     errorMessage : err.message,
     pageTitle: err.statusCode,
-    pageDescription: `${err.tag}`
+    pageDescription: `${err.tag}`,
   });
 });

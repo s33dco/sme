@@ -12,7 +12,6 @@ describe('Invoice', () => {
 
     beforeEach( async () => {
       invoice =  await makeInvoice(new mongoose.Types.ObjectId);
-      await invoice.save;
     })
 
     afterEach( async () => {
@@ -44,8 +43,8 @@ describe('Invoice', () => {
       for(i=0; i<5; i++) {
         let clientId = new mongoose.Types.ObjectId;
         clientIds.push(clientId);
-        await makeInvoice(clientId).save();
-        await makePaidInvoice(clientId).save();
+        await makeInvoice(clientId);
+        await makePaidInvoice(clientId);
       }
     })
 
@@ -96,11 +95,19 @@ describe('Invoice', () => {
       });
     });
 
+    it('should count invoices with clientId (find 2)', async () => {
+      let clientId = clientIds.pop();
+      const res = await Invoice.withClientId(clientId);
+      expect(res.length).toBe(2);
+    });
 
+    it('should count invoices with clientId (find 0)', async () => {
+      let clientId = new mongoose.Types.ObjectId;;
+      const res = await Invoice.withClientId(clientId);
+      expect(res.length).toBe(0);
+    });
 
     // InvoiceSchema.statics.newestInvoiceNumber
-
-
   });
 
 });

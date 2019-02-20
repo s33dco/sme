@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node ./server/server.js",
-    "test": "jest --watchAll --verbose --coverage",
+    "test": "jest --watchAll --verbose --coverage  --runInBand",
     "restart": "nodemon ./server/server.js"
   },
   "engines": {
