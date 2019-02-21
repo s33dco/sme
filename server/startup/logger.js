@@ -44,6 +44,7 @@ const logger = createLogger({
 
     new transports.Console({
       handleExceptions: true,
+      silent: env === 'test', // no logging to console if running in test..
       exitOnError: true,
       format: format.combine(
         format.colorize(),

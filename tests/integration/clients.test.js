@@ -1,6 +1,6 @@
 const {makeUserToken,
 makeAdminToken}     = require('../seed/user');
-const {makeInvoice} = require('../seed/invoice');
+const {makeUnpaidInvoice} = require('../seed/invoice');
 const request       = require('supertest');
 const {User}        = require('../../server/models/user');
 const {Client}      = require('../../server/models/client');
@@ -23,7 +23,7 @@ beforeEach( async () => {
   clients = await Client.insertMany(clients);
   id = clients[0]._id;
   token = await makeAdminToken();
-  invoice = await makeInvoice(id);
+  invoice = await makeUnpaidInvoice(id);
 });
 
 afterEach( async () => {
@@ -75,7 +75,7 @@ describe('/clients', () => {
     });
 
     it('should return 404 for not found id', async () => {
-      id = mongoose.Types.ObjectId;
+      id = mongoose.Types.ObjectId();
       const res = await exec();
       expect(res.status).toBe(404);
     });
@@ -317,7 +317,6 @@ describe('/clients', () => {
       csrfToken = $('.edit').find('[name=_csrf]').val();
       cookies = res.headers['set-cookie'];
       cookies.push(`token=${token}`);
-      console.log(`headers from getEditButton - ${cookies}`)
       return res;
     }
 

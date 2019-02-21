@@ -2,7 +2,8 @@ const express             = require('express');
 const router              = express.Router();
 const moment              = require('moment');
 const {validationResult}  = require('express-validator/check');
-const validate            = require('../middleware/validators')
+const validate            = require('../middleware/validators');
+const validateId          = require('../middleware/validateId')
 const {ObjectID}          = require('mongodb');
 const {Invoice}           = require("../models/invoice");
 const {Client}            = require("../models/client");
@@ -125,14 +126,18 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
     };
   });
 
-router.get('/:id',  auth, async (req, res) => {
+router.get('/:id',  [auth, validateId ], async (req, res) => {
   let id = req.params.id;
-
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
   const invoice = await Invoice.findOne({ _id: id});
 
-  if (!invoice) {throw Error("No find")}
+  if (!invoice) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
 
   let total = invoice.totalInvoiceValue();
 
@@ -163,27 +168,59 @@ router.post('/email', auth, async (req, res) => {
 });
 
 router.patch('/paid', [auth, admin], async (req, res) => {
-  let id = req.body.id
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
 
-  const invoice = await Invoice.findOneAndUpdate(
-     { _id : id },
-     {$set: {paid:true},$currentDate: { datePaid: true}},
-     {new : true });
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "Invoice can't be updated",
+      message : "The Invoice can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  const invoice = await Invoice.findOne({_id: req.body.id});
+
+  if (!invoice) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The invoice you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
+
+  await invoice.update({paid: true, $currentDate: { datePaid: true}});
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
   res.redirect('/dashboard');
 });
 
 router.patch('/unpaid', [auth, admin], async (req, res) => {
-  let id = req.body.id;
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
+  let id = req.body.id
 
-  const invoice = await Invoice.findOneAndUpdate(
-     { _id : id },
-     {$set: {paid:false}, $unset: {datePaid:1}},
-     {new : true });
+  if (!ObjectID.isValid(id)) {
+    throw ({
+      tag : "Invoice can't be updated",
+      message : "The Invoice can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  let invoice = await Invoice.withId(id);
+
+  if (!invoice) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The invoice you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
+
+  await invoice.update({paid: false, datePaid: undefined},{new:true});
+
+  // invoice = await Invoice.findOneAndUpdate({ _id : id },
+  //                         { $set: {paid:false},
+  //                           $unset: {datePaid:1}},
+  //                         {new : true });
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} now unpaid!`);
   res.redirect("/dashboard");

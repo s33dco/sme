@@ -1,5 +1,5 @@
 const {Invoice} = require('../../../server/models/invoice');
-const {makeInvoice, makePaidInvoice} = require('../../seed/invoice');
+const {makeUnpaidInvoice, makePaidInvoice} = require('../../seed/invoice');
 const mongoose = require('mongoose');
 const app       = require('../../../app');
 
@@ -11,7 +11,7 @@ describe('Invoice', () => {
   describe('invoice.methods', () => {
 
     beforeEach( async () => {
-      invoice =  await makeInvoice(new mongoose.Types.ObjectId);
+      invoice =  await makeUnpaidInvoice(new mongoose.Types.ObjectId);
     })
 
     afterEach( async () => {
@@ -43,7 +43,7 @@ describe('Invoice', () => {
       for(i=0; i<5; i++) {
         let clientId = new mongoose.Types.ObjectId;
         clientIds.push(clientId);
-        await makeInvoice(clientId);
+        await makeUnpaidInvoice(clientId);
         await makePaidInvoice(clientId);
       }
     })

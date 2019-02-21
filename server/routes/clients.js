@@ -31,51 +31,36 @@ router.get('/new', [auth, admin], (req, res) => {
   });
 });
 
-router.get('/:id', [auth, validateId ], (req, res) => {
+router.get('/:id', [auth, validateId ], async (req, res) => {
   const id = req.params.id;
 
-  const promise = Promise.all([
-    Client.withId(id),
-    Invoice.listItemsByClient(id)
-    ]);
+  const client = await Client.withId(id);
 
-  promise.then(([client, itemsList]) => {
+  if (!client) {
+        throw ({
+          tag : 'No longer available.',
+          message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+          statusCode : 404
+        });
+  }
 
-    if (!client) {
-      throw ({
-        tag : 'No longer available.',
-        message : "The resource you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
-        statusCode : 404
-      });
-    }
+  const itemsList = await Invoice.listItemsByClient(id);
 
-    if (itemsList.length > 0){
-      total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee)
-    } else {
-      total = '0'
-    }
-    res.render('clients/client', {
-        pageTitle       : "Client",
-        pageDescription : "Client.",
-        csrfToken       : req.csrfToken(),
-        client,
-        itemsList,
-        total,
-        admin : req.user.isAdmin
-    });
-  })
-  .catch((e) => {
-    logger.error(`${e.statusCode} - ${e.tag} - ${e.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-    req.flash('alert', "We can't find that for you.");
-    res.render('error', {
-      errorCode: e.statusCode,
-      errorTag: e.tag,
-      errorMessage : e.message,
-      pageTitle: e.statusCode,
-      pageDescription: `${e.tag}`
-    });
-  })
-});
+  if (itemsList.length > 0){
+    total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee);
+  } else {
+    total = '0';
+  }
+  res.render('clients/client', {
+      pageTitle       : "Client",
+      pageDescription : "Client.",
+      csrfToken       : req.csrfToken(),
+      client,
+      itemsList,
+      total,
+      admin : req.user.isAdmin
+  });
+})
 
 router.post('/', [auth, admin, validate.client], async (req, res) => {
 

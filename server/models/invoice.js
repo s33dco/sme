@@ -51,7 +51,10 @@ InvoiceSchema.methods.totalInvoiceValue = function async () {
   return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
 }
 
-// Invoice.withClientId
+
+InvoiceSchema.statics.withId = function (id) {
+  return this.findOne({_id: id});
+}
 
 InvoiceSchema.statics.withClientId = function (id) {
   return this.aggregate([
