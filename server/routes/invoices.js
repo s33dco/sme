@@ -85,15 +85,37 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           selected
       });
 
-    } else {
+    }
 
-      const promise = Promise.all([
-        Detail.findOne(),
-        Client.findOne({_id: req.body.clientId})
-      ]);
+    if (!ObjectID.isValid(req.body.clientId)) {
+      throw ({
+        tag : "Client can't be found",
+        message : "The client can't be found maybe you should try again.",
+        statusCode : 400
+      });
+    }
 
-      promise.then(([detail, client]) => {
-        return new Invoice({
+    const client = await Client.findOne({_id: req.body.clientId});
+
+    if (!client) {
+          throw ({
+            tag : 'No longer available.',
+            message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+            statusCode : 404
+          });
+    }
+
+    const detail = await Detail.findOne();
+
+    if (!detail) {
+      throw ({
+        tag : 'You need to add your details...',
+        message : "No information for your invoice can be found, head over to details and add your bank details etc....",
+        statusCode : 400
+      });
+    }
+
+    const invoice = await new Invoice({
           invNo      : req.body.invNo,
           invDate    : req.body.invDate,
           message    : req.body.message,
@@ -115,15 +137,9 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
               contact     : detail.contact
           },
           paid        : false
-        }).save();
-      }).then((invoice) => {
-          req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
-          res.redirect(`invoices/${invoice._id}`);
-      }).catch((e) => {
-          logger.error(e.message);
-          res.status(500);
-      });
-    };
+        }).save()
+    req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
+    res.redirect(`invoices/${invoice._id}`);
   });
 
 router.get('/:id',  [auth, validateId ], async (req, res) => {

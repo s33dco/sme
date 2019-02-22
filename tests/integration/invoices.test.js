@@ -4,6 +4,7 @@ const {makeUnpaidInvoice,
 makePaidInvoice}    = require('../seed/invoice');
 const {makeClient}  = require('../seed/client');
 const {makeDetails}  = require('../seed/details');
+const {Detail}      = require('../../server/models/detail')
 const {Client}      = require('../../server/models/client');
 const {Invoice}     = require('../../server/models/invoice');
 const request       = require('supertest');
@@ -12,12 +13,12 @@ const mongoose      = require('mongoose');
 const cheerio       = require('cheerio');
 const moment        = require('moment');
 
-let token, details, csrfToken, cookies, client, paidInvoice, unpaidInvoice, invoice, invoiceId, clientId, properties;
+let token, csrfToken, cookies, client, paidInvoice, unpaidInvoice, invoice, invoiceId, clientId, properties;
 
 beforeEach( async () => {
   token = await makeAdminToken();
   client = await makeClient();
-  details = await makeDetails();
+  await makeDetails();
   paid = await makePaidInvoice(client._id);
   unpaid = await makeUnpaidInvoice(client._id);
 });
@@ -25,7 +26,7 @@ beforeEach( async () => {
 afterEach( async () => {
   await Client.deleteMany();
   await Invoice.deleteMany();
-  token = '';
+  await Detail.deleteMany();
 });
 
 describe('/invoices', () => {
@@ -426,7 +427,6 @@ describe('/invoices', () => {
     const getNewInvoiceForm = async () => {
       const res = await request(app).get('/invoices/new')
                           .set('Cookie', `token=${token}`);
-
       let $ = cheerio.load(res.text);
       csrfToken = $('.details').find('[name=_csrf]').val();
       cookies = res.headers['set-cookie'];
@@ -438,25 +438,25 @@ describe('/invoices', () => {
       clientId =  client._id;
       await getNewInvoiceForm();
       properties = { _csrf: csrfToken,
-                    clientId: client._id.toHexString(),
-                    invDate: moment().format('YYYY-MM-DD'),
-                    invNo: 12,
-                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
-                    }
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                  }
 
       const res = await request(app).post('/invoices')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send(properties)
+                      .set('Cookie', cookies)
+                      .type('form')
+                      .send(properties)
 
       expect(res.status).toBe(302);
       number = await Invoice.find().countDocuments();
       expect(number).toEqual(3);
     });
 
-    it('gives 403 if no admin token', async ()=> {
+    it('returns 403 if no admin token', async ()=> {
       token = await makeUserToken();
       clientId =  client._id;
       await getNewInvoiceForm();
@@ -478,10 +478,130 @@ describe('/invoices', () => {
       number = await Invoice.find().countDocuments();
       expect(number).toEqual(2);
     });
+
+    it('returns 403 if no login token', async ()=> {
+      token = '';
+      clientId =  client._id;
+      await getNewInvoiceForm();
+      properties = { _csrf: csrfToken,
+                    clientId: client._id.toHexString(),
+                    invDate: moment().format('YYYY-MM-DD'),
+                    invNo: 12,
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                    }
+
+      const res = await request(app).post('/invoices')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send(properties)
+
+      expect(res.status).toBe(403);
+      number = await Invoice.find().countDocuments();
+      expect(number).toEqual(2);
+    });
+
+    it('returns 403 if invalid csrf token', async ()=> {
+      clientId =  client._id;
+      await getNewInvoiceForm();
+      properties = { _csrf: 'rubbish',
+                    clientId: client._id.toHexString(),
+                    invDate: moment().format('YYYY-MM-DD'),
+                    invNo: 12,
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                    }
+
+      const res = await request(app).post('/invoices')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send(properties)
+
+      expect(res.status).toBe(403);
+      number = await Invoice.find().countDocuments();
+      expect(number).toEqual(2);
+    });
+
+    it('displayed form when invalid data submitted and display message', async ()=> {
+      clientId =  client._id;
+      await getNewInvoiceForm();
+      properties = { _csrf: csrfToken,
+                    clientId: client._id.toHexString(),
+                    invDate: moment().format('YYYY-MM-DD'),
+                    invNo: 12,
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.'
+                    }
+
+      const res = await request(app).post('/invoices')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send(properties)
+
+      expect(res.status).toBe(200);
+      number = await Invoice.find().countDocuments();
+      expect(number).toEqual(2);
+      expect(res.text).toMatch(/please correct/)
+    });
+
+    it("returns 200 and error message for an invalid client id", async ()=> {
+      await getNewInvoiceForm();
+      properties = { _csrf: csrfToken,
+                    clientId: 'fake_id',
+                    invDate: moment().format('YYYY-MM-DD'),
+                    invNo: 12,
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'),
+                            desc:'run a mile',fee: 50 },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'),
+                            desc:'jump a stile',fee: 50 }]
+                  }
+
+      const res = await request(app).post('/invoices')
+                      .set('Cookie', cookies)
+                      .type('form')
+                      .send(properties)
+
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/Select a Client/)
+      number = await Invoice.find().countDocuments();
+      expect(number).toEqual(2);
+      expect(res.text).toMatch(/please correct/)
+    });
+
+    it("returns 200 and error for a valid client id not in db", async ()=> {
+
+      // need custom validator for express validator existing clientid
+
+      clientId =  new mongoose.Types.ObjectId();
+      await getNewInvoiceForm();
+      properties = { _csrf: csrfToken,
+                    clientId: clientId.toHexString(),
+                    invDate: moment().format('YYYY-MM-DD'),
+                    invNo: 12,
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'),
+                            desc:'run a mile',fee: 50 },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'),
+                            desc:'jump a stile',fee: 50 }]
+                  }
+
+      const res = await request(app).post('/invoices')
+                      .set('Cookie', cookies)
+                      .type('form')
+                      .send(properties)
+
+      expect(res.status).toBe(200);
+      number = await Invoice.find().countDocuments();
+      expect(number).toEqual(2);
+      expect(res.text).toMatch(/Client not found/)
+    });
+
   });
 
-  // describe('POST / edit', ()=> {});
-  // describe('PATCH / :id', ()=> {});
-  // describe('POST / email', ()=> {});
+  describe.skip('POST / edit', ()=> {});
+  describe.skip('PATCH / :id', ()=> {});
+  describe.skip('POST / email', ()=> {});
 
 });

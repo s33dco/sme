@@ -9,7 +9,7 @@ module.exports = {
       .custom(id => {
         return Client.findById(id).then(client => {
           if (!client) {
-            return Promise.reject('Client not in DB');
+            return Promise.reject('Client not found');
           } else {
             return true
           }
