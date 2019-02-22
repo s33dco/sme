@@ -215,7 +215,7 @@ router.patch('/unpaid', [auth, admin], async (req, res) => {
     });
   }
 
-  await invoice.update({paid: false, datePaid: undefined},{new:true});
+  await invoice.update({paid: false, datePaid: undefined});
 
   // invoice = await Invoice.findOneAndUpdate({ _id : id },
   //                         { $set: {paid:false},
@@ -337,16 +337,38 @@ router.delete('/', [auth, admin], async (req, res) => {
 
   const { id, number, name, paid } = req.body;
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
-  if (paid === 'true')  {
-    req.flash('alert', "Can't delete a paid invoice.");
-    return res.redirect("/dashboard");
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "Invoice can't be deleted",
+      message : "The invoice can't be found maybe you should try again.",
+      statusCode : 400
+    });
   }
 
-  const invoice = await Invoice.deleteOne({ _id : id });
+  const invoice =  await Invoice.findOne({_id: req.body.id});
 
-  req.flash('alert', `Invoice ${number} for ${name} deleted!`);
+  if (!invoice ){
+    throw ({
+      tag : "Invoice can't be found",
+      message : "The client can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  if (invoice.paid)  {
+    req.flash('alert', "Can't delete a paid invoice.");
+    throw ({
+      tag : "Invoice can't be deleted",
+      message : "The invoice can't be deleted if it has been paid, if you need to delete you'll need mark the invoice as unpaid first.",
+      statusCode : 400
+    });
+  }
+
+  await Invoice.deleteOne({ _id : invoice._id });
+
+  req.flash('alert', `Invoice ${invoice.invNo} deleted!`);
   return res.redirect("/invoices");
+
 });
 
 module.exports = router

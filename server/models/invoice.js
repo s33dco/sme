@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const logger   = require('../startup/logger');
 
 let InvoiceSchema = new mongoose.Schema({
   invNo       : { type: Number},
