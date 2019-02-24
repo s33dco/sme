@@ -2,26 +2,32 @@
   <h2><%=user.firstName%> <%=user.lastName%></h2>
 </header>
 
-
-<form method="post" action="/users/edit?_method=post" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="hidden" name="id" value="<%= user._id %>">
-  <div class="form-actions">
-    <button class="btn" type="submit">Edit</button>
-  </div>
-</form>
-
-<% if (!user.isAdmin){ %>
-  <form method="post" action="/users/upgrade?_method=post" novalidate>
+<div class="edit">
+  <form method="post" action="/users/edit?_method=post" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="hidden" name="id" value="<%= user._id %>">
     <div class="form-actions">
-      <button class="btn" type="submit">Make Admin</button>
+      <button class="btn" type="submit">Edit</button>
     </div>
   </form>
+</div>
 
-  <% } else { %>
 
+<% if (!user.isAdmin){ %>
+  <div class="upgrade">
+    <form method="post" action="/users/upgrade?_method=post" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= user._id %>">
+      <div class="form-actions">
+        <button class="btn" type="submit">Make Admin</button>
+      </div>
+    </form>
+  </div>
+
+
+<% } else { %>
+
+<div class="downgrade">
   <form method="post" action="/users/downgrade?_method=post" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="hidden" name="id" value="<%= user._id %>">
@@ -29,15 +35,17 @@
       <button class="btn danger" type="submit">No Admin</button>
     </div>
   </form>
+</div>
 
-  <% }%>
 
-<form method="post" action="/users?_method=DELETE" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="hidden" name="id" value="<%= user._id %>">
-  <input type="hidden" name="firstName" value="<%= user.firstName %>">
-  <input type="hidden" name="lastName" value="<%= user.lastName  %>">
-  <div class="form-actions">
-    <button class="btn danger" type="submit">Delete</button>
-  </div>
-</form>
+<% }%>
+
+<div class="delete">
+  <form method="post" action="/users?_method=DELETE" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="id" value="<%= user._id %>">
+    <div class="form-actions">
+      <button class="btn danger" type="submit">Delete</button>
+    </div>
+  </form>
+</div>

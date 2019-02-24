@@ -37,6 +37,13 @@ userSchema.statics.findByEmail = function (email){
   return this.findOne({email : email });
 }
 
+userSchema.statics.countAdmins = function () {
+  return this.aggregate([
+    {"$match" : { 'isAdmin' : true }},
+    {"$project" : { _id:1 , firstName:1, lastName:1, email:1}}
+  ]);
+}
+
 userSchema.methods.generateAuthToken = function (){
   const token = jwt.sign({_id: this._id, isAdmin: this.isAdmin, name: this.firstName}, config.get('JWT_SECRET'), { expiresIn: '1h' });
   return token;

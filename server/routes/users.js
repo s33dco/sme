@@ -1,7 +1,8 @@
 const express             = require('express');
 const router              = express.Router();
 const {validationResult}  = require('express-validator/check');
-const validate            = require('../middleware/validators')
+const validate            = require('../middleware/validators');
+const validateId          = require('../middleware/validateId');
 const {ObjectID}          = require('mongodb');
 const {User}              = require("../models/user");
 const auth                = require("../middleware/auth");
@@ -28,6 +29,145 @@ router.get('/new', [auth, admin], (req, res) => {
   });
 });
 
+router.get('/:id', [auth, admin, validateId], async (req, res) => {
+  let id = req.params.id;
+
+  const viewUser = await User.findOne({_id: id});
+
+  if (!viewUser) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The user you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
+
+  res.render('users/user', {
+      pageTitle       : "Users",
+      pageDescription : "People with access.",
+      csrfToken: req.csrfToken(),
+      user : viewUser
+  });
+});
+
+router.delete('/', [auth, admin], async (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "User can't be deleted",
+      message : "The user can't be found maybe you should try again.",
+      statusCode : 400
+    });
+  }
+
+  if ( req.user._id === req.body.id) {
+    throw ({
+      tag : "You can't delete yourself!",
+      message : "If you want to delete yourself get another admin user to do it for you.",
+      statusCode : 400
+    });
+  }
+
+  const user = await User.findOne({_id: req.body.id})
+
+  if (!user ){
+    throw ({
+      tag : "User can't be found",
+      message : "The user can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  const count = await User.find().countDocuments();
+
+  if (count === 1) {
+    throw ({
+      tag : "Cann't delete last user.",
+      message : "If there is only one user they cannot be deletes.",
+      statusCode : 400
+    });
+  }
+
+  await User.deleteOne({ _id : user._id });
+
+  req.flash('alert', `${user.firstName} ${user.lastName} deleted!`);
+  res.redirect("/users");
+});
+
+router.post('/upgrade', [auth, admin], async (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "User can't be upgraded",
+      message : "The user can't be to make an admin, should try again.",
+      statusCode : 400
+    });
+  }
+
+  let user = await User.findOne({_id: req.body.id})
+
+  if (!user ){
+    throw ({
+      tag : "User can't be found",
+      message : "The user can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  await User.findOneAndUpdate(
+     { _id : req.body.id },
+     {$set: {isAdmin : true}},
+     {new : true });
+
+  req.flash('success', `${user.firstName} can now change data`);
+  res.redirect('/dashboard');
+});
+
+router.post('/downgrade', [auth, admin], async (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "User can't be updated",
+      message : "The user can't be found, should try again.",
+      statusCode : 400
+    });
+  }
+
+  const user = await User.findOne({_id: req.body.id})
+
+  if (!user ){
+    throw ({
+      tag : "User can't be found",
+      message : "The user can't be found maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  let adminCount = await User.countAdmins();
+
+  if (adminCount.length === 1){
+    throw ({
+      tag : "Cannot change status",
+      message : "There must be atleast one user with admin rights",
+      statusCode : 400
+    });
+  }
+
+  await User.findOneAndUpdate(
+    { _id : req.body.id },
+    {$set: {isAdmin : false}},
+    {new : true });
+
+  req.flash('success', `${user.firstName} can now change data`);
+  res.redirect('/dashboard');
+});
+
+
+
+
+
+
+
 router.post('/', [auth, admin,validate.user], async (req, res) => {
   let errors = validationResult(req)
 
@@ -49,27 +189,11 @@ router.post('/', [auth, admin,validate.user], async (req, res) => {
   res.redirect('/dashboard')
 });
 
-router.get('/:id', [auth, admin], async (req, res) => {
-  let id = req.params.id;
 
-  if (!ObjectID.isValid(id)) {
-    res.status(400);
-    throw Error("No find");
-  }
 
-  const viewUser = await User.findOne({_id: id});
 
-  if (!viewUser) {
-    res.status(404);
-    throw Error("No find")}
 
-  res.render('users/user', {
-      pageTitle       : "Users",
-      pageDescription : "People with access.",
-      csrfToken: req.csrfToken(),
-      user : viewUser
-  });
-});
+
 
 router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
 
@@ -94,44 +218,6 @@ router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
     pageTitle       : "Edit user",
     pageDescription : "edit user."
   })
-});
-
-router.post('/upgrade', [auth, admin], async (req, res) => {
-
-  console.log(req.body.id)
-
-  if (!ObjectID.isValid(req.body.id)) {
-    res.status(400);
-    throw Error("No find")}
-
-  const user = await User.findOneAndUpdate(
-     { _id : req.body.id },
-     {$set: {isAdmin : true}},
-     {new : true });
-
-  req.flash('success', `${user.firstName} can now change data`);
-  res.redirect('/dashboard');
-});
-
-router.post('/downgrade', [auth, admin], async (req, res) => {
-
-  if (!ObjectID.isValid(req.body.id)){
-    res.status(400);
-    throw Error("No find");
-  }
-
-  if ( req.user._id === req.body.id) {
-    req.flash('alert', `You can't give up admin rights!`);
-    return res.redirect('/dashboard');
-  }
-
-  const user = await User.findOneAndUpdate(
-     { _id : req.body.id },
-     {$set: {isAdmin : false}},
-     {new : true });
-
-  req.flash('success', `${user.firstName} can only view data`);
-  res.redirect('/dashboard');
 });
 
 router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
@@ -167,38 +253,6 @@ router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
     res.redirect(`/users`);
 
   }
-});
-
-router.delete('/', [auth, admin], (req, res) => {
-  const { id, name, billed } = req.body;
-
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
-
-  if ( req.user._id === req.body.id) {
-    req.flash('alert', `You can't delete yourself!`);
-    return res.redirect('/dashboard');
-  }
-
-  const promise = Promise.all([
-    User.findOne({ _id : id }),
-    User.count()
-  ]);
-
-  promise.then(([xUser, count]) => {
-    if (count === 1) {
-      return Promise.reject(new Error('Must be atleast one user'));
-    } else {
-      xUser.remove();
-    }
-  })
-  .then(() => {
-       req.flash('alert', `${req.body.firstName} ${req.body.lastName} deleted!`);
-       res.redirect("/users");
-  })
-  .catch((e) => {
-      req.flash('alert', `${e.message}`);
-      res.redirect("/users");
-  });
 });
 
 module.exports = router
