@@ -25,7 +25,6 @@
     <form method="post" action="/clients?_method=delete" novalidate>
       <input type="hidden" name="_csrf" value="<%=csrfToken%>">
       <input type="hidden" name="id" value="<%=client._id%>">
-      <input type="hidden" name="billed" value="<%=total%>">
       <div class="form-actions">
         <button class="btn danger" type="submit">Delete</button>
       </div>

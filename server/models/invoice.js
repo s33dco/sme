@@ -57,7 +57,7 @@ InvoiceSchema.statics.withId = function (id) {
 
 InvoiceSchema.statics.withClientId = function (id) {
   return this.aggregate([
-    {"$match" : { 'client._id' : id }},
+    {"$match" : { 'client._id' : mongoose.Types.ObjectId(id) }},
     {"$project" : { _id:1 , invNo:1}}
   ]);
 }

@@ -3,30 +3,34 @@ makeAdminToken}     = require('../seed/user');
 const {makeUnpaidInvoice,
 makePaidInvoice}    = require('../seed/invoice');
 const {makeClient}  = require('../seed/client');
-const {makeDetails}  = require('../seed/details');
+const {makeDetails} = require('../seed/detail');
 const {Detail}      = require('../../server/models/detail')
 const {Client}      = require('../../server/models/client');
 const {Invoice}     = require('../../server/models/invoice');
+const {User}        = require('../../server/models/user');
 const request       = require('supertest');
 const app           = require('../../app');
 const mongoose      = require('mongoose');
 const cheerio       = require('cheerio');
 const moment        = require('moment');
 
-let token, csrfToken, cookies, client, paidInvoice, unpaidInvoice, invoice, invoiceId, clientId, properties;
+let token, csrfToken, cookies, client, paidInvoice, unpaidInvoice, invoice, userToken, invoiceId, clientId, properties;
 
 beforeEach( async () => {
   token = await makeAdminToken();
+  userToken = await makeUserToken();
   client = await makeClient();
   await makeDetails();
   paid = await makePaidInvoice(client._id);
   unpaid = await makeUnpaidInvoice(client._id);
+  invoiceId = unpaid._id;
 });
 
 afterEach( async () => {
   await Client.deleteMany();
   await Invoice.deleteMany();
   await Detail.deleteMany();
+  await User.deleteMany();
 });
 
 describe('/invoices', () => {
@@ -162,6 +166,12 @@ describe('/invoices', () => {
       expect(res.status).toBe(403);
     });
 
+    it('should redirect to details edit info no invoice info found', async () => {
+      await Detail.deleteMany();
+      const res = await exec();
+      expect(res.status).toBe(302);
+      expect(res.text).toBe("Found. Redirecting to /details/edit");
+    });
     // expect invoice number field to be populated with 2
 
   });
@@ -600,8 +610,95 @@ describe('/invoices', () => {
 
   });
 
-  describe.skip('POST / edit', ()=> {});
-  describe.skip('PATCH / :id', ()=> {});
-  describe.skip('POST / email', ()=> {});
+  describe('POST / edit', () => {
+    const getInvoice = async () => {
+      const res =  await request(app).get(`/invoices/${invoiceId}`).set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.edit').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      cookies.push(`token=${token}`);
+    };
+
+    it('should display the edit form', async ()=> {
+      await getInvoice();
+
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: invoiceId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(200);
+    });
+
+    it('returns 403 if no admin token', async ()=> {
+      await getInvoice();
+      cookies[2] = `token=${userToken}`;
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: invoiceId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 401 if no token', async ()=> {
+      await getInvoice();
+      cookies[2] = `token=`;
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: invoiceId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 404 if valid user id not found', async ()=> {
+      await getInvoice();
+
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: mongoose.Types.ObjectId().toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 if invalid id sent in form', async ()=> {
+      await getInvoice();
+
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: 'rogue_id',
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 for a paid invoice', async ()=> {
+      invoiceId = paid._id;
+      await getInvoice();
+      const res = await request(app).post('/invoices/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: invoiceId.toHexString(),
+                                _csrf: csrfToken});
+      expect(res.status).toBe(400);
+    })
+  })
+
+
+
+  describe('PATCH / :id', ()=> {
+    it.skip('updates the invoice with a valid request', async ()=> {});
+  });
+
+  describe('POST / email', ()=> {
+    it.skip('emails a pdf of the invoice', async ()=> {});
+  });
 
 });

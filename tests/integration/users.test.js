@@ -477,10 +477,7 @@ describe('/users', () => {
 
   });
 
-
-
-
-  describe.skip('POST / edit', () => {
+  describe('POST / edit', () => {
     const getUser = async () => {
       const res =  await request(app).get(`/users/${userId}`).set('Cookie', `token=${token}`);
       let $ = cheerio.load(res.text);
@@ -489,8 +486,68 @@ describe('/users', () => {
       cookies.push(`token=${token}`);
     };
 
+    it('should display the edit form', async ()=> {
+      await getUser();
 
+      const res = await request(app).post('/users/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: userId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(200);
+    });
+
+    it('returns 403 if no admin token', async ()=> {
+      await getUser();
+      cookies[2] = `token=${userToken}`;
+      const res = await request(app).post('/users/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: userId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 401 if no token', async ()=> {
+      await getUser();
+      cookies[2] = `token=`;
+      const res = await request(app).post('/users/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: userId.toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 404 if valid user id not found', async ()=> {
+      await getUser();
+
+      const res = await request(app).post('/users/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: new mongoose.Types.ObjectId().toHexString(),
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 if invalid id sent in form', async ()=> {
+      await getUser();
+
+      const res = await request(app).post('/users/edit')
+                        .set('Cookie', cookies)
+                        .type('form')
+                        .send({ id: 'fake_id',
+                                _csrf: csrfToken});
+
+      expect(res.status).toBe(400);
+    });
   })
 
-  describe.skip('PATCH / :id', () => {})
+  describe('PATCH / :id', () => {
+    it.skip('updates the record with a valid request', async ()=> {});
+  });
 });

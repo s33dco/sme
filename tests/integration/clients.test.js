@@ -9,7 +9,7 @@ const app           = require('../../app');
 const mongoose      = require('mongoose');
 const cheerio       = require('cheerio');
 
-let user, clients, token, id, name, cookies, newcookies, csrfToken, properties, newClient, invoice, newCsrfToken;
+let user, clients, token, id, name, idWithNoInvoice, cookies, newcookies, csrfToken, clientId, properties, newClient, invoice, newCsrfToken;
 
 beforeEach( async () => {
   clients = [
@@ -23,7 +23,9 @@ beforeEach( async () => {
   clients = await Client.insertMany(clients);
   id = clients[0]._id;
   token = await makeAdminToken();
+  userToken = await makeUserToken();
   invoice = await makeUnpaidInvoice(id);
+  idWithNoInvoice = clients[1]._id;
 });
 
 afterEach( async () => {
@@ -253,7 +255,7 @@ describe('/clients', () => {
 
     it('it should delete a record with a valid request and redirect to dashboard', async () => {
       cookies.push(`token=${token}`);
-      properties = { id : id.toHexString(), _csrf: csrfToken, billed: 0};
+      properties = { id : idWithNoInvoice.toHexString(), _csrf: csrfToken, billed: 0};
       const res = await deleteID();
       let number = await countClients();
       expect(number).toEqual(1);
@@ -282,7 +284,9 @@ describe('/clients', () => {
     });
 
     it('it should not delete a client with invoices attached.', async () => {
+
       cookies.push(`token=${token}`);
+      await makeUnpaidInvoice(id);
       properties = { id : id.toHexString(), _csrf: csrfToken, billed: 10};
       const res = await deleteID();
       let number = await countClients();
@@ -309,92 +313,121 @@ describe('/clients', () => {
     });
   });
 
+  describe('POST / edit', () => {
+      const getClient = async () => {
+        const res =  await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
+        let $ = cheerio.load(res.text);
+        csrfToken = $('.edit').find('[name=_csrf]').val();
+        cookies = res.headers['set-cookie'];
+        cookies.push(`token=${token}`);
+      };
+
+      it('should display the edit form', async ()=> {
+        await getClient();
+
+        const res = await request(app).post('/clients/edit')
+                          .set('Cookie', cookies)
+                          .type('form')
+                          .send({ id: id.toHexString(),
+                                  _csrf: csrfToken});
+
+        expect(res.status).toBe(200);
+      });
+
+      it('returns 403 if no admin token', async ()=> {
+        await getClient();
+        cookies[2] = `token=${userToken}`;
+        const res = await request(app).post('/clients/edit')
+                          .set('Cookie', cookies)
+                          .type('form')
+                          .send({ id: id.toHexString(),
+                                  _csrf: csrfToken});
+
+        expect(res.status).toBe(403);
+      });
+
+      it('returns 401 if no token', async ()=> {
+        await getClient();
+        cookies[2] = `token=`;
+        const res = await request(app).post('/clients/edit')
+                          .set('Cookie', cookies)
+                          .type('form')
+                          .send({ id: id.toHexString(),
+                                  _csrf: csrfToken});
+
+        expect(res.status).toBe(401);
+      });
+
+      it('should return 404 if valid user id not found', async ()=> {
+        await getClient();
+        const res = await request(app).post('/clients/edit')
+                          .set('Cookie', cookies)
+                          .type('form')
+                          .send({ id: mongoose.Types.ObjectId().toHexString(),
+                                  _csrf: csrfToken});
+
+        expect(res.status).toBe(404);
+      });
+
+      it('should return 400 if invalid id sent in form', async ()=> {
+        await getClient();
+
+        const res = await request(app).post('/clients/edit')
+                          .set('Cookie', cookies)
+                          .type('form')
+                          .send({ id: 'rogue_id',
+                                  _csrf: csrfToken});
+
+        expect(res.status).toBe(400);
+      });
+
+    })
+
+
+
+
   describe.skip('PATCH / :id ', () => {
 
-    const getEditButton = async () => {
-      const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
-      let $ = cheerio.load(res.text);
-      csrfToken = $('.edit').find('[name=_csrf]').val();
-      cookies = res.headers['set-cookie'];
-      cookies.push(`token=${token}`);
-      return res;
-    }
+      const getEditButton = async () => {
+        const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
+        let $ = cheerio.load(res.text);
+        csrfToken = $('.edit').find('[name=_csrf]').val();
+        cookies = res.headers['set-cookie'];
+        cookies.push(`token=${token}`);
+        return res;
+      }
 
-    const getUpdateForm = async () => {
-      const res = await request(app).post('/clients/edit')
-          .type('form')
-          .set('Cookie', cookies)
-          .send({id : id.toHexString(), _csrf: csrfToken});
-      let $ = cheerio.load(res.text);
-      newCsrfToken = $('[name=_csrf]').val();
-      console.log(`headers from getUpdateForm - ${cookies}`)
-      return res;
-    };
+      const getUpdateForm = async () => {
+        const res = await request(app).post('/clients/edit')
+            .type('form')
+            .set('Cookie', cookies)
+            .send({id : id.toHexString(), _csrf: csrfToken});
+        let $ = cheerio.load(res.text);
+        newCsrfToken = $('[name=_csrf]').val();
+        console.log(`headers from getUpdateForm - ${cookies}`)
+        return res;
+      };
 
-    const sendUpdate = async () => {
-      return await request(app).patch(`/clients/${id}`)
-          .type('form')
-          .set('Cookie', cookies)
-          .send(properties);
-    };
+      const sendUpdate = async () => {
+        return await request(app).patch(`/clients/${id}`)
+            .type('form')
+            .set('Cookie', cookies)
+            .send(properties);
+      };
 
-    it('updates the client record with valid input', async () => {
-      properties = {id : id.toHexString(),
-                    _csrf: newCsrfToken,
-                    name: 'New Name for Client',
-                    email: 'newmemail@example.com',
-                    phone: '07777777777'};
-      let get = await getEditButton();
-      let form = await getUpdateForm();
-      const res = await sendUpdate();
-      console.log(`headers from send update - ${cookies}`)
-      expect(res.status).toBe(302);
+      it('updates the client record with valid input', async () => {
+        properties = {id : id.toHexString(),
+                      _csrf: newCsrfToken,
+                      name: 'New Name for Client',
+                      email: 'newmemail@example.com',
+                      phone: '07777777777'};
+        let get = await getEditButton();
+        let form = await getUpdateForm();
+        const res = await sendUpdate();
+        console.log(`headers from send update - ${cookies}`)
+        expect(res.status).toBe(302);
+      });
+
     });
 
-  });
-
-  describe('POST / edit', () => {
-    beforeEach( async () => {
-      const res = await request(app).get(`/clients/${id}`).set('Cookie', `token=${token}`);
-      let $ = cheerio.load(res.text);
-      csrfToken = $('.edit').find('[name=_csrf]').val();
-      cookies = res.headers['set-cookie'];
-      properties = {};
-    });
-
-    afterEach ( async () => {
-      cookies = [];
-      properties = {};
-      token = '';
-    });
-
-
-    const editID = async () => {
-      return await request(app).post('/clients/edit')
-          .type('form')
-          .set('Cookie', cookies)
-          .send({id : id.toHexString(), _csrf: csrfToken});
-    };
-
-    it('should display the edit form with admin token', async () => {
-      cookies.push(`token=${token}`);
-      const res = await editID();
-      expect(res.status).toBe(200);
-    });
-
-    it('will not display the edit form with user token', async () => {
-      token = await makeUserToken();
-      cookies.push(`token=${token}`);
-      const res = await editID();
-      expect(res.status).toBe(403);
-    });
-
-    it('will not display the edit form with no token', async () => {
-      token = "";
-      cookies.push(`token=${token}`);
-      const res = await editID();
-      expect(res.status).toBe(401);
-    });
-
-  });
 });

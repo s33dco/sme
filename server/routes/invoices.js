@@ -23,7 +23,15 @@ router.get('/',  auth, async (req, res) => {
   })
 });
 
-router.get('/new', [auth, admin], (req, res) => {
+router.get('/new', [auth, admin], async (req, res) => {
+
+  const detail = await Detail.findOne();
+
+  if (!detail){
+    req.flash('alert', `You must enter the standard invoice details first!`);
+    res.redirect(`/details/edit`);
+  };
+
 
   const promise = Promise.all([
     Invoice.newestInvoiceNumber(),
@@ -242,45 +250,51 @@ router.patch('/unpaid', [auth, admin], async (req, res) => {
   res.redirect("/dashboard");
 });
 
-router.post('/edit', [auth, admin], (req, res) => {
+router.post('/edit', [auth, admin], async (req, res) => {
   let id = req.body.id;
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
-
-  const promise = Promise.all([
-    Invoice.findOne({  _id: id }),
-    Client.find({}, {name:1}).sort({name: 1})
-  ]);
-
-  promise.then(([invoice, clients]) => {
-
-    if (!invoice ) {throw Error("No find")}
-
-    if (invoice.paid ) {
-      req.flash('alert', "can't edit a paid invoice!");
-      res.redirect(`/dashboard`);
-    }
-
-    let { client, _id, invNo, invDate, message, items, paid} = invoice;
-    let clientId = client._id;
-    let selected = client
-
-    res.render('invoices/editinvoice', {
-      clients,
-      selected,
-      data: { _id, invNo, invDate, message, items, paid, clientId},
-      errors: {},
-      csrfToken: req.csrfToken(),  // generate a csrf token
-      pageTitle       : "Edit Invoice",
-      pageDescription : "edit invoice."
-    })
-  }).catch((e) => {
-    req.flash('alert', `${e.message}`);
-    res.render('404', {
-        pageTitle       : "404",
-        pageDescription : "Invalid resource",
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "Invoice can't be edited",
+      message : "The invoice can't be found or amended.",
+      statusCode : 400
     });
-  });
+  }
+
+  invoice = await Invoice.findOne({  _id: id });
+
+  if (!invoice ){
+    throw ({
+      tag : "Invoice can't be edited",
+      message : "The invoice can't be found or edited, maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  if (invoice.paid)  {
+    req.flash('alert', "Can't delete a paid invoice.");
+    throw ({
+      tag : "Invoice can't be deleted",
+      message : "The invoice can't be deleted if it has been paid, if you need to delete you'll need mark the invoice as unpaid first.",
+      statusCode : 400
+    });
+  }
+
+  const clients = await Client.find({}, {name:1}).sort({name: 1})
+
+  let { client, _id, invNo, invDate, message, items, paid} = invoice;
+  let clientId = client._id;
+  let selected = client
+
+  res.render('invoices/editinvoice', {
+    clients,
+    selected,
+    data: { _id, invNo, invDate, message, items, paid, clientId},
+    errors: {},
+    csrfToken: req.csrfToken(),  // generate a csrf token
+    pageTitle       : "Edit Invoice",
+    pageDescription : "edit invoice."
+  })
 });
 
 router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {

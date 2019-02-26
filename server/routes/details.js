@@ -5,13 +5,16 @@ const validate          = require('../middleware/validators')
 const {ObjectID}        = require('mongodb');
 const {Detail}          = require("../models/detail");
 const auth              = require("../middleware/auth");
-const admin              = require("../middleware/admin");
-const logger              = require('../startup/logger');
+const admin             = require("../middleware/admin");
+const logger            = require('../startup/logger');
 
 router.get('/', [auth, admin], async (req, res) => {
   const detail = await Detail.findOne();
 
-  if (!detail){throw Error("No find")};
+  if (!detail){
+    req.flash('alert', `You must enter the standard invoice details first!`);
+    res.redirect(`/details/edit`);
+  };
 
   res.render('details/details', {
       pageTitle       : "Invoice Details",
@@ -23,6 +26,10 @@ router.get('/', [auth, admin], async (req, res) => {
 
 router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
   let detail = await Detail.findOne();
+
+  if(!detail){
+    detail = {};
+  }
 
   let {utr, email, phone, bank, sortcode,
     accountNo, terms, contact, farewell} = detail;
@@ -38,7 +45,7 @@ router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
 
 });
 
-router.patch('/', [auth, admin, validate.detail] , async (req, res) => {
+router.post('/', [auth, admin, validate.detail], async (req, res) => {
 
   const errors = validationResult(req)
 

@@ -159,11 +159,9 @@ router.delete('/', [auth, admin], async (req, res) => {
     });
   }
 
+  const attachedInvoices = await Invoice.withClientId(req.body.id);
 
-// TODO: improve this so found from db rather than sent from form...
-// use InvoicewithClientId(client._id)
-
-  if (req.body.billed != 0) {
+  if (attachedInvoices.length) {
     req.flash('alert', `${client.name} cannot be deleted!`);
     throw ({
       tag : "Client can't be deleted",

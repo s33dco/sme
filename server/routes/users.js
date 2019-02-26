@@ -162,12 +162,6 @@ router.post('/downgrade', [auth, admin], async (req, res) => {
   res.redirect('/dashboard');
 });
 
-
-
-
-
-
-
 router.post('/', [auth, admin,validate.user], async (req, res) => {
   let errors = validationResult(req)
 
@@ -189,27 +183,27 @@ router.post('/', [auth, admin,validate.user], async (req, res) => {
   res.redirect('/dashboard')
 });
 
-
-
-
-
-
-
 router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
-    res.status(400);
-    throw Error("No find")
+    throw ({
+      tag : "User can't be edited",
+      message : "The user can't be found or amended.",
+      statusCode : 400
+    });
   }
 
-  const editUser = await User.findOne({_id: req.body.id});
+  const user = await User.findOne({_id: req.body.id})
 
-  if (!editUser ) {
-      res.status(404);
-      throw Error("No find")
-      }
+  if (!user ){
+    throw ({
+      tag : "User can't be edited",
+      message : "The user can't be found or edited, maybe you should try again.",
+      statusCode : 404
+    });
+  }
 
-  let { _id, firstName, lastName, email} = editUser;
+  let { _id, firstName, lastName, email} = user;
 
   res.render('users/edituser', {
     data: { _id, firstName, lastName, email },
@@ -219,6 +213,14 @@ router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
     pageDescription : "edit user."
   })
 });
+
+
+
+
+
+
+
+
 
 router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 
