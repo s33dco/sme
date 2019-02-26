@@ -33,11 +33,12 @@
     <% } %>
   </div>
 
-<div class="form-field <%= errors.passwordConfirmation ? 'form-field-invalid' : '' %>">
-  <label for="passwordConfirmation">Confirm Password</label>
-  <input class="input" id="passwordConfirmation" name="passwordConfirmation" type="password" value="" />
-  <% if (errors.passwordConfirmation) { %>
-    <div class="error"><%= errors.passwordConfirmation.msg %></div>
-  <% } %>
-</div>
+  <div class="form-field <%= errors.passwordConfirmation ? 'form-field-invalid' : '' %>">
+    <label for="passwordConfirmation">Confirm Password</label>
+    <input class="input" id="passwordConfirmation" name="passwordConfirmation" type="password" value="" />
+    <% if (errors.passwordConfirmation) { %>
+      <div class="error"><%= errors.passwordConfirmation.msg %></div>
+    <% } %>
+  </div>
+  
 </div>

@@ -183,17 +183,9 @@ router.post('/', [auth, admin,validate.user], async (req, res) => {
   res.redirect('/dashboard')
 });
 
-router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
+router.get('/edit/:id', [auth, admin, validateId, validate.useredit], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)) {
-    throw ({
-      tag : "User can't be edited",
-      message : "The user can't be found or amended.",
-      statusCode : 400
-    });
-  }
-
-  const user = await User.findOne({_id: req.body.id})
+  const user = await User.findOne({_id: req.params.id})
 
   if (!user ){
     throw ({
@@ -214,19 +206,7 @@ router.post('/edit', [auth, admin, validate.useredit], async (req, res) => {
   })
 });
 
-
-
-
-
-
-
-
-
-router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
-
-  if (!ObjectID.isValid(req.params.id)) {
-    res.status(400);
-    throw Error("No find")}
+router.put('/:id', [auth, admin, validateId, validate.useredit], async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -243,6 +223,15 @@ router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 // this is about the pre.save
 
     let updateUser = await User.findOne({_id : req.params.id});
+
+    if (!updateUser) {
+      throw ({
+        tag : "User can't be found",
+        message : "The user can't be found to update maybe you should try again.",
+        statusCode : 404
+      });
+    }
+
     updateUser.firstName = req.body.firstName;
     updateUser.lastName  = req.body.lastName;
     updateUser.email     = req.body.email;
@@ -251,9 +240,8 @@ router.patch('/:id', [auth, admin, validate.useredit], async (req, res) => {
 
     await updateUser.save();
 
-    req.flash('success', `${req.body.firstName} ${req.body.lastName} updated!`);
+    req.flash('success', `${updateUser.firstName} ${updateUser.lastName} updated!`);
     res.redirect(`/users`);
-
   }
 });
 

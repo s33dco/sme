@@ -477,77 +477,153 @@ describe('/users', () => {
 
   });
 
-  describe('POST / edit', () => {
-    const getUser = async () => {
-      const res =  await request(app).get(`/users/${userId}`).set('Cookie', `token=${token}`);
-      let $ = cheerio.load(res.text);
-      csrfToken = $('.edit').find('[name=_csrf]').val();
-      cookies = res.headers['set-cookie'];
-      cookies.push(`token=${token}`);
+  describe('GET / edit / :id', () => {
+    const getEdit = async () => {
+      return await request(app).get(`/users/edit/${userId}`).set('Cookie', `token=${token}`);
     };
 
     it('should display the edit form', async ()=> {
-      await getUser();
-
-      const res = await request(app).post('/users/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: userId.toHexString(),
-                                _csrf: csrfToken});
-
+      const res = await getEdit();
       expect(res.status).toBe(200);
     });
 
     it('returns 403 if no admin token', async ()=> {
-      await getUser();
-      cookies[2] = `token=${userToken}`;
-      const res = await request(app).post('/users/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: userId.toHexString(),
-                                _csrf: csrfToken});
-
+      token= userToken;
+      const res = await getEdit();
       expect(res.status).toBe(403);
     });
 
     it('returns 401 if no token', async ()=> {
-      await getUser();
-      cookies[2] = `token=`;
-      const res = await request(app).post('/users/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: userId.toHexString(),
-                                _csrf: csrfToken});
-
+      token= '';
+      const res = await getEdit();
       expect(res.status).toBe(401);
     });
 
-    it('should return 404 if valid user id not found', async ()=> {
-      await getUser();
-
-      const res = await request(app).post('/users/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: new mongoose.Types.ObjectId().toHexString(),
-                                _csrf: csrfToken});
-
+    it('should return 404 if valid user id not in db sent in request', async ()=> {
+      userId = mongoose.Types.ObjectId();
+      await getEdit();
+      const res = await getEdit();
       expect(res.status).toBe(404);
     });
 
-    it('should return 400 if invalid id sent in form', async ()=> {
-      await getUser();
-
-      const res = await request(app).post('/users/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: 'fake_id',
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(400);
+    it('should return 400 if invalid id sent in request', async ()=> {
+      userId = 'fake_id';
+      await getEdit();
+      const res = await getEdit();
+      expect(res.status).toBe(404);
     });
   })
 
-  describe('PATCH / :id', () => {
-    it.skip('updates the record with a valid request', async ()=> {});
+  describe('PUT / :id', () => {
+
+    const getEdit = async () => {
+      const res = await request(app).get(`/users/edit/${userId}`).set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.userFields').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      cookies.push(`token=${token}`);
+      return res;
+    };
+
+    it('updates the record with a valid request', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'}
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(302);
+      const {firstName} = await User.findOne({_id : userId });
+      expect(firstName).toMatch(/Tarquin/);
+    });
+
+    it('redisplays form with invalid form data', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                    firstName : '',
+                    lastName: 'Farquis',
+                    email: 'e@co'}
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/Oops/);
+    });
+
+    it('returns 403 with invalid _csrf token', async ()=> {
+      await getEdit();
+      properties = { _csrf: '',
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'};
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 401 if no auth token', async ()=> {
+      await getEdit();
+      cookies[2]= `token=`
+      properties = { _csrf: csrfToken,
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'}
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 403 if user auth token', async ()=> {
+      await getEdit();
+      cookies[2]= `token=${userToken}`
+      properties = { _csrf: csrfToken,
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'}
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 404 with invalid id in request', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'}
+      userId = 'fake_id';
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(404);
+
+    });
+
+    it('returns 404 with valid id in request not in db', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                    firstName : 'Tarquin',
+                    lastName: 'Farquis',
+                    email: 'email@example.com'}
+      userId = mongoose.Types.ObjectId();
+      const res = await request(app).put(`/users/${userId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(404);
+    });
+
+
   });
 });

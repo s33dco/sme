@@ -297,7 +297,7 @@ router.post('/edit', [auth, admin], async (req, res) => {
   })
 });
 
-router.patch('/:id',  [auth, admin, validate.invoice], async (req, res) => {
+router.put('/:id',  [auth, admin, validate.invoice], async (req, res) => {
 
   const errors = validationResult(req)
 

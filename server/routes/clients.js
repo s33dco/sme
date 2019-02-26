@@ -84,17 +84,9 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
   res.redirect('/clients')
 });
 
-router.post('/edit', [auth, admin], async (req, res) => {
+router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
 
-  if (!ObjectID.isValid(req.body.id)) {
-    throw ({
-      tag : "Client can't be edited",
-      message : "The client can't be found maybe you should try again.",
-      statusCode : 400
-    });
-  }
-
-  const client =  await Client.findOne({_id: req.body.id});
+  const client =  await Client.findOne({_id: req.params.id});
 
   if (!client ){
     throw ({
@@ -115,9 +107,7 @@ router.post('/edit', [auth, admin], async (req, res) => {
   })
 });
 
-router.patch('/:id', [auth, admin, validate.client, validateId], async (req, res) => {
-
-  if (!ObjectID.isValid(req.params.id)) {throw Error("No find")}
+router.put('/:id', [auth, admin, validateId, validate.client], async (req, res) => {
 
   const errors = validationResult(req)
 
@@ -130,9 +120,18 @@ router.patch('/:id', [auth, admin, validate.client, validateId], async (req, res
         pageDescription : "Give it another shot.",
     });
   } else {
+
     const client = await Client.findOneAndUpdate({_id: req.params.id},
       {name: req.body.name, phone: req.body.phone, email: req.body.email},
       {new: true});
+
+    if (!client) {
+      throw ({
+        tag : "Client can't be found",
+        message : "The client can't be found to update maybe you should try again.",
+        statusCode : 404
+      });
+    }
 
     req.flash('success', `${client.name} updated!`);
     res.redirect(`/clients`);

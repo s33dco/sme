@@ -11,7 +11,7 @@
   <% } %>
 </div>
 
-<form method="post" action="/clients/<%= data._id%>?_method=patch" novalidate>
+<form method="post" action="/clients/<%= data._id%>?_method=PUT" novalidate>
     <% include ../partials/clientfields %>
     <div class="form-actions">
       <button class="btn" type="submit">Update</button>

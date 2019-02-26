@@ -3,9 +3,7 @@
 </header>
 
 <div class="edit">
-  <form method="post" action="/users/edit?_method=post" novalidate>
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <input type="hidden" name="id" value="<%= user._id %>">
+  <form method="get" action="/users/edit/<%= user._id %>" novalidate>
     <div class="form-actions">
       <button class="btn" type="submit">Edit</button>
     </div>

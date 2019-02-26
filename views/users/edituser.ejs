@@ -1,7 +1,6 @@
 <div class="form-header">
   <% if (Object.keys(errors).length === 0) { %>
     <h2>Editing <%=data.firstName%> <%=data.lastName%>.</h2>
-    <h5>Change Password</h5>
   <% } else { %>
     <h2 class="errors-heading">Oops, please correct the following:</h2>
     <ul class="errors-list">
@@ -12,7 +11,7 @@
   <% } %>
 </div>
 
-<form method="post" action="/users/<%= data._id%>?_method=patch" novalidate>
+<form method="post" action="/users/<%= data._id%>?_method=put" novalidate>
 
   <% include ../partials/userfields %>
 
