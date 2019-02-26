@@ -85,7 +85,7 @@
 
     <h4>Invoice Terms.</h4>
     <div class="form-field <%= errors.terms ? 'form-field-invalid' : '' %>">
-      <label for="terms">Account Number</label>
+      <label for="terms">Payment Terms</label>
       <textarea class="input" name="terms" type="text" rows='4'><%=data.terms%></textarea>
       <% if (errors.terms) { %>
         <div class="error"><%= errors.terms.msg %></div>

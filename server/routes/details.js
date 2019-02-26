@@ -58,8 +58,7 @@ router.post('/', [auth, admin, validate.detail], async (req, res) => {
         pageDescription : "Give it another shot.",
     });
   } else {
-    let detail = await Detail.findOne();
-    await detail.updateOne({
+    await Detail.updateOne({},{
         $set:
          {
             utr      : req.body.utr,
@@ -72,7 +71,7 @@ router.post('/', [auth, admin, validate.detail], async (req, res) => {
             contact  : req.body.contact,
             farewell : req.body.farewell
           }
-        })
+        },{ upsert: true });
 
     req.flash('success', `Invoice Information updated!`);
     res.redirect(`/invoices`);
