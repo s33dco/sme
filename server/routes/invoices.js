@@ -1,16 +1,16 @@
-const express             = require('express');
-const router              = express.Router();
-const moment              = require('moment');
-const {validationResult}  = require('express-validator/check');
-const validate            = require('../middleware/validators');
-const validateId          = require('../middleware/validateId')
-const {ObjectID}          = require('mongodb');
-const {Invoice}           = require("../models/invoice");
-const {Client}            = require("../models/client");
-const {Detail}            = require("../models/detail");
-const logger              = require('../startup/logger');
-const auth                = require("../middleware/auth");
-const admin               = require("../middleware/admin");
+const express            = require('express');
+const router             = express.Router();
+const moment             = require('moment');
+const {validationResult} = require('express-validator/check');
+const validate           = require('../middleware/validators');
+const validateId         = require('../middleware/validateId')
+const {ObjectID}         = require('mongodb');
+const {Invoice}          = require("../models/invoice");
+const {Client}           = require("../models/client");
+const {Detail}           = require("../models/detail");
+const logger             = require('../startup/logger');
+const auth               = require("../middleware/auth");
+const admin              = require("../middleware/admin");
 
 router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
@@ -158,7 +158,7 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
   if (!invoice) {
     throw ({
       tag : 'No longer available.',
-      message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+      message : "The invoice you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
       statusCode : 404
     });
   }
@@ -191,7 +191,7 @@ router.post('/email', auth, async (req, res) => {
   res.redirect('/dashboard')
 });
 
-router.patch('/paid', [auth, admin], async (req, res) => {
+router.post('/paid', [auth, admin], async (req, res) => {
 
   if (!ObjectID.isValid(req.body.id)) {
     throw ({
@@ -211,13 +211,13 @@ router.patch('/paid', [auth, admin], async (req, res) => {
     });
   }
 
-  await invoice.update({paid: true, $currentDate: { datePaid: true}});
+  await Invoice.findOneAndUpdate({_id: req.body.id},{paid: true, $currentDate: { datePaid: true}});
 
   req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} paid!`);
   res.redirect('/dashboard');
 });
 
-router.patch('/unpaid', [auth, admin], async (req, res) => {
+router.post('/unpaid', [auth, admin], async (req, res) => {
 
   let id = req.body.id
 
@@ -250,16 +250,8 @@ router.patch('/unpaid', [auth, admin], async (req, res) => {
   res.redirect("/dashboard");
 });
 
-router.post('/edit', [auth, admin], async (req, res) => {
-  let id = req.body.id;
-
-  if (!ObjectID.isValid(req.body.id)) {
-    throw ({
-      tag : "Invoice can't be edited",
-      message : "The invoice can't be found or amended.",
-      statusCode : 400
-    });
-  }
+router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
+  let id = req.params.id;
 
   invoice = await Invoice.findOne({  _id: id });
 
@@ -272,10 +264,10 @@ router.post('/edit', [auth, admin], async (req, res) => {
   }
 
   if (invoice.paid)  {
-    req.flash('alert', "Can't delete a paid invoice.");
+    req.flash('alert', "Can't edit a paid invoice.");
     throw ({
-      tag : "Invoice can't be deleted",
-      message : "The invoice can't be deleted if it has been paid, if you need to delete you'll need mark the invoice as unpaid first.",
+      tag : "Invoice can't be edited",
+      message : "The invoice can't be edited once it has been paid, if you need to edit you'll need mark the invoice as unpaid first.",
       statusCode : 400
     });
   }
@@ -297,13 +289,12 @@ router.post('/edit', [auth, admin], async (req, res) => {
   })
 });
 
-router.put('/:id',  [auth, admin, validate.invoice], async (req, res) => {
-
-  const errors = validationResult(req)
+router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res) => {
+  let errors = validationResult(req)
 
   if (!errors.isEmpty()) {
 
-    const clients = await Client.find({}, {name:1}).sort({name: 1});
+    let clients = await Client.find({}, {name:1}).sort({name: 1});
     let selected;
     if (req.body.clientId) {
       selected = clients.find(c => c._id == req.body.clientId);
@@ -316,7 +307,7 @@ router.put('/:id',  [auth, admin, validate.invoice], async (req, res) => {
       clients
     }
 
-    return res.render('invoices/editinvoice', {
+    return res.render('invoices/newinvoice', {
         data            : req.body,
         errors          : errors.mapped(),
         csrfToken       : req.csrfToken(),
@@ -326,41 +317,49 @@ router.put('/:id',  [auth, admin, validate.invoice], async (req, res) => {
         selected
     });
 
-  } else {
-    const promise = Promise.all([
-      Invoice.findOne({_id : req.params.id}),
-      Client.findOne({_id: req.body.clientId})
-    ]);
-
-    promise.then(([invoice, client]) => {
-      return invoice.updateOne({
-        $set:
-        {
-            invNo    : req.body.invNo,
-            invDate  : req.body.invDate,
-            message  : req.body.message,
-            items    : req.body.items,
-            client: {
-              _id         : client._id,
-              name        : client.name,
-              email       : client.email,
-              phone       : client.phone
-            }
-        }
-      })
-    })
-    .then((client) => {
-       req.flash('success', `Invoice ${req.body.invNo} updated!`);
-       res.redirect(`/dashboard`);
-     })
-     .catch((e) => {
-      req.flash('alert', `${e.message}`);
-      res.render('404', {
-          pageTitle       : "404",
-          pageDescription : "Invalid resource",
-      });
-    });
   }
+
+  const detail = await Detail.findOne({});
+
+  if (!detail){
+      req.flash('alert', `You must enter the standard invoice details first!`);
+      res.redirect(`/details/edit`);
+    };
+
+  const invoice = await Invoice.findOne({_id : req.params.id});
+
+  if (!invoice) {
+      throw ({
+        tag : 'No longer available.',
+        message : "The invoice you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+        statusCode : 404
+      });
+    }
+
+  const client = await Client.findOne({_id: req.body.clientId});
+
+  if (!client) {
+      throw ({
+        tag : 'No longer available.',
+        message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+        statusCode : 404
+      });
+    }
+
+  await Invoice.updateOne({_id : req.params.id} ,
+    {$set:  { invNo     :  req.body.invNo,
+              invDate   : req.body.invDate,
+              message   : req.body.message,
+              items     : req.body.items,
+              client    : { _id  : client._id,
+                          name   : client.name,
+                          email  : client.email,
+                          phone  : client.phone }
+            }
+      });
+   req.flash('success', `Invoice ${req.body.invNo} updated!`);
+   res.redirect(`/dashboard`);
+
 });
 
 router.delete('/', [auth, admin], async (req, res) => {

@@ -24,6 +24,7 @@ beforeEach( async () => {
   paid = await makePaidInvoice(client._id);
   unpaid = await makeUnpaidInvoice(client._id);
   invoiceId = unpaid._id;
+  clientId = client._id;
 });
 
 afterEach( async () => {
@@ -176,7 +177,7 @@ describe('/invoices', () => {
 
   });
 
-  describe('PATCH / paid', () => {
+  describe('POST / paid', () => {
     const getUnpaidInvoice = async () => {
       const res =  await request(app).get(`/invoices/${invoiceId}`).set('Cookie', `token=${token}`);
       let $ = cheerio.load(res.text);
@@ -188,14 +189,14 @@ describe('/invoices', () => {
     it('updates the paid field to true', async () => {
       invoiceId = unpaid._id;
       await getUnpaidInvoice();
-      const res = await request(app).patch('/invoices/paid')
+      const res = await request(app).post('/invoices/paid')
                     .set('Cookie', cookies)
                     .type('form')
-                    .send({ id: unpaid._id.toHexString(),
+                    .send({ id: invoiceId.toHexString(),
                             _csrf: csrfToken})
-      invoice = await Invoice.findOne({_id: unpaid._id});
-      expect(invoice).toHaveProperty('datePaid', expect.any(Date));
+      invoice = await Invoice.findOne({_id: invoiceId});
       expect(invoice).toHaveProperty('paid', true);
+      expect(invoice).toHaveProperty('datePaid', expect.any(Date));
       expect(res.status).toBe(302);
       expect(res.text).toMatch(/dashboard/)
     });
@@ -204,7 +205,7 @@ describe('/invoices', () => {
       invoiceId = unpaid._id;
       token = makeUserToken();
       await getUnpaidInvoice();
-      const res = await request(app).patch('/invoices/paid')
+      const res = await request(app).post('/invoices/paid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: unpaid._id.toHexString(),
@@ -216,7 +217,7 @@ describe('/invoices', () => {
       invoiceId = unpaid._id;
       token = '';
       await getUnpaidInvoice();
-      const res = await request(app).patch('/invoices/paid')
+      const res = await request(app).post('/invoices/paid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: unpaid._id.toHexString(),
@@ -227,7 +228,7 @@ describe('/invoices', () => {
     it('responds with 404 for an invalid id', async ()=>{
       invoiceId = 'rubbish_id';
       await getUnpaidInvoice();
-      const res = await request(app).patch('/invoices/paid')
+      const res = await request(app).post('/invoices/paid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: invoiceId,
@@ -240,7 +241,7 @@ describe('/invoices', () => {
     it('responds with 404 for a valid id not found in db', async ()=>{
       invoiceId = mongoose.Types.ObjectId();
       await getUnpaidInvoice();
-      const res = await request(app).patch('/invoices/paid')
+      const res = await request(app).post('/invoices/paid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: invoiceId,
@@ -249,7 +250,7 @@ describe('/invoices', () => {
     });
   });
 
-  describe('PATCH / unpaid', () => {
+  describe('POST / unpaid', () => {
     const getPaidInvoice = async () => {
       const res =  await request(app).get(`/invoices/${invoiceId}`).set('Cookie', `token=${token}`);
       let $ = cheerio.load(res.text);
@@ -258,11 +259,26 @@ describe('/invoices', () => {
       cookies.push(`token=${token}`);
     };
 
+    it('updates the paid field to false', async () => {
+      invoiceId = paid._id;
+      await getPaidInvoice();
+
+      const res =  await request(app).post('/invoices/unpaid')
+                    .set('Cookie', cookies)
+                    .type('form')
+                    .send({ id: paid._id.toHexString(),
+                            _csrf: csrfToken});
+      invoice = await Invoice.findOne({_id: paid._id});
+      expect(invoice).toHaveProperty('paid', false);
+      expect(res.status).toBe(302);
+      expect(res.text).toMatch(/dashboard/)
+    });
+
     it('responds with a 403 if not admin', async () => {
       invoiceId = paid._id;
       token = makeUserToken();
       await getPaidInvoice();
-      const res = await request(app).patch('/invoices/unpaid')
+      const res = await request(app).post('/invoices/unpaid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: unpaid._id.toHexString(),
@@ -274,7 +290,7 @@ describe('/invoices', () => {
       invoiceId = paid._id;
       token = '';
       await getPaidInvoice();
-      const res = await request(app).patch('/invoices/unpaid')
+      const res = await request(app).post('/invoices/unpaid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: unpaid._id.toHexString(),
@@ -285,7 +301,7 @@ describe('/invoices', () => {
     it('responds with 403 for an invalid id', async ()=>{
       invoiceId = 'rubbish_id';
       await getPaidInvoice();
-      const res = await request(app).patch('/invoices/unpaid')
+      const res = await request(app).post('/invoices/unpaid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: invoiceId,
@@ -298,27 +314,12 @@ describe('/invoices', () => {
     it('responds with 404 for a valid id not found in db', async ()=>{
       invoiceId = mongoose.Types.ObjectId();
       await getPaidInvoice();
-      const res = await request(app).patch('/invoices/unpaid')
+      const res = await request(app).post('/invoices/unpaid')
                     .set('Cookie', cookies)
                     .type('form')
                     .send({ id: invoiceId,
                             _csrf: csrfToken})
       expect(res.status).toBe(403);
-    });
-
-    it('updates the paid field to false', async () => {
-      invoiceId = paid._id;
-      await getPaidInvoice();
-
-      const res =  await request(app).patch('/invoices/unpaid')
-                    .set('Cookie', cookies)
-                    .type('form')
-                    .send({ id: paid._id.toHexString(),
-                            _csrf: csrfToken});
-      invoice = await Invoice.findOne({_id: paid._id});
-      expect(invoice).toHaveProperty('paid', false);
-      expect(res.status).toBe(302);
-      expect(res.text).toMatch(/dashboard/)
     });
   });
 
@@ -610,95 +611,178 @@ describe('/invoices', () => {
 
   });
 
-  describe('POST / edit', () => {
-    const getInvoice = async () => {
-      const res =  await request(app).get(`/invoices/${invoiceId}`).set('Cookie', `token=${token}`);
-      let $ = cheerio.load(res.text);
-      csrfToken = $('.edit').find('[name=_csrf]').val();
-      cookies = res.headers['set-cookie'];
-      cookies.push(`token=${token}`);
-    };
-
-    it('should display the edit form', async ()=> {
-      await getInvoice();
-
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: invoiceId.toHexString(),
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(200);
-    });
-
-    it('returns 403 if no admin token', async ()=> {
-      await getInvoice();
-      cookies[2] = `token=${userToken}`;
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: invoiceId.toHexString(),
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(403);
-    });
-
-    it('returns 401 if no token', async ()=> {
-      await getInvoice();
-      cookies[2] = `token=`;
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: invoiceId.toHexString(),
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 404 if valid user id not found', async ()=> {
-      await getInvoice();
-
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: mongoose.Types.ObjectId().toHexString(),
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(404);
-    });
-
-    it('should return 400 if invalid id sent in form', async ()=> {
-      await getInvoice();
-
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: 'rogue_id',
-                                _csrf: csrfToken});
-
-      expect(res.status).toBe(400);
-    });
-
-    it('should return 400 for a paid invoice', async ()=> {
-      invoiceId = paid._id;
-      await getInvoice();
-      const res = await request(app).post('/invoices/edit')
-                        .set('Cookie', cookies)
-                        .type('form')
-                        .send({ id: invoiceId.toHexString(),
-                                _csrf: csrfToken});
-      expect(res.status).toBe(400);
-    })
-  })
-
-
-
-  describe('PATCH / :id', ()=> {
-    it.skip('updates the invoice with a valid request', async ()=> {});
-  });
-
   describe('POST / email', ()=> {
     it.skip('emails a pdf of the invoice', async ()=> {});
   });
 
+  describe('GET / edit / :id', () => {
+    const getEdit = async () => {
+      return await request(app).get(`/invoices/edit/${invoiceId}`).set('Cookie', `token=${token}`);
+    };
+
+    it('should display the edit form', async ()=> {
+      const res =  await getEdit();
+      expect(res.status).toBe(200);
+    });
+
+    it('returns 403 if no admin token', async ()=> {
+      token= userToken;
+      const res = await getEdit();
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 401 if no token', async ()=> {
+      token= '';
+      const res = await getEdit();
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 404 if valid user id not found', async ()=> {
+      invoiceId = mongoose.Types.ObjectId();
+      await getEdit();
+      const res = await getEdit();
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 if invalid id sent in request', async ()=> {
+      invoiceId = 'fake_id';
+      await getEdit();
+      const res = await getEdit();
+      expect(res.status).toBe(404);
+    });
+  })
+
+  describe('PUT / :id', () => {
+
+    const getEdit = async () => {
+      const res = await request(app).get(`/invoices/edit/${invoiceId}`).set('Cookie', `token=${token}`);
+      let $ = cheerio.load(res.text);
+      csrfToken = $('.details').find('[name=_csrf]').val();
+      cookies = res.headers['set-cookie'];
+      cookies.push(`token=${token}`);
+      return res;
+    };
+
+    it('updates the record with a valid request', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'new message',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(302);
+      const {message} = await Invoice.findOne({_id : invoiceId });
+      expect(message).toMatch(/new message/);
+    });
+
+    it('redisplays form with invalid form data', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: '',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(200);
+      expect(res.text).toMatch(/Oops/);
+    });
+
+    it('returns 403 with invalid _csrf token', async ()=> {
+      await getEdit();
+      properties = { _csrf: "",
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 401 if no auth token', async ()=> {
+      await getEdit();
+      cookies[2]= `token=`
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 403 if user auth token', async ()=> {
+      await getEdit();
+      cookies[2]= `token=${userToken}`
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 404 with invalid id in request', async ()=> {
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      invoiceId = 'fake_id';
+      const res = await request(app).put(`/invoice/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(404);
+
+    });
+
+    it('returns 404 with valid id in request not in db', async ()=> {
+
+      await getEdit();
+      properties = { _csrf: csrfToken,
+                  clientId: clientId.toHexString(),
+                  invDate: moment().format('YYYY-MM-DD'),
+                  invNo: 12,
+                  message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+      invoiceId = mongoose.Types.ObjectId();
+      const res = await request(app).put(`/invoices/${invoiceId}`)
+                              .type('form')
+                              .set('Cookie', cookies)
+                              .send(properties);
+      expect(res.status).toBe(404);
+    });
+  });
 });
