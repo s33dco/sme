@@ -16,9 +16,9 @@ const makeUnpaidInvoice =  async (id) => {
                 email       : faker.internet.email(),
                 phone       : "07967355526"
             },
-            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:20},
-                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:40},
-                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:40}],
+            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:'20.00'},
+                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:'40.00'},
+                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:'40.00'}],
             details    : {
                 utr         : "1234567891",
                 email       : "myemail@email.com",
@@ -44,9 +44,9 @@ const makePaidInvoice =  async (id) => {
                 email       : faker.internet.email(),
                 phone       : "07967355526"
             },
-            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:20},
-                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:40},
-                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:40}],
+            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:'20.00'},
+                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:'40.00'},
+                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:'40.00'}],
             details    : {
                 utr         : "1234567891",
                 email       : "myemail@email.com",

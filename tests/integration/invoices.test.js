@@ -453,15 +453,14 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
                   }
 
       const res = await request(app).post('/invoices')
                       .set('Cookie', cookies)
                       .type('form')
                       .send(properties)
-
       expect(res.status).toBe(302);
       number = await Invoice.find().countDocuments();
       expect(number).toEqual(3);
@@ -476,8 +475,8 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -499,8 +498,8 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -521,8 +520,8 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -563,11 +562,9 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'),
-                            desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'),
-                            desc:'jump a stile',fee: 50 }]
-                  }
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
+                    }
 
       const res = await request(app).post('/invoices')
                       .set('Cookie', cookies)
@@ -592,11 +589,9 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'),
-                            desc:'run a mile',fee: 50 },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'),
-                            desc:'jump a stile',fee: 50 }]
-                  }
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
+                    }
 
       const res = await request(app).post('/invoices')
                       .set('Cookie', cookies)
@@ -670,8 +665,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'new message',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
 
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
@@ -689,8 +684,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: '',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -706,8 +701,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -723,8 +718,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -740,8 +735,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -756,8 +751,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       invoiceId = 'fake_id';
       const res = await request(app).put(`/invoice/${invoiceId}`)
                               .type('form')
@@ -775,8 +770,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: 50 },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: 50 }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
       invoiceId = mongoose.Types.ObjectId();
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')

@@ -43,8 +43,8 @@ module.exports = {
       .withMessage('Include details for the item'),
 
     check('items.*.fee')
-      .isInt()
-      // .isDecimal({force_decimal: true, decimal_digits: '1,', locale: 'en-UK'})
+      // .isInt()
+      .isDecimal({ decimal_digits: '2,', force_decimal: true })
       .withMessage('check fee xx.xx')
     ],
 
