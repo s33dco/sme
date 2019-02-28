@@ -16,7 +16,7 @@
 
 <div class="billed-items">
   <h3>Billed Items.</h3>
-  <% invoice.items.forEach((item) => { %>
+  <% sortedItems.forEach((item) => { %>
     <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
     <p><%= item.desc %></p>
     <p>£<%= item.fee %></p>

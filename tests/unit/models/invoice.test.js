@@ -53,12 +53,12 @@ describe('Invoice', () => {
       clientIds = [];
     });
 
-    it('should count number of unique clients', async () => {
+    it('countUniqueClients() should count number of unique clients', async () => {
       const res = await Invoice.countUniqueClients();
       expect(res[0].count).toEqual(5);
     });
 
-    it('should list unpaid invoices', async () => {
+    it('listUnpaidInvoices() should list unpaid invoices', async () => {
       const res = await Invoice.listUnpaidInvoices();
       let ids = res.map( inv => inv._id.clientLink);
       expect(ids.length).toBe(5);
@@ -67,22 +67,12 @@ describe('Invoice', () => {
       });
     });
 
-    it('should list all invoices', async () => {
+    it('listInvoices() should list all invoices', async () => {
       const res = await Invoice.listInvoices();
       expect(res.length).toBe(10);
     });
 
-    it('should sum paid invoices', async () => {
-      const res = await Invoice.sumOfPaidInvoices();
-      expect(res[0].total).toEqual(500);
-    });
-
-    it('should sum unpaid invoices', async () => {
-      const res = await Invoice.sumOfOwedInvoices();
-      expect(res[0].total).toEqual(500);
-    });
-
-    it('should list invoiced items by client', async () => {
+    it('listItemsByClient(clientId) should list invoiced items by client', async () => {
       let clientId = clientIds.pop();
       const res = await Invoice.listItemsByClient(clientId);
       expect(res.length).toBe(6);
@@ -95,18 +85,33 @@ describe('Invoice', () => {
       });
     });
 
-    it('should count invoices with clientId (find 2)', async () => {
+    it('withClientId(clientId) should count invoices with clientId (find 2)', async () => {
       let clientId = clientIds.pop();
       const res = await Invoice.withClientId(clientId);
       expect(res.length).toBe(2);
     });
 
-    it('should count invoices with clientId (find 0)', async () => {
+    it('.withClientId(clientId) should count invoices with clientId (find 0)', async () => {
       let clientId = new mongoose.Types.ObjectId;;
       const res = await Invoice.withClientId(clientId);
       expect(res.length).toBe(0);
     });
 
+    it('sumOfInvoice() should add up the items on an invoice', async () => {
+      const invoice = await Invoice.findOne({});
+      const res = await Invoice.sumOfInvoice(invoice._id);
+      expect(res).toEqual(100);
+    });
+
+    it('sumOfPaidInvoices() should sum paid invoices', async () => {
+      const res = await Invoice.sumOfPaidInvoices();
+      expect(res).toEqual(500);
+    });
+
+    it('sumOfOwedInvoices() should sum unpaid invoices', async () => {
+      const res = await Invoice.sumOfOwedInvoices();
+      expect(res).toEqual(500);
+    });
     // InvoiceSchema.statics.newestInvoiceNumber
   });
 

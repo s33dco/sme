@@ -163,13 +163,18 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
     });
   }
 
-  let total = invoice.totalInvoiceValue();
+  let total = await Invoice.sumOfInvoice(id);
+
+  let sortedItems = invoice.items.sort((a,b) => b.date - a.date);
+
+  console.log(sortedItems);
 
   res.render('invoices/invoice', {
       pageTitle       : "Invoice",
       pageDescription : "invoice.",
       total,
       invoice,
+      sortedItems,
       csrfToken       : req.csrfToken(),
       admin : req.user.isAdmin
   });
