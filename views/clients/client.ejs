@@ -6,9 +6,18 @@
 </header>
 <% itemsList.forEach((item) => { %>
   <div class="item">
-    <p><%= moment(item.items.date).format("Do MMMM YYYY") %>
-       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>) £<%= item.items.fee %></p>
+    <h4><%= moment(item.items.date).format("Do MMMM YYYY") %>
+       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</h4>
     <p><%= item.items.desc %></p>
+    <p>£<%= item.items.fee %>
+
+      <% if (item.paid) { %>
+        ( paid <%= moment(item.datePaid).format("Do MMMM YYYY")%> )
+      <% } else { %>
+        ( outstanding )
+      <% } %>
+
+    </p>
   </div>
 <% }); %>
 <% if (admin) { %>

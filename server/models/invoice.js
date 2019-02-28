@@ -45,10 +45,10 @@ let InvoiceSchema = new mongoose.Schema({
                 ]
 });
 
-InvoiceSchema.methods.totalInvoiceValue = function  () {
-  inv = this;
-  return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
-};
+// InvoiceSchema.methods.totalInvoiceValue = function  () {
+//   inv = this;
+//   return inv.items.map( item => item.fee).reduce((total, fee) => total + fee);
+// };
 
 InvoiceSchema.statics.sumOfInvoice = async function (id){
   const result = await this.aggregate([
@@ -142,12 +142,25 @@ InvoiceSchema.statics.sumOfPaidInvoices = async function () {
 InvoiceSchema.statics.listItemsByClient = function (id) {
   return this.aggregate([
     {"$match" : { 'client._id' : mongoose.Types.ObjectId(id) }},
-    {"$project" : { _id:1 , invNo:1 , items:1 }},
+    {"$project" : { _id:1 , invNo:1 , items:1, paid:1, datePaid:1 }},
     {"$unwind" : "$items"},
-    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1, paid:1, datePaid:1}},
     {"$sort": {"items.date": -1}}
   ]);
 };
+
+InvoiceSchema.statics.totalBilledtoClient = async function (id) {
+  const result = await this.aggregate([
+    {"$match" : { 'client._id' : mongoose.Types.ObjectId(id) }},
+    {"$project" : { items:1 }},
+    {"$unwind" : "$items"},
+    {"$project" : { _id:0, "items.fee":1}},
+    {"$group": { _id: null, "total": {"$sum": "$items.fee"} }},
+    {"$project" : {_id:0, total:1}}
+  ]);
+  return result[0].total;
+};
+
 
 let Invoice = mongoose.model('Invoice', InvoiceSchema);
 

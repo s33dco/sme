@@ -57,7 +57,8 @@ const makePaidInvoice =  async (id) => {
                 terms       : "cash is king",
                 contact     : "myemail@example.com"
             },
-            paid        : true
+            paid        : true,
+            datePaid    : Date.now(),
           }).save();
 }
 

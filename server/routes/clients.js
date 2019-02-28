@@ -47,7 +47,7 @@ router.get('/:id', [auth, validateId ], async (req, res) => {
   const itemsList = await Invoice.listItemsByClient(id);
 
   if (itemsList.length > 0){
-    total = itemsList.map(item => item.items.fee).reduce((total, fee) => total + fee);
+    total = await Invoice.totalBilledtoClient(client._id);
   } else {
     total = '0';
   }

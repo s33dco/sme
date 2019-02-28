@@ -27,13 +27,6 @@ describe('Invoice', () => {
         expect(invoice.details.phone).toEqual('07865356742');
       });
     });
-
-    describe('add up the total of the billed items on invoice', () => {
-      it('should add up the value of the invoice items', async () => {
-        const sum = await invoice.totalInvoiceValue();
-        expect(sum).toBe(100);
-      });
-    });
   });
 
   describe('Invoice.statics', () => {
@@ -82,6 +75,7 @@ describe('Invoice', () => {
         expect(r).toHaveProperty('items.date');
         expect(r).toHaveProperty('items.desc');
         expect(r).toHaveProperty('items.fee');
+        expect(r).toHaveProperty('paid');
       });
     });
 
@@ -100,18 +94,27 @@ describe('Invoice', () => {
     it('sumOfInvoice() should add up the items on an invoice', async () => {
       const invoice = await Invoice.findOne({});
       const res = await Invoice.sumOfInvoice(invoice._id);
-      expect(res).toEqual(100);
+      expect(res).toBe(100.00);
     });
 
     it('sumOfPaidInvoices() should sum paid invoices', async () => {
       const res = await Invoice.sumOfPaidInvoices();
-      expect(res).toEqual(500);
+      expect(res).toContain(500);
     });
 
     it('sumOfOwedInvoices() should sum unpaid invoices', async () => {
       const res = await Invoice.sumOfOwedInvoices();
       expect(res).toEqual(500);
     });
+
+    it('totalBilledtoClient() should return the sum of all invoice items for clientId', async () => {
+      let clientId = clientIds.pop();
+      const res = await Invoice.totalBilledtoClient(clientId);
+      expect(res).toEqual(200);
+    });
+
+
+
     // InvoiceSchema.statics.newestInvoiceNumber
   });
 

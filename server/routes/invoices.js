@@ -167,8 +167,6 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
 
   let sortedItems = invoice.items.sort((a,b) => b.date - a.date);
 
-  console.log(sortedItems);
-
   res.render('invoices/invoice', {
       pageTitle       : "Invoice",
       pageDescription : "invoice.",
