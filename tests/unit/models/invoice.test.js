@@ -48,7 +48,7 @@ describe('Invoice', () => {
 
     it('countUniqueClients() should count number of unique clients', async () => {
       const res = await Invoice.countUniqueClients();
-      expect(res[0].count).toEqual(5);
+      expect(res).toEqual(5);
     });
 
     it('listUnpaidInvoices() should list unpaid invoices', async () => {
@@ -113,7 +113,10 @@ describe('Invoice', () => {
       expect(res).toEqual(200);
     });
 
-
+    it('should work out the average daily earnings', async () => {
+      const res = await Invoice.averageWeeklyEarnings(12);
+      expect(res).toEqual(200);
+    });
 
     // InvoiceSchema.statics.newestInvoiceNumber
   });
