@@ -1,4 +1,5 @@
 {
   "PORT"                  : "PORT",
-  "MONGODB_URI"           : "MONGODB_URI"
+  "MONGODB_URI"           : "MONGODB_URI",
+  "SENDGRID_API_PASSWORD" : "SENDGRID_API_PASSWORD"
 }

@@ -1,0 +1,42 @@
+<div class="invoice-message">
+  <h4><%= invoice.message%> </h4>
+</div>
+
+<header>
+  <h1>Invoice <%= invoice.invNo %>.</h1>
+</header>
+
+<div class="invoice-header">
+  <h2><%= invoice.client.name %></h2>
+  <h3><%= moment(invoice.invDate).format("Do MMMM YYYY") %></h3>
+</div>
+
+<div class="billed-items">
+  <h3>Invoiced Items.</h3>
+  <% sortedItems.forEach((item) => { %>
+    <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
+    <p><%= item.desc %></p>
+    <p>£<%= item.fee %></p>
+  <% }) %>
+</div>
+
+<div class="total-due">
+    <h3>Total Due £<%= total %></h3>
+    <% if (invoice.paid) { %>
+    <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
+    <% } %>
+</div>
+
+<div class="signature">
+  <h4>kind regards,</br>
+  <%= invoice.details.contact %></br>
+  <%= invoice.details.email %></br>
+  <%= invoice.details.phone %></h4>
+</div>
+
+<div class="pay-details">
+  <h3>Payee Details.</h3>
+  <p>UTR : <%= invoice.details.utr %></p>
+  <p><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
+  <h4>(<%= invoice.details.terms %>)</h4>
+</div>

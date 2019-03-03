@@ -1,3 +1,7 @@
+const nodemailer         = require('nodemailer');
+const sendgridTransport  = require('nodemailer-sendgrid-transport');
+const ejs                = require('ejs');
+const config             = require('config');
 const express            = require('express');
 const router             = express.Router();
 const moment             = require('moment');
@@ -152,7 +156,6 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
 
 router.get('/:id',  [auth, validateId ], async (req, res) => {
   let id = req.params.id;
-
   const invoice = await Invoice.findOne({ _id: id});
 
   if (!invoice) {
@@ -163,9 +166,9 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
     });
   }
 
-  let total = await Invoice.sumOfInvoice(id);
+  const total = await Invoice.sumOfInvoice(id);
 
-  let sortedItems = invoice.items.sort((a,b) => b.date - a.date);
+  const sortedItems = invoice.items.sort((a,b) => b.date - a.date);
 
   res.render('invoices/invoice', {
       pageTitle       : "Invoice",
@@ -180,18 +183,64 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
 
 router.post('/email', auth, async (req, res) => {
 
-  let id = req.body.id;
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "Invoice can't be emailed",
+      message : "The Invoice can't be found to email maybe you should try again.",
+      statusCode : 404
+    });
+  }
 
-  if (!ObjectID.isValid(id)) {throw Error("No find")}
+  const invoice = await Invoice.findOne({_id: req.body.id});
 
-  const invoice = await Invoice.findOne({  _id: id });
+  if (!invoice) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The invoice you want to email cannot be found, maybe it was deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
 
-  if (!invoice) {throw Error("No find")}
+  const total = await Invoice.sumOfInvoice(invoice._id);
+  const sortedItems = invoice.items.sort((a,b) => b.date - a.date);
 
-    // send the email....
+  // Configure Nodemailer SendGrid Transporter
+  const transporter = nodemailer.createTransport(
+    sendgridTransport({
+      auth: {
+        api_key: config.get('SENDGRID_API_PASSWORD')
+      },
+    })
+  );
 
-  req.flash('success', `Invoice ${invoice.invNo} sent to ${invoice.client.email}`)
-  res.redirect('/dashboard')
+  ejs.renderFile( "./views/emailInvoice.ejs", { total, invoice, sortedItems, moment: moment }, function (error, data) {
+    if (error) {
+      logger.error(`file error: ${error.message} - ${error.stack}`);
+    } else {
+      const options = {
+        from: invoice.details.email,
+        to: invoice.client.email,
+        bcc: invoice.details.email,
+        replyTo: invoice.details.email,
+        subject: `Invoice ${invoice.invNo} - ${moment(invoice.invDate).format("Do MMMM YYYY")}`,
+        text: `${invoice.message}, please see attached.`,
+        html: data }; // html body
+
+      logger.info(options.html);
+
+      transporter.sendMail(options, (error, info) => {
+          if (error) {
+            logger.error(`send email error: ${error.message} - ${error.stack}`);
+            req.flash('alert', `Invoice has not been emailed.`)
+            res.redirect('/dashboard')
+          } else {
+            logger.info(`Invoice ${invoice.invNo} mailed to ${invoice.client.email}`);
+            req.flash('success', `Invoice ${invoice.invNo} mailed to ${invoice.client.email}.`)
+            res.redirect('/dashboard')
+          }
+      });
+    };
+  });
 });
 
 router.post('/paid', [auth, admin], async (req, res) => {

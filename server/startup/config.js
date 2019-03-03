@@ -28,6 +28,9 @@ module.exports = () => {
     if (!config.get('SME_EMAIL')) {
       throw new Error('FATAL ERROR: SME_EMAIL is not defined.');
     }
+    if (!config.get('SENDGRID_API_PASSWORD')) {
+      throw new Error('FATAL ERROR: SENDGRID_API_PASSWORD is not defined.');
+    }
     logger.info(`** successfully read......... 👍🏻`);
     logger.info(`** starting in ${config.util.getEnv('NODE_ENV')}... 👉🏻`)
   }
