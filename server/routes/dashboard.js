@@ -13,18 +13,23 @@ router.get('/', auth, async (req, res) => {
                                   Invoice.sumOfOwedInvoices(),
                                   Invoice.sumOfPaidInvoices(),
                                   Invoice.countItems(),
-                                  Invoice.numberOfInvoices()]);
+                                  Invoice.numberOfInvoices(),
+                                  Invoice.sumOutgoings()
+                                ]);
 
-    promise.then( async ([uniqueClients, firstItem, unpaidInvoices, sumOfOwed, sumOfPaid, noItems, noInvoices]) => {
+    promise.then( async ([uniqueClients, firstItem, unpaidInvoices, sumOfOwed,
+                          sumOfPaid, noItems, noInvoices, outgoings]) => {
+
       const numberOfClients   = uniqueClients;
       const firstDate         = firstItem;
       const unpaidInvoiceList = unpaidInvoices;
       const moneyDue          = sumOfOwed;
-      const moneyPaid         = sumOfPaid;
+      const moneyIn           = sumOfPaid;
       const tradingDays       = moment(Date.now()).diff(moment(firstDate), 'days');
       const avWeekEarnings    = await Invoice.averageWeeklyEarnings(tradingDays);
       const items             = noItems;
-      const invoices          = noInvoices
+      const invoices          = noInvoices;
+      const moneyOut          = outgoings
 
       res.render('dashboard', {
         pageTitle: "Dashboard",
@@ -33,11 +38,12 @@ router.get('/', auth, async (req, res) => {
         csrfToken: req.csrfToken(),
         numberOfClients,
         moneyDue,
-        moneyPaid,
+        moneyIn,
         avWeekEarnings,
         unpaidInvoiceList,
         items,
-        invoices
+        invoices,
+        moneyOut
       });
     })
     .catch((e) => {

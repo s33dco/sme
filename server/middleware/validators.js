@@ -38,6 +38,10 @@ module.exports = {
       .isBefore(new Date().toISOString())
       .withMessage('dates must be today or earlier'),
 
+    check('items.*.type')
+      .isIn(['Invoice', 'Expense', 'Cost'])
+      .withMessage('value should be Invoice, Expense or Cost'),
+
     check('items.*.desc')
       .isLength({ min: 1 })
       .withMessage('Include details for the item'),
@@ -190,5 +194,24 @@ module.exports = {
               }
         })
         .withMessage("Passwords don't match")
+      ],
+
+    reports: [
+      check('startDate')
+        .isISO8601()
+        .withMessage('date is wrong')
+        .isBefore(new Date().toISOString())
+        .withMessage('dates must be today or earlier'),
+      check('endDate')
+        .isISO8601()
+        .withMessage('date is wrong')
+        .custom((value, { req }) => {
+          if (value < req.body.startDate) {
+                return false;
+              } else {
+                return value;
+              }
+        })
+        .withMessage("must be later than start date.")
       ]
 }

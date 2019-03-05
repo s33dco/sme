@@ -17,9 +17,15 @@
 <div class="billed-items">
   <h3>Billed Items.</h3>
   <% sortedItems.forEach((item) => { %>
-    <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
-    <p><%= item.desc %></p>
-    <p>£<%= item.fee %></p>
+    <div class="<%= item.type %>">
+      <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.
+        <% if (item.type!=='Invoice'){%>
+          (Hidden)
+        <% } %></p>
+      <p><%= item.desc %></p>
+      <p>£<%= item.fee %></p>
+    </div>
+
   <% }) %>
 </div>
 

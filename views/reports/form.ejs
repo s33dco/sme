@@ -1,0 +1,36 @@
+<div class="form-header">
+  <% if (Object.keys(errors).length === 0) { %>
+    <h2>Run reports by date.</h2>
+  <% } else { %>
+    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <ul class="errors-list">
+      <% Object.values(errors).forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
+
+<form method="post" action="/reports" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="form-field <%= errors.startDate ? 'form-field-invalid' : '' %>">
+    <label for="startDate">Start Date</label>
+    <input class="input" name="startDate" type="date" value="<%=moment(data.startDate).format('YYYY-MM-DD')%>" />
+    <% if (errors.startDate) { %>
+      <div class="error"><%= errors.startDate.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-field <%= errors.endDate ? 'form-field-invalid' : '' %>">
+    <label for="endDate">End Date</label>
+    <input class="input" name="endDate" type="date" value="<%=moment(data.endDate).format('YYYY-MM-DD')%>" />
+    <% if (errors.endDate) { %>
+      <div class="error"><%= errors.endDate.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn" type="submit">Run</button>
+  </div>
+</form>

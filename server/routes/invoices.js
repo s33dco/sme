@@ -202,7 +202,8 @@ router.post('/email', auth, async (req, res) => {
   }
 
   const total = await Invoice.sumOfInvoice(invoice._id);
-  const sortedItems = invoice.items.sort((a,b) => b.date - a.date);
+  const sortedItems = invoice.items.sort((a,b) => a.date - b.date);
+  const billedItems = sortedItems.filter(item => item.type === 'Invoice');
 
   // Configure Nodemailer SendGrid Transporter
   const transporter = nodemailer.createTransport(
@@ -213,7 +214,7 @@ router.post('/email', auth, async (req, res) => {
     })
   );
 
-  ejs.renderFile( "./views/emailInvoice.ejs", { total, invoice, sortedItems, moment: moment }, function (error, data) {
+  ejs.renderFile( "./views/invoiceEmail.ejs", { total, invoice, billedItems, moment: moment }, function (error, data) {
     if (error) {
       logger.error(`file error: ${error.message} - ${error.stack}`);
     } else {
@@ -223,10 +224,7 @@ router.post('/email', auth, async (req, res) => {
         bcc: invoice.details.email,
         replyTo: invoice.details.email,
         subject: `Invoice ${invoice.invNo} - ${moment(invoice.invDate).format("Do MMMM YYYY")}`,
-        text: `${invoice.message}, please see attached.`,
-        html: data }; // html body
-
-      logger.info(options.html);
+        html: data };
 
       transporter.sendMail(options, (error, info) => {
           if (error) {

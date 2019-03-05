@@ -44,7 +44,9 @@ router.get('/:id', [auth, validateId ], async (req, res) => {
         });
   }
 
-  const itemsList = await Invoice.listItemsByClient(id);
+  const itemsList = await Invoice.listChargedItemsByClient(id);
+
+  console.log(itemsList);
 
   if (itemsList.length > 0){
     total = await Invoice.totalBilledtoClient(client._id);

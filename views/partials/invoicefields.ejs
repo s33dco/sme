@@ -61,6 +61,16 @@
         </div>
 
         <div class='form-field'>
+          <select class='input' id='items[<%=index%>][type]' name='items[<%=index%>][type]'>
+              <option value="<%= item.type %>"><%= item.type %></option>
+              <option value="Invoice">Invoice</option>
+              <option value="Expense">Expense</option>
+              <option value="Cost">Cost</option>
+          </select>
+        </div>
+
+
+        <div class='form-field'>
           <textarea class='input' id='items[<%=index%>][desc]' name='items[<%=index%>][desc]' rows='6'><%= item.desc %></textarea>
         </div>
 
