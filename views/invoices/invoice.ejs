@@ -5,11 +5,11 @@
 
 <div class="invoice-header">
   <p>Invoice Date : <%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
-  <p>Client : <a href="/clients/<%= invoice.client._id %>"><%= invoice.client.name %></a></p>
+  <p>Client : <a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
 
-  <p><%=invoice.client.address1%></p>
-  <p><%=invoice.client.address2%></p>
-  <p><%=invoice.client.address3%></p>
+  <p class='capitalize'><%=invoice.client.address1%></p>
+  <p class='capitalize'><%=invoice.client.address2%></p>
+  <p class='capitalize'><%=invoice.client.address3%></p>
   <p><%=invoice.client.postcode%></p>
 
   <p>Email : <%= invoice.client.email %></p>
@@ -21,13 +21,10 @@
 </div>
 
 <div class="billed-items">
-  <h3>Billed Items.</h3>
+  <h3>Invoice Items.</h3>
   <% sortedItems.forEach((item) => { %>
     <div class="<%= item.type %>">
-      <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.
-        <% if (item.type!=='Invoice'){%>
-          (Hidden)
-        <% } %></p>
+      <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
       <p><%= item.desc %></p>
       <p>£<%= item.fee %></p>
     </div>
@@ -43,16 +40,16 @@
 </div>
 
 <div class="signature">
-  <h4><%= invoice.details.farewell %>,</br>
-  <%= invoice.details.contact %></br>
-  <%= invoice.details.email %></br>
-  <%= invoice.details.phone %></h4>
+  <h4><%= invoice.details.farewell %>,</h4>
+  <h4 class='capitalize'><%= invoice.details.contact %></h4>
+  <p><%= invoice.details.email %></p>
+  <p><%= invoice.details.phone %></p>
 </div>
 
 <div class="pay-details">
   <h3>Payee Details.</h3>
   <p>UTR : <%= invoice.details.utr %></p>
-  <p><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
+  <p class='capitalize'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
   <h4>(<%= invoice.details.terms %>)</h4>
 </div>
 

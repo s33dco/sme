@@ -4,12 +4,12 @@ let DetailSchema = new mongoose.Schema({
     utr       : {type:String},
     email     : {type:String},
     phone     : {type:String},
-    bank      : {type:String},
+    bank      : {type:String,    lowercase: true,},
     sortcode  : {type:String},
     accountNo : {type:String},
-    terms     : {type:String},
-    farewell  : {type:String},
-    contact   : {type:String}
+    terms     : {type:String,    lowercase: true,},
+    farewell  : {type:String,    lowercase: true,},
+    contact   : {type:String,    lowercase: true,}
   });
 
 

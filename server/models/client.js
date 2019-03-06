@@ -61,6 +61,14 @@ clientSchema.statics.withId = function (id) {
   return this.findOne({_id: id});
 }
 
+clientSchema.statics.orderedByName = function () {
+  return this.aggregate([
+    {"$project" : { _id:1, name:1}},
+    {"$sort": {name : 1}}
+  ]);
+};
+
+
 let Client = mongoose.model('Client', clientSchema);
 
 module.exports = {Client};

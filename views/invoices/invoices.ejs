@@ -13,7 +13,7 @@
         Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %>
       </a>
       <p>
-        <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>, £<%= invoice.total%></p><br>
+        <a href="/clients/<%= invoice._id.clientLink %>" class='capitalize'><%= invoice._id.client %></a>, £<%= invoice.total%></p><br>
     </div>
   <% }); %>
 

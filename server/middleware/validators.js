@@ -209,7 +209,7 @@ module.exports = {
         .withMessage("Passwords don't match")
       ],
 
-    reports: [
+  reports: [
       check('startDate')
         .isISO8601()
         .withMessage('date is wrong')

@@ -17,7 +17,7 @@
     <h4>Paid (£<%=incomings%>)</h4>
     <% listPaidItems.forEach((item) => { %>
       <div class="item">
-        <p>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+        <p class='capitalize'>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
         <p>Paid : <%= moment(item.datePaid).format("Do MMMM YYYY") %> / Invoiced : <%= moment(item.invDate).format("Do MMMM YYYY") %></p>
         <p><%= item.items.desc %></p>
       </div>
@@ -30,7 +30,7 @@
     <h4>Unpaid (£<%=owed%>)</h4>
     <%listUnpaidItems.forEach((item) => { %>
       <div class="item">
-        <p>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+        <p class='capitalize'>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
         <p>Invoiced : <%= moment(item.invDate).format("Do MMMM YYYY") %></p>
         <p><%= item.items.desc %></p>
       </div>

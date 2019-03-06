@@ -12,7 +12,8 @@ const logger            = require('../startup/logger');
 const mongoose          = require('mongoose');
 
 router.get('/', auth, async (req, res) => {
-  const clients = await Client.find({}, {name:1}).sort({name: 1});
+  const clients = await Client.orderedByName();
+
   res.render('clients/clients', {
       pageTitle       : "Client List",
       pageDescription : "Clients.",

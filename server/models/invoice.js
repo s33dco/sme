@@ -12,7 +12,15 @@ let InvoiceSchema = new mongoose.Schema({
       phone   : { type: String,
                   required: true},
       email   : { type: String,
-                  required: true}
+                  required: true},
+      address1: { type: String,
+                  required: true},
+      address2: { type: String,
+                  required: true},
+      address3: { type: String,
+                  required: true},
+      postcode: { type: String,
+                  required: true},
                 },
 
   message     : { type: String},
@@ -33,7 +41,9 @@ let InvoiceSchema = new mongoose.Schema({
     contact   : { type: String,
                   required: true},
     terms     : { type: String,
-                  required: true}
+                  required: true},
+    farewell  : { type: String,
+                required: true}
               },
 
   paid        : { type: Boolean },

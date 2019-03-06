@@ -10,7 +10,7 @@ const admin               = require("../middleware/admin");
 const logger              = require('../startup/logger');
 
 router.get('/', [auth, admin], async (req, res) => {
-  const users = await User.find({},{firstName:1, lastName:1}).sort({firstName: 1});
+  const users = await User.orderedByName();
   res.render('users/users', {
       pageTitle       : "Users",
       pageDescription : "People with access.",

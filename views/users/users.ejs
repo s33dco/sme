@@ -1,6 +1,6 @@
 <header>
   <h1>Users.</h1>
-  <a href="/users/new">Add a new user with admin access.</a>  
+  <a href="/users/new">Add a new user.</a>
 </header>
 
 
@@ -8,7 +8,7 @@
   <ul>
   <% users.forEach((user) => {%>
     <li>
-      <a href="/users/<%=user._id%>"><%=user.firstName%></a>
+      <a href="/users/<%=user._id%>" class='capitalize'><%=user.firstName%></a>
     </li>
     <%})%>
   </ul>

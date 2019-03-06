@@ -9,7 +9,7 @@
   <ul>
     <% clients.forEach((client) => {%>
       <li>
-        <a href="/clients/<%=client._id%>"><%= client.name%></a>
+        <a href="/clients/<%=client._id%>" class='capitalize'><%= client.name%></a>
       </li>
     <%})%>
   </ul>

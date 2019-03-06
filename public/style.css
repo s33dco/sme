@@ -21,6 +21,9 @@ h2 {
   font-size: 20px;
 }
 
+
+/* forms and flashes */
+
 .form-header {
   width: 100%;
   max-width: 600px;
@@ -125,6 +128,9 @@ label {
   color: #721c24;
 }
 
+
+/* menus */
+
 ul {
   list-style: none;
 
@@ -151,4 +157,15 @@ ul {
 section header
 {
   text-align: center;
+}
+
+/* typography */
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.billed-items .Expense,
+.billed-items .Cost {
+  color: #d6c1b6;
 }

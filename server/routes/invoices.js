@@ -163,6 +163,8 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
   let id = req.params.id;
   const invoice = await Invoice.findOne({ _id: id});
 
+  console.log(invoice);
+
   if (!invoice) {
     throw ({
       tag : 'No longer available.',

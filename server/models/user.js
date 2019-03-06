@@ -8,12 +8,14 @@ let userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 1,
+    lowercase: true,
     trim: true
   },
   lastName: {
     type: String,
     required: true,
     minlength: 1,
+    lowercase: true,
     trim: true
   },
   email: {
@@ -54,6 +56,13 @@ userSchema.statics.isValid = function (id) {
     .then(result => {
       if (!result) {return false} else {return id}})
 }
+
+userSchema.statics.orderedByName = function () {
+  return this.aggregate([
+    {"$project" : { _id:1, firstName:1}},
+    {"$sort": {firstName : 1}}
+  ]);
+};
 
 userSchema.pre('save',  async function (next) {
   let user = this;
