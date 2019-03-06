@@ -6,6 +6,7 @@ let clientSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 1,
+    lowercase: true,
     trim: true
   },
   email: {
@@ -24,18 +25,27 @@ let clientSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 1,
+    lowercase: true,
     trim: true
   },
   address2: {
     type: String,
     required: true,
     minlength: 1,
+    lowercase: true,
+    trim: true
+  },
+  address3: {
+    type: String,
+    minlength: 1,
+    lowercase: true,
     trim: true
   },
   postcode: {
     type: String,
     required: true,
     minlength: 1,
+    uppercase: true,
     trim: true
   }
 });
@@ -50,8 +60,6 @@ clientSchema.statics.isValid = function (id) {
 clientSchema.statics.withId = function (id) {
   return this.findOne({_id: id});
 }
-
-
 
 let Client = mongoose.model('Client', clientSchema);
 

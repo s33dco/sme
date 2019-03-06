@@ -92,7 +92,20 @@ module.exports = {
       .isLength({ min: 11 })
       .withMessage("too short!")
       .isLength({ max: 16 })
-      .withMessage("too long!")
+      .withMessage("too long!"),
+    check('address1')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words and numbers'),
+    check('address2')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('address3')
+      .optional({checkFalsy:true}).isLength({ min: 1 })
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('postcode')
+      .matches(/^([a-z0-9]\s*){5,7}$/i)
+      .withMessage('postcode looks wrong.')
   ],
 
   user: [

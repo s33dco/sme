@@ -78,9 +78,9 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
     });
   };
 
-  const { name, email, phone, address1, address2, postcode} = req.body;
+  const { name, email, phone, address1, address2, address3, postcode} = req.body;
 
-  let client = new Client({name, email, phone, address1, address2, postcode});
+  let client = new Client({name, email, phone, address1, address2, address3, postcode});
   await client.save();
   req.flash('success', `${client.name} created !`)
   res.redirect('/clients')
@@ -98,10 +98,10 @@ router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
     });
   }
 
-  let { _id, name, email, phone} = client;
+  let { _id, name, email, phone, address1, address2, address3, postcode} = client;
 
   res.render('clients/editclient', {
-    data: { _id, name, email, phone},
+    data: { _id, name, email, phone, address1, address2, address3, postcode},
     errors: {},
     csrfToken: req.csrfToken(),  // generate a csrf token
     pageTitle       : "Edit Client",
@@ -129,6 +129,7 @@ router.put('/:id', [auth, admin, validateId, validate.client], async (req, res) 
         email: req.body.email,
         address1: req.body.address1,
         address2: req.body.address2,
+        address3: req.body.address3,
         postcode : req.body.postcode},
       {new: true});
 
