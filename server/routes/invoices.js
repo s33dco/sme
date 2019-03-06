@@ -129,13 +129,17 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
 
     const invoice = await new Invoice({
           invNo      : req.body.invNo,
-          invDate    : req.body.invDate,
+          invDate    : moment(req.body.invDate).endOf('day'),
           message    : req.body.message,
           client     : {
               _id         : client._id,
               name        : client.name,
               email       : client.email,
-              phone       : client.phone
+              phone       : client.phone,
+              address1    : client.address1,
+              address2    : client.address2,
+              address3    : client.address3,
+              postcode    : client.postcode
           },
           items      : req.body.items,
           details    : {
@@ -146,7 +150,8 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
               sortcode    : detail.sortcode,
               accountNo   : detail.accountNo,
               terms       : detail.terms,
-              contact     : detail.contact
+              contact     : detail.contact,
+              farewell    : detail.farewell
           },
           paid        : false
         }).save()
@@ -398,13 +403,29 @@ router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res
 
   await Invoice.updateOne({_id : req.params.id} ,
     {$set:  { invNo     :  req.body.invNo,
-              invDate   : req.body.invDate,
+              invDate   : moment(req.body.invDate).endOf('day'),
               message   : req.body.message,
               items     : req.body.items,
               client    : { _id  : client._id,
                           name   : client.name,
                           email  : client.email,
-                          phone  : client.phone }
+                          phone  : client.phone,
+                          address1 : client.address1,
+                          address2 : client.address2,
+                          address3 : client.address3,
+                          postcode : client.postcode,
+                        },
+              details   : {
+                  utr         : detail.utr,
+                  email       : detail.email,
+                  phone       : detail.phone,
+                  bank        : detail.bank,
+                  sortcode    : detail.sortcode,
+                  accountNo   : detail.accountNo,
+                  terms       : detail.terms,
+                  contact     : detail.contact,
+                  farewell    : detail.farewell
+              },
             }
       });
    req.flash('success', `Invoice ${req.body.invNo} updated!`);

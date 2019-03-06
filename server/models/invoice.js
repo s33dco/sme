@@ -121,6 +121,7 @@ InvoiceSchema.statics.listUnpaidInvoices = function () {
     {"$match" : { paid : false}},
     {"$project" : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
     {"$unwind" : "$items"},
+    {"$match" : { 'items.type' : 'Invoice' }},
     {"$sort": {"items.date" : -1}},
     {"$group": {
      "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
@@ -163,7 +164,7 @@ InvoiceSchema.statics.sumOfPaidInvoices = async function () {
   }
 };
 
-InvoiceSchema.statics.averageWeeklyEarnings = async function (days) {
+InvoiceSchema.statics.averageWeeklyGrossEarnings = async function (days) {
     const result = await this.aggregate([
       {"$project" : { paid:1 , items:1 }},
       {"$match" : { paid : true }},
@@ -191,6 +192,37 @@ InvoiceSchema.statics.averageWeeklyEarnings = async function (days) {
     }
 
 };
+//
+// InvoiceSchema.statics.averageWeeklyNettEarnings = async function (days) {
+//     const result = await this.aggregate([
+//       {"$project": {items :1}},
+//       {"$unwind" : "$items"},
+//       {"$match" : { 'items.type' : 'Invoice' }},
+//       {"$project" : { _id:1, "items.fee":1}},
+//       {"$group": {_id: 1, earnings: {$sum: "$items.fee"}}},
+//       {"$match" : { "items.type" : { "$in": ['Cost', 'Expense' ] }}},
+//       {"$group": {_id: 1, outgoings: {$sum: "$items.fee"}}},
+//       {"$project" : { _id:1, total: {"$subtract": [ earnings, outgoings ]}}},
+//       {"$project" : { _id:null, "AvdayEarnings": { $divide: [ "$total", days ]}}},
+//       {"$project": { avPerWeek: { $divide: [
+//         {
+//         $trunc: {
+//             $multiply: [
+//               "$AvdayEarnings", 700
+//             ]
+//           }
+//         },
+//         100
+//       ] }}}
+//     ]);
+//
+//     if (result.length === 0) {
+//       return 0
+//     } else {
+//       return result[0].avPerWeek;
+//     }
+//
+// };
 
 InvoiceSchema.statics.listChargedItemsByClient = function (id) {
   return this.aggregate([
@@ -279,8 +311,6 @@ InvoiceSchema.statics.sumOutgoings = async function () {
     return result[0].total;
   }
 };
-
-
 
 InvoiceSchema.statics.numberOfInvoicesProducedBetween = async function (start, end ){
   const result = await this.aggregate([

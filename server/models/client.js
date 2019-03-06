@@ -19,6 +19,24 @@ let clientSchema = new mongoose.Schema({
     required: true,
     minlength: 7,
     trim: true
+  },
+  address1: {
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true
+  },
+  address2: {
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true
+  },
+  postcode: {
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true
   }
 });
 

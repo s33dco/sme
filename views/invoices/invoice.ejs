@@ -6,6 +6,12 @@
 <div class="invoice-header">
   <p>Invoice Date : <%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
   <p>Client : <a href="/clients/<%= invoice.client._id %>"><%= invoice.client.name %></a></p>
+
+  <p><%=invoice.client.address1%></p>
+  <p><%=invoice.client.address2%></p>
+  <p><%=invoice.client.address3%></p>
+  <p><%=invoice.client.postcode%></p>
+
   <p>Email : <%= invoice.client.email %></p>
   <p>Telephone : <%= invoice.client.phone %></p>
 </div>
@@ -37,7 +43,7 @@
 </div>
 
 <div class="signature">
-  <h4>kind regards,</br>
+  <h4><%= invoice.details.farewell %>,</br>
   <%= invoice.details.contact %></br>
   <%= invoice.details.email %></br>
   <%= invoice.details.phone %></h4>

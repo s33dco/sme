@@ -78,9 +78,9 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
     });
   };
 
-  const { name, email, phone} = req.body;
+  const { name, email, phone, address1, address2, postcode} = req.body;
 
-  let client = new Client({name, email, phone});
+  let client = new Client({name, email, phone, address1, address2, postcode});
   await client.save();
   req.flash('success', `${client.name} created !`)
   res.redirect('/clients')
@@ -124,7 +124,12 @@ router.put('/:id', [auth, admin, validateId, validate.client], async (req, res) 
   } else {
 
     const client = await Client.findOneAndUpdate({_id: req.params.id},
-      {name: req.body.name, phone: req.body.phone, email: req.body.email},
+      { name: req.body.name,
+        phone: req.body.phone,
+        email: req.body.email,
+        address1: req.body.address1,
+        address2: req.body.address2,
+        postcode : req.body.postcode},
       {new: true});
 
     if (!client) {

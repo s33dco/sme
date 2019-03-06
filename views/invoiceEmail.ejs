@@ -316,7 +316,11 @@
 
                         <div class="invoice-header">
                           <h2>Billed to : <%= invoice.client.name %></h2>
-                          <h3>BIlling Date: <%= moment(invoice.invDate).format("Do MMMM YYYY") %></h3>
+                          <h3>Billing Date: <%= moment(invoice.invDate).format("Do MMMM YYYY") %></h3>
+                          <p><%=invoice.client.address1%></p>
+                          <p><%=invoice.client.address2%></p>
+                          <p><%=invoice.client.address3%></p>
+                          <p><%=invoice.client.postcode%></p>
                         </div>
 
                         <div class="billed-items">
@@ -340,7 +344,7 @@
                         </div>
 
                         <div class="signature">
-                          <h4>kind regards,</br>
+                          <h4><%= invoice.details.farewell %>,</br>
                           <%= invoice.details.contact %></br>
                           <%= invoice.details.email %></br>
                           <%= invoice.details.phone %></h4>
