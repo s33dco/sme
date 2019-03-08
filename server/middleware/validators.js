@@ -172,7 +172,20 @@ module.exports = {
       .withMessage('account number 8 digits only'),
     check('terms')
       .matches(/(\w(\s)?)+/)
-      .withMessage('just words')
+      .withMessage('just words'),
+    check('address1')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words and numbers'),
+    check('address2')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('address3')
+      .optional({checkFalsy:true}).isLength({ min: 1 })
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
+    check('postcode')
+      .matches(/^([a-z0-9]\s*){5,7}$/i)
+      .withMessage('postcode looks wrong.')
     ],
 
   useredit: [
@@ -210,21 +223,43 @@ module.exports = {
       ],
 
   reports: [
-      check('startDate')
+      check('start')
         .isISO8601()
         .withMessage('date is wrong')
         .isBefore(new Date().toISOString())
         .withMessage('dates must be today or earlier'),
-      check('endDate')
+      check('end')
         .isISO8601()
         .withMessage('date is wrong')
         .custom((value, { req }) => {
-          if (value < req.body.startDate) {
+          if (value < req.query.start) {
                 return false;
               } else {
                 return value;
               }
         })
         .withMessage("must be later than start date.")
+      ],
+
+  download: [
+      check('start')
+        .isISO8601()
+        .withMessage('date is wrong')
+        .isBefore(new Date().toISOString())
+        .withMessage('dates must be today or earlier'),
+      check('end')
+        .isISO8601()
+        .withMessage('date is wrong')
+        .custom((value, { req }) => {
+          if (value < req.query.start) {
+                return false;
+              } else {
+                return value;
+              }
+        })
+        .withMessage("must be later than start date."),
+      check('type')
+        .isIn(['outgoing', 'incoming'])
+        .withMessage('only outgoing or incoming available')
       ]
 }

@@ -32,11 +32,12 @@ router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
   }
 
   let {utr, email, phone, bank, sortcode,
-    accountNo, terms, contact, farewell} = detail;
+    accountNo, terms, contact, farewell, address1, address2, address3, postcode} = detail;
 
   res.render('details/editdetails', {
     data            : {utr, email, phone, bank, sortcode,
-                        accountNo, terms, contact, farewell},
+                        accountNo, terms, contact, farewell,
+                        address1, address2, address3, postcode},
     errors          : {},
     csrfToken       : req.csrfToken(),
     pageTitle       : "Edit Inv Info",
@@ -69,12 +70,16 @@ router.post('/', [auth, admin, validate.detail], async (req, res) => {
             accountNo: req.body.accountNo,
             terms    : req.body.terms,
             contact  : req.body.contact,
-            farewell : req.body.farewell
+            farewell : req.body.farewell,
+            address1 : req.body.address1,
+            address2 : req.body.address2,
+            address3 : req.body.address3,
+            postcode : req.body.postcode
           }
         },{ upsert: true });
 
     req.flash('success', `Invoice Information updated!`);
-    res.redirect(`/invoices`);
+    res.redirect(`/details`);
   }
 });
 

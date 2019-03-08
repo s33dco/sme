@@ -43,7 +43,15 @@ let InvoiceSchema = new mongoose.Schema({
     terms     : { type: String,
                   required: true},
     farewell  : { type: String,
-                required: true}
+                required: true},
+    address1: { type: String,
+                required: true},
+    address2: { type: String,
+                required: true},
+    address3: { type: String,
+                required: true},
+    postcode: { type: String,
+                required: true},
               },
 
   paid        : { type: Boolean },
@@ -55,6 +63,14 @@ let InvoiceSchema = new mongoose.Schema({
                   fee : {type: mongoose.Schema.Types.Decimal, required: true}}
                 ]
 });
+
+
+// InvoiceSchema.set('toJSON', {
+//   transform: (doc, ret) => {
+//     ret.items.fee = ret.items.fee.toString();
+//     return ret;
+//   },
+// });
 
 // InvoiceSchema.methods.totalInvoiceValue = function  () {
 //   inv = this;
@@ -469,6 +485,17 @@ InvoiceSchema.statics.listCostsBetween = function (start, end) {
     {"$project" : { _id:1 , invNo:1 , items:1}},
     {"$unwind" : "$items"},
     {"$match" : { 'items.type' : 'Cost' }},
+    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    {"$sort": {"items.date": 1}}
+  ]);
+};
+
+InvoiceSchema.statics.listOutgoingsBetween = function (start, end) {
+  return this.aggregate([
+    {"$project" : { _id:1 , invNo:1 , items:1}},
+    {"$unwind" : "$items"},
+    {"$match" : { "items.type" : { "$in": ['Cost', 'Expense' ] }}},
     {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
     {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
     {"$sort": {"items.date": 1}}

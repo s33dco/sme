@@ -11,22 +11,20 @@
   <% } %>
 </div>
 
-<form method="post" action="/reports" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-  <div class="form-field <%= errors.startDate ? 'form-field-invalid' : '' %>">
-    <label for="startDate">Start Date</label>
-    <input class="input" name="startDate" type="date" value="<%=moment(data.startDate).format('YYYY-MM-DD')%>" />
-    <% if (errors.startDate) { %>
-      <div class="error"><%= errors.startDate.msg %></div>
+<form method="get" action="/reports/viewer" novalidate>
+  <div class="form-field <%= errors.start ? 'form-field-invalid' : '' %>">
+    <label for="start">Start Date</label>
+    <input class="input" name="start" type="date" value="<%=moment(data.start).format('YYYY-MM-DD')%>" />
+    <% if (errors.start) { %>
+      <div class="error"><%= errors.start.msg %></div>
     <% } %>
   </div>
 
-  <div class="form-field <%= errors.endDate ? 'form-field-invalid' : '' %>">
-    <label for="endDate">End Date</label>
-    <input class="input" name="endDate" type="date" value="<%=moment(data.endDate).format('YYYY-MM-DD')%>" />
-    <% if (errors.endDate) { %>
-      <div class="error"><%= errors.endDate.msg %></div>
+  <div class="form-field <%= errors.end ? 'form-field-invalid' : '' %>">
+    <label for="end">End Date</label>
+    <input class="input" name="end" type="date" value="<%=moment(data.end).format('YYYY-MM-DD')%>" />
+    <% if (errors.end) { %>
+      <div class="error"><%= errors.end.msg %></div>
     <% } %>
   </div>
 

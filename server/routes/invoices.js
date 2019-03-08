@@ -151,10 +151,16 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
               accountNo   : detail.accountNo,
               terms       : detail.terms,
               contact     : detail.contact,
-              farewell    : detail.farewell
+              farewell    : detail.farewell,
+              address1    : detail.address1,
+              address2    : detail.address2,
+              address3    : detail.address3,
+              postcode    : detail.postcode
           },
           paid        : false
         }).save()
+
+
     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
     res.redirect(`invoices/${invoice._id}`);
   });
@@ -162,8 +168,6 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
 router.get('/:id',  [auth, validateId ], async (req, res) => {
   let id = req.params.id;
   const invoice = await Invoice.findOne({ _id: id});
-
-  console.log(invoice);
 
   if (!invoice) {
     throw ({
@@ -331,14 +335,14 @@ router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
 
   const clients = await Client.find({}, {name:1}).sort({name: 1})
 
-  let { client, _id, invNo, invDate, message, items, paid} = invoice;
+  let { client, _id, invNo, invDate, message, items} = invoice;
   let clientId = client._id;
   let selected = client
 
   res.render('invoices/editinvoice', {
     clients,
     selected,
-    data: { _id, invNo, invDate, message, items, paid, clientId},
+    data: { _id, invNo, invDate, message, items, clientId},
     errors: {},
     csrfToken: req.csrfToken(),  // generate a csrf token
     pageTitle       : "Edit Invoice",
@@ -373,7 +377,6 @@ router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res
         clients,
         selected
     });
-
   }
 
   const detail = await Detail.findOne({});
@@ -426,7 +429,11 @@ router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res
                   accountNo   : detail.accountNo,
                   terms       : detail.terms,
                   contact     : detail.contact,
-                  farewell    : detail.farewell
+                  farewell    : detail.farewell,
+                  address1    : detail.address1,
+                  address2    : detail.address2,
+                  address3    : detail.address3,
+                  postcode    : detail.postcode
               },
             }
       });

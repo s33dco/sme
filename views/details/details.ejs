@@ -1,17 +1,25 @@
 <header>
-  <h1>Invoice Information.</h1>  
+  <h1>Invoice Information.</h1>
 </header>
 
 
 <h3>Contact Details.</h3>
 <p>farewell : <%= detail.farewell %></p>
-<p>contact name : <%= detail.contact %></p>
+<p class='capitalize'>contact name : <%= detail.contact %></p>
 <p>contact email : <%= detail.email %></p>
 <p>contact number : <%= detail.phone %></p>
 
+<h3>Address Details.</h3>
+<p class='capitalize'><%= detail.address1 %></p>
+<p class='capitalize'><%= detail.address2 %></p>
+<% if (detail.address3) { %>
+ <p class='capitalize'><%= detail.address3 %></p>
+<% } %>
+<p class='capitalize'><%= detail.postcode %></p>
+
 <h3>Pay Details.</h3>
 <p>UTR : <%=detail.utr %></p>
-<p>Bank Name : <%= detail.bank %></p>
+<p class='capitalize'>Bank Name : <%= detail.bank %></p>
 <p>Sort Code : <%= detail.sortcode %></p>
 <p>Account No: <%= detail.accountNo %></p>
 

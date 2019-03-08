@@ -9,7 +9,34 @@ let DetailSchema = new mongoose.Schema({
     accountNo : {type:String},
     terms     : {type:String,    lowercase: true,},
     farewell  : {type:String,    lowercase: true,},
-    contact   : {type:String,    lowercase: true,}
+    contact   : {type:String,    lowercase: true,},
+    address1: {
+      type: String,
+      required: true,
+      minlength: 1,
+      lowercase: true,
+      trim: true
+    },
+    address2: {
+      type: String,
+      required: true,
+      minlength: 1,
+      lowercase: true,
+      trim: true
+    },
+    address3: {
+      type: String,
+      minlength: 1,
+      lowercase: true,
+      trim: true
+    },
+    postcode: {
+      type: String,
+      required: true,
+      minlength: 1,
+      uppercase: true,
+      trim: true
+    }
   });
 
 

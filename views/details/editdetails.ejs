@@ -50,6 +50,42 @@
       <% } %>
     </div>
 
+    <h4>Address Details</h4>
+
+      <div class="form-field <%= errors.address1 ? 'form-field-invalid' : '' %>">
+        <label for="address1">Address 1</label>
+        <input class="input" id="address1" name="address1" type="text" value="<%= data.address1 %>" />
+        <% if (errors.address1) { %>
+          <div class="error"><%= errors.address1.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.address2 ? 'form-field-invalid' : '' %>">
+        <label for="address2">Address 2</label>
+        <input class="input" id="address2" name="address2" type="text" value="<%= data.address2 %>" />
+        <% if (errors.address2) { %>
+          <div class="error"><%= errors.address2.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.address3 ? 'form-field-invalid' : '' %>">
+        <label for="address3">Address 3</label>
+        <input class="input" id="address3" name="address3" type="text" value="<%= data.address3 %>" />
+        <% if (errors.address3) { %>
+          <div class="error"><%= errors.address3.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.postcode ? 'form-field-invalid' : '' %>">
+        <label for="postcode">Postcode</label>
+        <input class="input" id="postcode" name="postcode" type="text" value="<%= data.postcode %>" />
+        <% if (errors.postcode) { %>
+          <div class="error"><%= errors.postcode.msg %></div>
+        <% } %>
+      </div>
+
+
+
     <h4>Pay Details</h4>
 
     <div class="form-field <%= errors.utr ? 'form-field-invalid' : '' %>">

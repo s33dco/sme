@@ -9,7 +9,9 @@
 
   <p class='capitalize'><%=invoice.client.address1%></p>
   <p class='capitalize'><%=invoice.client.address2%></p>
-  <p class='capitalize'><%=invoice.client.address3%></p>
+  <% if (invoice.client.address3){ %>
+    <p class='capitalize'><%=invoice.client.address3%></p>
+  <% } %>
   <p><%=invoice.client.postcode%></p>
 
   <p>Email : <%= invoice.client.email %></p>
@@ -51,6 +53,15 @@
   <p>UTR : <%= invoice.details.utr %></p>
   <p class='capitalize'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
   <h4>(<%= invoice.details.terms %>)</h4>
+</div>
+
+<div class="address">
+  <p class='capitalize'><%=invoice.details.address1%></p>
+  <p class='capitalize'><%=invoice.details.address2%></p>
+  <% if (invoice.details.address3){ %>
+    <p class='capitalize'><%=invoice.details.address3%></p>
+  <% } %>
+  <p><%=invoice.details.postcode%></p>
 </div>
 
 
@@ -107,5 +118,4 @@
       </div>
     </form>
   </div>
-
 <% } %>
