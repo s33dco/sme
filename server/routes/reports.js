@@ -32,19 +32,18 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
 
   const start             = moment(req.query.start).startOf('day').toISOString();
   const end               = moment(req.query.end).endOf('day').toISOString();
+  const incomings         = await Invoice.sumOfPaidInvoicesBetween(start,end);
   const invoicesProduced  = await Invoice.numberOfInvoicesProducedBetween(start,end);
   const invoicesPaid      = await Invoice.numberOfInvoicesPaidBetween(start,end);
   const itemsInvoiced     = await Invoice.countItemsInvoicedBetween(start,end);
   const itemsPaid         = await Invoice.countItemsPaidBetween(start,end);
-  const listPaidItems     = await Invoice.listPaidItemsBetween(start, end);
-  const listUnpaidItems   = await Invoice.listUnpaidItemsBetween(start, end);
-  const incomings         = await Invoice.sumOfPaidInvoicesBetween(start,end);
-  const outgoings         = await Invoice.sumOfOutgoingsBetween(start,end);
   const owed              = await Invoice.sumOfOwedInvoicesBetween(start,end);
-  const costs             = await Invoice.sumOfCostsBetween(start,end);
-  const costsList         = await Invoice.listCostsBetween(start,end);
+  const labour            = await Invoice.sumOfLabourBetween(start,end);
+  const labourList        = await Invoice.listLabourBetween(start,end);
   const expenses          = await Invoice.sumOfExpensesBetween(start,end);
   const expensesList      = await Invoice.listExpensesBetween(start,end);
+  const materials         = await Invoice.sumOfMaterialsBetween(start,end);
+  const materialsList     = await Invoice.listMaterialsBetween(start,end);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -55,15 +54,14 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     invoicesPaid,
     itemsInvoiced,
     itemsPaid,
-    listPaidItems,
-    listUnpaidItems,
     incomings,
-    outgoings,
     owed,
-    costs,
-    costsList,
+    labour,
+    labourList,
     expenses,
-    expensesList
+    expensesList,
+    materials,
+    materialsList
   });
 });
 
@@ -77,70 +75,42 @@ router.get('/download', [auth, validate.download], async (req, res) => {
     return res.redirect('/reports')
   }
 
-  const {type, start, end} = req.query;
+  const {start, end} = req.query;
 
-  if (type === 'incoming'){
+  data  = await Invoice.listPaidItemsBetween(start, end);
 
-    data  = await Invoice.listPaidItemsBetween(start, end);
-
-    if (data.length === 0 ) {
-      req.flash('alert', 'no data to export!')
-      return res.redirect('/reports')
-    }
-
-    fields = [
-                      { label : 'Invoice',
-                        value : 'invNo'},
-                      { label : 'Invoice Date',
-                        value : (field) => moment(field).format('DD/MM/YY'),
-                        stringify: true},
-                      { label : 'Client Name',
-                        value : 'client.name'},
-                      { label : 'Item Date',
-                        value : (field) => moment(field).format('DD/MM/YY'),
-                        stringify: true},
-                      { label : 'Description',
-                        value : 'items.desc'},
-                      { label : 'Amount',
-                        value : 'items.fee'},
-                      // { label : 'Amount',
-                      //   value : (field) => stringMoney(field),
-                      //   stringify: true},
-
-
-                      { label : 'Date Paid',
-                        value : (field) => moment(field).format('DD/MM/YY'),
-                        stringify: true}
-                    ];
-    filepath =`./public/Incomings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
-
-  } else {
-    data = await Invoice.listOutgoingsBetween(start, end);
-
-    if (data.length === 0 ) {
-      req.flash('alert', 'no data to export!')
-      return res.redirect('/reports')
-    }
-
-    fields = [
-                      { label : 'Invoice',
-                        value : 'invNo'},
-                      { label : 'Item Date',
-                        value : (field) => moment(field).format('DD/MM/YY'),
-                        stringify: true},
-                      { label : 'Description',
-                        value : 'items.desc'},
-                      { label : 'Amount',
-                        value : 'items.fee'}
-                    ];
-    filepath =`./public/Outgoings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
-
+  if (data.length === 0 ) {
+    req.flash('alert', 'no data to export!')
+    return res.redirect('/reports')
   }
+
+  fields = [
+              { label : 'Invoice',
+                value : 'invNo'},
+              { label : 'Invoice Date',
+                value : (field) => moment(field).format('DD/MM/YY'),
+                stringify: true},
+              { label : 'Type',
+                value : 'items.type'},
+              { label : 'Client Name',
+                value : 'client.name'},
+              { label : 'Item Date',
+                value : (field) => moment(field).format('DD/MM/YY'),
+                stringify: true},
+              { label : 'Description',
+                value : 'items.desc'},
+              { label : 'Amount',
+                value : 'items.fee'},
+              { label : 'Date Paid',
+                value : (field) => moment(field).format('DD/MM/YY'),
+                stringify: true}
+            ];
+  filepath =`./public/Earnings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
 
   data.forEach((item) => {
     item.items.fee = parseFloat(item.items.fee).toFixed(2);
   })
-  
+
   const json2csvParser = new Json2csvParser({ fields });
   const csv = json2csvParser.parse(data);
 
@@ -150,7 +120,6 @@ router.get('/download', [auth, validate.download], async (req, res) => {
        res.download(filepath);
      }
   });
-
 
 });
 

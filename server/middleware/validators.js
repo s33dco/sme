@@ -36,20 +36,20 @@ module.exports = {
       .isISO8601()
       .withMessage('date is wrong')
       .isBefore(new Date().toISOString())
-      .withMessage('dates must be today or earlier'),
+      .withMessage('items dates must be today or earlier'),
 
     check('items.*.type')
-      .isIn(['Invoice', 'Expense', 'Cost'])
-      .withMessage('value should be Invoice, Expense or Cost'),
+      .isIn(['Labour', 'Materials', 'Expense'])
+      .withMessage('items type should be Labour, Materials or Expense'),
 
     check('items.*.desc')
       .isLength({ min: 1 })
-      .withMessage('Include details for the item'),
+      .withMessage('Include details for the items'),
 
     check('items.*.fee')
       // .isInt()
       .isDecimal({ decimal_digits: '2,', force_decimal: true })
-      .withMessage('check fee xx.xx')
+      .withMessage('check items fee, format xx.xx')
     ],
 
   email: [
@@ -97,6 +97,7 @@ module.exports = {
       .matches(/(\w(\s)?)+/)
       .withMessage('just words and numbers'),
     check('address2')
+      .optional({checkFalsy:true}).isLength({ min: 1 })
       .matches(/(\w(\s)?)+/)
       .withMessage('just words'),
     check('address3')

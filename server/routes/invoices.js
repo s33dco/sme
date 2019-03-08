@@ -44,6 +44,12 @@ router.get('/new', [auth, admin], async (req, res) => {
 
   promise.then(([lastInvoiceNo, clients]) => {
 
+
+    if (clients.length < 1){
+      req.flash('alert', `You must create a client first!`);
+      res.redirect(`/clients/new`);
+    };
+
     let checkInvoice = ((invArray) => {
       if(invArray.length < 1) {
         return 1;
@@ -70,6 +76,9 @@ router.get('/new', [auth, admin], async (req, res) => {
 });
 
 router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
+
+console.log(req.body)
+
     let errors = validationResult(req)
 
     if (!errors.isEmpty()) {

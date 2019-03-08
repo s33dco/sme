@@ -19,14 +19,11 @@ let DetailSchema = new mongoose.Schema({
     },
     address2: {
       type: String,
-      required: true,
-      minlength: 1,
       lowercase: true,
       trim: true
     },
     address3: {
       type: String,
-      minlength: 1,
       lowercase: true,
       trim: true
     },

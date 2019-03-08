@@ -14,11 +14,10 @@ router.get('/', auth, async (req, res) => {
                                   Invoice.sumOfPaidInvoices(),
                                   Invoice.countItems(),
                                   Invoice.numberOfInvoices(),
-                                  Invoice.sumOutgoings()
                                 ]);
 
     promise.then( async ([uniqueClients, firstItem, unpaidInvoices, sumOfOwed,
-                          sumOfPaid, noItems, noInvoices, outgoings]) => {
+                          sumOfPaid, noItems, noInvoices]) => {
 
       const numberOfClients     = uniqueClients;
       const firstDate           = firstItem;
@@ -28,11 +27,10 @@ router.get('/', auth, async (req, res) => {
       const tradingDays         = moment(Date.now()).diff(moment(firstDate), 'days');
       const items               = noItems;
       const invoices            = noInvoices;
-      const moneyOut            = outgoings;
       const avWeekEarningsGross = await Invoice.averageWeeklyGrossEarnings(tradingDays);
-      const averageNettPerWeek  = () => {
-        return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(moneyOut) * 100)) / tradingDays) * 7) / 100).toFixed(2);
-      }
+      // const averageNettPerWeek  = () => {
+      //   return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(moneyOut) * 100)) / tradingDays) * 7) / 100).toFixed(2);
+      // }
 
       res.render('dashboard', {
         pageTitle: "Dashboard",
@@ -45,9 +43,7 @@ router.get('/', auth, async (req, res) => {
         avWeekEarningsGross,
         unpaidInvoiceList,
         items,
-        invoices,
-        moneyOut,
-        avWeekEarningsNett : averageNettPerWeek()
+        invoices
       });
     })
     .catch((e) => {

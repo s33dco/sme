@@ -3,45 +3,21 @@
 </header>
 
 <div class="money">
-    <h3>Incoming £<%=incomings%> <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a></h3>
-    <h3>Outgoing £<%=outgoings%> <a href="/reports/download?type=outgoing&start=<%=start%>&end=<%=end%>">(export)</a></h3>
-  </div>
+    <h3>Incomings £<%=incomings%> <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a></h3>
+    <% if (owed) { %>
+      <h3>Outstanding £<%=owed%></h3>
+    <% } %>
+</div>
 
 <div class="summary">
     <p><%=invoicesProduced%> invoices were created, (<%=invoicesPaid%> paid).</p>
     <p><%=itemsInvoiced%> items were invoiced, (<%=itemsPaid%> paid).</p>
 </div>
 
-<% if (listPaidItems.length > 0) { %>
-  <div class="paid-items">
-    <h4>Paid (£<%=incomings%>)</h4>
-    <% listPaidItems.forEach((item) => { %>
-      <div class="item">
-        <p class='capitalize'>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
-        <p>Paid : <%= moment(item.datePaid).format("Do MMMM YYYY") %> / Invoiced : <%= moment(item.invDate).format("Do MMMM YYYY") %></p>
-        <p><%= item.items.desc %></p>
-      </div>
-    <% }); %>
-  </div>
-<% } %>
-
-<% if (listUnpaidItems.length > 0) { %>
-  <div class="unpaid-items">
-    <h4>Unpaid (£<%=owed%>)</h4>
-    <%listUnpaidItems.forEach((item) => { %>
-      <div class="item">
-        <p class='capitalize'>£<%= item.items.fee%> <%= item.client.name %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
-        <p>Invoiced : <%= moment(item.invDate).format("Do MMMM YYYY") %></p>
-        <p><%= item.items.desc %></p>
-      </div>
-    <% }); %>
-  </div>
-<% } %>
-
-<% if (costsList.length > 0) { %>
-  <div class="costs-items">
-    <h4>Costs (£<%=costs%>)</h4>
-    <%costsList.forEach((item) => { %>
+<% if (labourList.length > 0) { %>
+  <div class="labour-items">
+    <h4>Labour (£<%=labour%>)</h4>
+    <%labourList.forEach((item) => { %>
       <div class="item">
         <p><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
         <p><%= item.items.desc %>, £<%= item.items.fee%></p>
@@ -50,10 +26,22 @@
   </div>
 <% } %>
 
+<% if (materialsList.length > 0) { %>
+  <div class="materials-items">
+    <h4>Materials (£<%=materials%>)</h4>
+    <%materialsList.forEach((item) => { %>
+      <div class="item">
+        <p><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+        <p><%= item.items.desc%>, £<%= item.items.fee%></p>
+      </div>
+    <% }); %>
+  </div>
+<% } %>
+
 <% if (expensesList.length > 0) { %>
-  <div class="expenses-items">
+  <div class="expense-items">
     <h4>Expenses (£<%=expenses%>)</h4>
-    <%expensesList.forEach((item) => { %>
+    <%materialsList.forEach((item) => { %>
       <div class="item">
         <p><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
         <p><%= item.items.desc %>, £<%= item.items.fee%></p>

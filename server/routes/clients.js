@@ -45,7 +45,7 @@ router.get('/:id', [auth, validateId ], async (req, res) => {
         });
   }
 
-  const itemsList = await Invoice.listChargedItemsByClient(id);
+  const itemsList = await Invoice.listItemsByClient(id);
 
   console.log(itemsList);
 
@@ -69,6 +69,8 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
 
   let errors = validationResult(req)
 
+  console.log(req.body);
+
   if (!errors.isEmpty()) {
     return res.render('clients/newclient', {
       data            : req.body,
@@ -80,6 +82,8 @@ router.post('/', [auth, admin, validate.client], async (req, res) => {
   };
 
   const { name, email, phone, address1, address2, address3, postcode} = req.body;
+
+  console.log(name, email, phone, address1, address2, address3, postcode);
 
   let client = new Client({name, email, phone, address1, address2, address3, postcode});
   await client.save();

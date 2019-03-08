@@ -1,10 +1,8 @@
 <header>
   <h1>Dashboard</h1>
   <div class="summary">
-    <p>Average weekly income £<%=avWeekEarningsNett%> (nett)</p>
     <p>Average weekly income £<%=avWeekEarningsGross%> (gross)</p>
     <p>Incomings : £<%=moneyIn%></p>
-    <p>Outgoings : £<%=moneyOut%></p>
     <p>invoices : <%=invoices%></p>
     <p>items : <%=items%></p>
     <p>clients : <%=numberOfClients%></p>
@@ -13,8 +11,7 @@
 
 <% if (unpaidInvoiceList.length > 0) { %>
   <div class="outstanding-invoices">
-    <h3>Unpaid Invoices.</h3>
-    <p>£<%=moneyDue%> owed.</p>
+    <h3>Unpaid Invoices £<%=moneyDue%>.</h3>
     <% unpaidInvoiceList.forEach((invoice) => { %>
       <form method="post" action="/invoices/paid?_method=POST"  novalidate>
         <p><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> for
