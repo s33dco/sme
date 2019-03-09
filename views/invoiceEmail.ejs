@@ -88,7 +88,7 @@
         .footer span,
         .footer a {
           color: #999999;
-          font-size: 12px;
+          font-size: 10px;
           text-align: center;
       }
       /* -------------------------------------
@@ -100,75 +100,38 @@
       h4 {
         color: #000000;
         font-family: sans-serif;
-        font-weight: 400;
-        line-height: 1.4;
-        margin: 0;
-        margin-bottom: 30px;
+        font-weight: bold;
+        line-height: 1.2;
+        padding: 0px;
       }
-      h1 {
-        font-size: 35px;
-        font-weight: 300;
-        text-align: center;
-        text-transform: capitalize;
-      }
-      p,
-      ul,
-      ol {
+
+      p {
         font-family: sans-serif;
         font-size: 14px;
         font-weight: normal;
         margin: 0;
-        margin-bottom: 15px;
+        margin-top: 0px;
+        margin-bottom: 5px;
+        padding-top: : 5px;
       }
-        p li,
-        ul li,
-        ol li {
-          list-style-position: inside;
-          margin-left: 5px;
+
+      .billed-items {
+        margin-bottom: 35px;
       }
-      a {
-        color: #3498db;
-        text-decoration: underline;
+
+      h4 .date {
+        margin : 0;
+        margin-bottom: 0;
       }
-      /* -------------------------------------
-          BUTTONS
-      ------------------------------------- */
-      .btn {
-        box-sizing: border-box;
-        width: 100%; }
-        .btn > tbody > tr > td {
-          padding-bottom: 15px; }
-        .btn table {
-          width: auto;
+
+      .invoice-message {
+        font-style: italic;
       }
-        .btn table td {
-          background-color: #ffffff;
-          border-radius: 5px;
-          text-align: center;
+
+      div.from {
+        float : right;
       }
-        .btn a {
-          background-color: #ffffff;
-          border: solid 1px #3498db;
-          border-radius: 5px;
-          box-sizing: border-box;
-          color: #3498db;
-          cursor: pointer;
-          display: inline-block;
-          font-size: 14px;
-          font-weight: bold;
-          margin: 0;
-          padding: 12px 25px;
-          text-decoration: none;
-          text-transform: capitalize;
-      }
-      .btn-primary table td {
-        background-color: #3498db;
-      }
-      .btn-primary a {
-        background-color: #3498db;
-        border-color: #3498db;
-        color: #ffffff;
-      }
+
       /* -------------------------------------
           OTHER STYLES THAT MIGHT BE USEFUL
       ------------------------------------- */
@@ -196,6 +159,9 @@
       .mb0 {
         margin-bottom: 0;
       }
+      .capitalize {
+        text-transform: capitalize;
+      }
       .preheader {
         color: transparent;
         display: none;
@@ -208,9 +174,7 @@
         visibility: hidden;
         width: 0;
       }
-      .powered-by a {
-        text-decoration: none;
-      }
+
       hr {
         border: 0;
         border-bottom: 1px solid #f6f6f6;
@@ -294,7 +258,7 @@
     </style>
   </head>
   <body class="">
-    <span class="preheader">This is preheader text. Some clients will show this text as a preview.</span>
+    <span class="preheader">Please find attached invoice.</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -310,25 +274,44 @@
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <header>
-                          <h1>Invoice <%= invoice.invNo %>.</h1>
-                        </header>
+                        <div class="addresses">
+                          <div class="from">
+                            <p>from :</p>
+                            <p class='capitalize'><%=invoice.details.contact%></p>
+                            <p class='capitalize'><%=invoice.details.address1%></p>
+                            <% if (invoice.details.address2){ %>
+                              <p class='capitalize'><%=invoice.details.address2%></p>
+                            <% } %>
+                            <% if (invoice.details.address3){ %>
+                              <p class='capitalize'><%=invoice.details.address3%></p>
+                            <% } %>
+                            <p class='capitalize'><%=invoice.details.postcode%></p>
+                          </div>
 
-                        <div class="invoice-header">
-                          <h2>Billed to : <%= invoice.client.name %></h2>
-                          <h3>Billing Date: <%= moment(invoice.invDate).format("Do MMMM YYYY") %></h3>
-                          <p><%=invoice.client.address1%></p>
-                          <p><%=invoice.client.address2%></p>
-                          <p><%=invoice.client.address3%></p>
-                          <p><%=invoice.client.postcode%></p>
+                          <div class="to">
+                            <p>to :</p>
+                            <p class='capitalize'><%=invoice.client.name %></p>
+                            <p class='capitalize'><%=invoice.client.address1%></p>
+                            <% if (invoice.client.address2){ %>
+                              <p class='capitalize'><%=invoice.client.address2%></p>
+                            <% } %>
+                            <% if (invoice.client.address3){ %>
+                              <p class='capitalize'><%=invoice.client.address3%></p>
+                            <% } %>
+                            <p><%=invoice.client.postcode%></p>
+                          </div>
                         </div>
 
+                        <header class="align-center clear">
+                          <h3>Invoice <%= invoice.invNo %> - <%= moment(invoice.invDate).format("Do MMMM YYYY") %>.</h3>
+                        </header>
+
                         <div class="billed-items">
-                          <h3>Invoiced Items.</h3>
-                          <% billedItems.forEach((item) => { %>
-                            <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
-                            <p><%= item.desc %></p>
-                            <p>£<%= item.fee %></p>
+                          <% itemsByDateAndType.forEach((item) => { %>
+                            <h4 class='date'><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</h4>
+                            <% item.item.forEach((charge)=> { %>
+                              <p><%= charge.type %> £<%= charge.fee %>, <%= charge.desc %></p>
+                            <% }) %>
                           <% }) %>
                         </div>
 
@@ -344,10 +327,9 @@
                         </div>
 
                         <div class="signature">
-                          <h4><%= invoice.details.farewell %>,</br>
-                          <%= invoice.details.contact %></br>
-                          <%= invoice.details.email %></br>
-                          <%= invoice.details.phone %></h4>
+                          <p class='capitalize'><%= invoice.details.farewell %>,</p>
+                          <p class='capitalize'><%= invoice.details.contact %></p>
+                          <p><%= invoice.details.phone %> / <%=invoice.details.email %></p>
                         </div>
 
                         <div class="pay-details align-center">
@@ -369,16 +351,6 @@
             <!-- START FOOTER -->
             <div class="footer">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td class="content-block">
-                    <p>Thanks!</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content-block powered-by">
-                    Powered by <a href="http://htmlemail.io">HTMLemail</a>.
-                  </td>
-                </tr>
               </table>
             </div>
             <!-- END FOOTER -->

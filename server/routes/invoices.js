@@ -176,7 +176,8 @@ console.log(req.body)
 
 router.get('/:id',  [auth, validateId ], async (req, res) => {
   let id = req.params.id;
-  const invoice = await Invoice.findOne({ _id: id});
+
+  const invoice = await Invoice.withId(id);
 
   if (!invoice) {
     throw ({
@@ -187,15 +188,15 @@ router.get('/:id',  [auth, validateId ], async (req, res) => {
   }
 
   const total = await Invoice.sumOfInvoice(id);
+  const itemsByDateAndType = await Invoice.itemsByDateAndType(id);
 
-  const sortedItems = invoice.items.sort((a,b) => b.date - a.date);
 
   res.render('invoices/invoice', {
       pageTitle       : "Invoice",
       pageDescription : "invoice.",
       total,
       invoice,
-      sortedItems,
+      itemsByDateAndType,
       csrfToken       : req.csrfToken(),
       admin : req.user.isAdmin
   });
@@ -211,7 +212,11 @@ router.post('/email', auth, async (req, res) => {
     });
   }
 
-  const invoice = await Invoice.findOne({_id: req.body.id});
+  const id = req.body.id;
+
+  const invoice = await Invoice.withId(id);
+
+
 
   if (!invoice) {
     throw ({
@@ -221,9 +226,8 @@ router.post('/email', auth, async (req, res) => {
     });
   }
 
-  const total = await Invoice.sumOfInvoice(invoice._id);
-  const sortedItems = invoice.items.sort((a,b) => a.date - b.date);
-  const billedItems = sortedItems.filter(item => item.type === 'Invoice');
+  const total = await Invoice.sumOfInvoice(id);
+  const itemsByDateAndType = await Invoice.itemsByDateAndType(id);
 
   // Configure Nodemailer SendGrid Transporter
   const transporter = nodemailer.createTransport(
@@ -234,7 +238,7 @@ router.post('/email', auth, async (req, res) => {
     })
   );
 
-  ejs.renderFile( "./views/invoiceEmail.ejs", { total, invoice, billedItems, moment: moment }, function (error, data) {
+  ejs.renderFile( "./views/invoiceEmail.ejs", { total, invoice, itemsByDateAndType, moment: moment }, function (error, data) {
     if (error) {
       logger.error(`file error: ${error.message} - ${error.stack}`);
     } else {

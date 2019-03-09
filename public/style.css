@@ -164,8 +164,3 @@ section header
 .capitalize {
   text-transform: capitalize;
 }
-
-.billed-items .Expense,
-.billed-items .Cost {
-  color: #b7371d;
-}

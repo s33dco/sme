@@ -71,6 +71,34 @@ InvoiceSchema.statics.sumOfInvoice = async function (id){
   return result[0].total;
 };
 
+
+
+InvoiceSchema.statics.itemsByDateAndType = async function (id){
+  const result = await this.aggregate([
+    {"$match" : { '_id' : mongoose.Types.ObjectId(id) }},
+    {"$unwind" : "$items"},
+    {"$project" : { _id:0, "items.date":1, "items.type":1, "items.desc":1, "items.fee":1 }},
+    {"$sort" : { "items.type":-1 }},
+    {"$group" :
+      {_id : "$items.date", item: {$push:  { type: "$items.type", desc:"$items.desc",fee:"$items.fee"  }}}
+    },
+    {"$sort" : { _id : 1 }},
+  ]);
+  return result;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 InvoiceSchema.statics.withId = function (id) {
   return this.findOne({_id: id});
 };
@@ -98,6 +126,19 @@ InvoiceSchema.statics.newestInvoiceNumber = function () {
     {"$limit"   : 1}
   ]);
 };
+
+// InvoiceSchema.statics.listInvoices = function () {
+//   return this.aggregate([
+//     {$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
+//     {"$unwind" : "$items"},
+//     {"$group": {
+//      "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
+//      "total": {"$sum": "$items.fee"}
+//       }
+//     },
+//     {"$sort": {"_id.invoice": -1}}
+//   ]);
+// };
 
 InvoiceSchema.statics.listInvoices = function () {
   return this.aggregate([

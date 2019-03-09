@@ -2,7 +2,6 @@
   <h1>Invoice <%= invoice.invNo %>.</h1>
 </header>
 
-
 <div class="invoice-header">
   <p>Invoice Date : <%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
   <p>Client : <a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
@@ -22,15 +21,12 @@
   <h4><%= invoice.message%> </h4>
 </div>
 
-<div class="billed-items">
-  <h3>Invoice Items.</h3>
-  <% sortedItems.forEach((item) => { %>
-    <div class="<%= item.type %>">
-      <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
-      <p><%= item.desc %></p>
-      <p>£<%= item.fee %></p>
-    </div>
-
+<div class="items-day">
+  <% itemsByDateAndType.forEach((item) => { %>
+    <h4><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</h4>
+    <% item.item.forEach((charge)=> { %>
+      <p><%= charge.type %> £<%= charge.fee %>, <%= charge.desc %></p>
+    <% }) %>
   <% }) %>
 </div>
 
@@ -63,8 +59,6 @@
   <% } %>
   <p><%=invoice.details.postcode%></p>
 </div>
-
-
 
 <form method="post" action="/invoices/email?_method=post" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
