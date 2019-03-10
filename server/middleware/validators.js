@@ -226,12 +226,12 @@ module.exports = {
   reports: [
       check('start')
         .isISO8601()
-        .withMessage('date is wrong')
+        .withMessage('select a date')
         .isBefore(new Date().toISOString())
-        .withMessage('dates must be today or earlier'),
+        .withMessage('date must be today or earlier'),
       check('end')
         .isISO8601()
-        .withMessage('date is wrong')
+        .withMessage('select a date')
         .custom((value, { req }) => {
           if (value < req.query.start) {
                 return false;
@@ -262,5 +262,27 @@ module.exports = {
       check('type')
         .isIn(['outgoing', 'incoming'])
         .withMessage('only outgoing or incoming available')
-      ]
+      ],
+
+  expense: [
+    check('date')
+      .isISO8601()
+      .withMessage('date is wrong.')
+      .isBefore(new Date().toISOString())
+      .withMessage('dates must be today or earlier.'),
+    check('category')
+      .isIn([ "Office, property and equipment",
+              "Car, van and travel expenses",
+              "Staff expenses", "Reselling goods",
+              "Legal and financial costs",
+              "Mktg, entertainment and subs"
+            ])
+      .withMessage('select a category.'),
+    check('desc')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('description - just words and numbers.'),
+    check('amount')
+      .isDecimal({ decimal_digits: '2,', force_decimal: true })
+      .withMessage('check amount, format xx.xx')
+  ]
 }

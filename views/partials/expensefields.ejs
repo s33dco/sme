@@ -1,0 +1,52 @@
+<div class="expenseFields">
+
+  <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+
+  <div class="form-field <%= errors.date ? 'form-field-invalid' : '' %>">
+    <label for="date">Date.</label>
+    <input class="input" name="date" type="date" value="<%=moment(data.date).format('YYYY-MM-DD')%>" />
+    <% if (errors.date) { %>
+      <div class="error"><%= errors.date.msg %></div>
+    <% } %>
+  </div>
+
+
+  <div class="form-field <%= errors.category ? 'form-field-invalid' : '' %>">
+    <label for="category">Category</label>
+    <select name="category">
+      <% if (data.category && !errors.category) { %>
+        <option value="<%=selected%>"><%= selected%></option>
+        <% nonSelected.forEach((category) => { %>
+          <option value="<%=category%>"><%=category%></option>
+        <%})%>
+      <% } else { %>
+        <option value='select client'>select client</option>
+        <% categories.forEach((category) => { %>
+          <option value="<%=category%>"><%=category%></option>
+        <%})%>
+      <% } %>
+    </select>
+    <% if (errors.clientId) { %>
+      <div class="error"><%= errors.category.msg %></div>
+    <% } %>
+  </div>
+
+
+
+  <div class="form-field <%= errors.desc ? 'form-field-invalid' : '' %>">
+    <label for="desc">Description.</label>
+    <textarea class="input" id="desc" name="desc" rows="2"><%=data.desc%></textarea>
+    <% if (errors.desc) { %>
+      <div class="error"><%= errors.desc.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-field <%= errors.amount ? 'form-field-invalid' : '' %>">
+    <label for="amount">Amount.</label>
+    <input class='input' id='amount' name='amount' type='text' value="<%=data.amount%>">
+    <% if (errors.amount) { %>
+      <div class="error"><%= errors.amount.msg %></div>
+    <% } %>
+  </div>
+
+</div>

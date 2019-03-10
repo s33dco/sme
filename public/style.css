@@ -164,3 +164,8 @@ section header
 .capitalize {
   text-transform: capitalize;
 }
+
+.title {
+  font-weight : bold;
+  text-transform: capitalize;
+}

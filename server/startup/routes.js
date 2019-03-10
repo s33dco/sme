@@ -23,6 +23,7 @@ const dashboard       = require('../routes/dashboard');
 const reports         = require('../routes/reports');
 const logout          = require('../routes/logout');
 const home            = require('../routes/home');
+const expense         = require('../routes/expenses');
 const otherwise       = require('../routes/otherwise');
 const logger          = require('./logger');
 
@@ -62,6 +63,7 @@ module.exports = (app) => {
   app.use('/contact', contact);
   app.use('/login', login);
   app.use('/dashboard', dashboard);
+  app.use('/expenses', expense);
   app.use('/reports', reports);
   app.use('/logout', logout);
   app.use('/', home);

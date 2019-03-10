@@ -4,6 +4,7 @@
 
 <!-- basic invoice details -->
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
   <div class="form-field <%= errors.clientId ? 'form-field-invalid' : '' %>">
     <label for="clientId">Bill to</label>
     <select name="clientId">
@@ -16,8 +17,6 @@
           <option value="<%=client._id%>"><%=client.name%>
           <%= client._id === data.clientId ? "selected='selected'":"" %></option>
         <%})%>
-
-
     </select>
     <% if (errors.clientId) { %>
       <div class="error"><%= errors.clientId.msg %></div>
@@ -68,7 +67,6 @@
               <option value="Expense">Expense</option>
           </select>
         </div>
-
 
         <div class='form-field'>
           <textarea class='input' id='items[<%=index%>][desc]' name='items[<%=index%>][desc]' rows='6'><%= item.desc %></textarea>

@@ -1,0 +1,40 @@
+<fieldset id='item-${position}'>
+
+  <div class="form-field <%= errors.date ? 'form-field-invalid' : '' %>">
+    <input class='input' id='items[${position}][date]' name='items[${position}][date]' type='date' placeholder='date' value='' />
+    <% if (errors.date) { %>
+      <div class="error"><%= errors.date.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-field <%= errors.type ? 'form-field-invalid' : '' %>">
+    <select name='items[${position}][type]' id='items[${position}][type]'>
+      <option value='Labour'>Labour</option>
+      <option value='Materials'>Materials</option>
+      <option value='Expense'>Expense</option>
+    </select>
+    <% if (errors.type) { %>
+      <div class="error"><%= errors.type.msg %></div>
+    <% } %>
+  </div>
+
+  <div class="form-field <%= errors.desc ? 'form-field-invalid' : '' %>">
+    <textarea class='input' id='items[${position}][desc]' name='items[${position}][desc]' placeholder='details' rows='6'></textarea>
+    <% if (errors.desc) { %>
+      <div class="error"><%= errors.desc.msg %></div>
+    <% } %>
+  </div>
+
+
+
+  <div class="form-field <%= errors.fee ? 'form-field-invalid' : '' %>">
+    <input class='input' id='items[${position}][fee]' name='items[${position}][fee]' type='number' placeholder='£amount'></textarea>
+    <% if (errors.fee) { %>
+      <div class="error"><%= errors.fee.msg %></div>
+    <% } %>
+  </div>
+  
+  <div class='form-actions'>
+    <button onclick='remove_fieldset(${position})' class='btn danger'  type='button'>remove</button>
+  </div>
+</fieldset>
