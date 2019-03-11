@@ -15,18 +15,18 @@
     <label for="category">Category</label>
     <select name="category">
       <% if (data.category && !errors.category) { %>
-        <option value="<%=selected%>"><%= selected%></option>
+        <option value="<%=selected%>"><%=selected%></option>
         <% nonSelected.forEach((category) => { %>
           <option value="<%=category%>"><%=category%></option>
         <%})%>
       <% } else { %>
-        <option value='select client'>select client</option>
+        <option value='select client'>select category</option>
         <% categories.forEach((category) => { %>
           <option value="<%=category%>"><%=category%></option>
         <%})%>
       <% } %>
     </select>
-    <% if (errors.clientId) { %>
+    <% if (errors.category) { %>
       <div class="error"><%= errors.category.msg %></div>
     <% } %>
   </div>

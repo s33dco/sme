@@ -60,6 +60,10 @@ let InvoiceSchema = new mongoose.Schema({
                 ]
 });
 
+const itemType =  [ "Labour",
+                    "Materials",
+                    "Expense"];
+
 InvoiceSchema.statics.sumOfInvoice = async function (id){
   const result = await this.aggregate([
     {"$match" : { '_id' : mongoose.Types.ObjectId(id) }},
@@ -86,18 +90,6 @@ InvoiceSchema.statics.itemsByDateAndType = async function (id){
   ]);
   return result;
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 InvoiceSchema.statics.withId = function (id) {
   return this.findOne({_id: id});
@@ -126,19 +118,6 @@ InvoiceSchema.statics.newestInvoiceNumber = function () {
     {"$limit"   : 1}
   ]);
 };
-
-// InvoiceSchema.statics.listInvoices = function () {
-//   return this.aggregate([
-//     {$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
-//     {"$unwind" : "$items"},
-//     {"$group": {
-//      "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
-//      "total": {"$sum": "$items.fee"}
-//       }
-//     },
-//     {"$sort": {"_id.invoice": -1}}
-//   ]);
-// };
 
 InvoiceSchema.statics.listInvoices = function () {
   return this.aggregate([
@@ -477,8 +456,6 @@ InvoiceSchema.statics.sumOfLabourBetween = async function (start, end) {
   }
 };
 
-
-
 let Invoice = mongoose.model('Invoice', InvoiceSchema);
 
-module.exports = {Invoice};
+module.exports = {Invoice, itemType};

@@ -4,6 +4,7 @@
 
 <div class="money">
     <h3>Incomings £<%=incomings%> <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a></h3>
+    <h3>Incomings £<%=deductions%> <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a></h3>
     <% if (owed) { %>
       <h3>Outstanding £<%=owed%></h3>
     <% } %>

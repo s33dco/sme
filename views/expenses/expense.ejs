@@ -1,0 +1,29 @@
+<header>
+  <h2 class='capitalize'>Expense Details</h2>
+</header>
+
+<div class="expense-list">
+  <p><%= moment(expense.date).format("Do MMMM YYYY") %></p>
+  <p><%=expense.category%></p>
+  <p>£<%=expense.amount%></p>
+  <p><%=expense.desc%></p>
+  <p><%=expense._id%></p>
+</div>
+
+<div class="edit">
+  <form method="get" action="/expenses/edit/<%= expense._id %>" novalidate>
+    <div class="form-actions">
+      <button class="btn" type="submit">Edit</button>
+    </div>
+  </form>
+</div>
+
+<div class="delete">
+  <form method="post" action="/expenses?_method=DELETE" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="id" value="<%= expense._id %>">
+    <div class="form-actions">
+      <button class="btn danger" type="submit">Delete</button>
+    </div>
+  </form>
+</div>

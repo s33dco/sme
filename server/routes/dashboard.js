@@ -2,6 +2,7 @@ const express     = require('express');
 const router      = express.Router();
 const moment      = require('moment');
 const {Invoice}   = require("../models/invoice");
+const {Expense}   = require("../models/expense");
 const auth        = require("../middleware/auth")
 const logger      = require('../startup/logger');
 
@@ -14,10 +15,11 @@ router.get('/', auth, async (req, res) => {
                                   Invoice.sumOfPaidInvoices(),
                                   Invoice.countItems(),
                                   Invoice.numberOfInvoices(),
+                                  Expense.sumOfExpenses()
                                 ]);
 
     promise.then( async ([uniqueClients, firstItem, unpaidInvoices, sumOfOwed,
-                          sumOfPaid, noItems, noInvoices]) => {
+                          sumOfPaid, noItems, noInvoices, outgoings]) => {
 
       const numberOfClients     = uniqueClients;
       const firstDate           = firstItem;
@@ -27,10 +29,11 @@ router.get('/', auth, async (req, res) => {
       const tradingDays         = moment(Date.now()).diff(moment(firstDate), 'days');
       const items               = noItems;
       const invoices            = noInvoices;
+      const sumOfOutgoings      = outgoings
       const avWeekEarningsGross = await Invoice.averageWeeklyGrossEarnings(tradingDays);
-      // const averageNettPerWeek  = () => {
-      //   return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(moneyOut) * 100)) / tradingDays) * 7) / 100).toFixed(2);
-      // }
+      const averageNettPerWeek  = () => {
+        return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(sumOfOutgoings) * 100)) / tradingDays) * 7) / 100).toFixed(2);
+      }
 
       res.render('dashboard', {
         pageTitle: "Dashboard",
@@ -43,7 +46,9 @@ router.get('/', auth, async (req, res) => {
         avWeekEarningsGross,
         unpaidInvoiceList,
         items,
-        invoices
+        invoices,
+        sumOfOutgoings,
+        averageNettPerWeek: averageNettPerWeek()
       });
     })
     .catch((e) => {

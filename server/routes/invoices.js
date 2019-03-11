@@ -9,7 +9,7 @@ const {validationResult} = require('express-validator/check');
 const validate           = require('../middleware/validators');
 const validateId         = require('../middleware/validateId')
 const {ObjectID}         = require('mongodb');
-const {Invoice}          = require("../models/invoice");
+const {Invoice, itemType}= require("../models/invoice");
 const {Client}           = require("../models/client");
 const {Detail}           = require("../models/detail");
 const logger             = require('../startup/logger');
@@ -77,24 +77,26 @@ router.get('/new', [auth, admin], async (req, res) => {
 
 router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
 
-console.log(req.body)
 
-    let errors = validationResult(req)
+    let errors = validationResult(req);
 
     if (!errors.isEmpty()) {
 
       let clients = await Client.find({}, {name:1}).sort({name: 1});
       let selected;
+
       if (req.body.clientId) {
-        selected = clients.find(c => c._id == req.body.clientId);
+        selected = clients.find(c => c._id === req.body.clientId);
         if (!selected){
           clients
         } else {
-          clients = clients.filter((c) => c._id != selected._id);
+          clients = clients.filter((c) => c._id !== selected._id);
         }
       } else {
         clients
       }
+
+      console.log('these are the errors', errors.mapped());
 
       return res.render('invoices/newinvoice', {
           data            : req.body,
@@ -215,8 +217,6 @@ router.post('/email', auth, async (req, res) => {
   const id = req.body.id;
 
   const invoice = await Invoice.withId(id);
-
-
 
   if (!invoice) {
     throw ({

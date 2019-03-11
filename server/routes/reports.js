@@ -4,6 +4,7 @@ const express           = require('express');
 const router            = express.Router();
 const moment            = require('moment');
 const {Invoice}         = require("../models/invoice");
+const {Expense}         = require("../models/expense");
 const {validationResult}= require('express-validator/check');
 const validate          = require('../middleware/validators');
 const auth              = require("../middleware/auth");
@@ -44,6 +45,7 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const expensesList      = await Invoice.listExpensesBetween(start,end);
   const materials         = await Invoice.sumOfMaterialsBetween(start,end);
   const materialsList     = await Invoice.listMaterialsBetween(start,end);
+  const deductions        = await Expense.sumOfExpensesBetween(start,end);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -61,7 +63,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     expenses,
     expensesList,
     materials,
-    materialsList
+    materialsList,
+    deductions
   });
 });
 
@@ -75,41 +78,74 @@ router.get('/download', [auth, validate.download], async (req, res) => {
     return res.redirect('/reports')
   }
 
-  const {start, end} = req.query;
+  const {start, end, type} = req.query;
 
-  data  = await Invoice.listPaidItemsBetween(start, end);
+  if (type ==='incoming'){
 
-  if (data.length === 0 ) {
-    req.flash('alert', 'no data to export!')
-    return res.redirect('/reports')
+    data  = await Invoice.listPaidItemsBetween(start, end);
+
+    if (data.length === 0 ) {
+      req.flash('alert', 'no data to export!')
+      return res.redirect('/reports')
+    }
+
+    fields = [
+                { label : 'Invoice',
+                  value : 'invNo'},
+                { label : 'Invoice Date',
+                  value : (field) => moment(field).format('DD/MM/YY'),
+                  stringify: true},
+                { label : 'Type',
+                  value : 'items.type'},
+                { label : 'Client Name',
+                  value : 'client.name'},
+                { label : 'Item Date',
+                  value : (field) => moment(field).format('DD/MM/YY'),
+                  stringify: true},
+                { label : 'Description',
+                  value : 'items.desc'},
+                { label : 'Amount',
+                  value : 'items.fee'},
+                { label : 'Date Paid',
+                  value : (field) => moment(field).format('DD/MM/YY'),
+                  stringify: true}
+              ];
+    filepath =`./public/Earnings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
+
+    data.forEach((item) => {
+      item.items.fee = parseFloat(item.items.fee).toFixed(2);
+    })
+
+  } else {
+
+    data  = await Expense.listOfExpensesBetween(start, end);
+
+    if (data.length === 0 ) {
+      req.flash('alert', 'no data to export!')
+      return res.redirect('/reports')
+    }
+
+    fields = [
+                { label : 'Expense Date',                               //// TODO: why invalid date
+                  value : (field) => moment(field).format('DD/MM/YY'),
+                  stringify: true},
+                { label : 'Category',
+                  value : 'category'},
+                { label : 'Description',
+                  value : 'desc'},
+                { label : 'Amount',
+                  value : 'amount'},
+              ];
+
+    filepath =`./public/Deductions-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
+
+    data.forEach((item) => {
+      item.amount = parseFloat(item.amount).toFixed(2);
+    })
+    console.log(data)
   }
 
-  fields = [
-              { label : 'Invoice',
-                value : 'invNo'},
-              { label : 'Invoice Date',
-                value : (field) => moment(field).format('DD/MM/YY'),
-                stringify: true},
-              { label : 'Type',
-                value : 'items.type'},
-              { label : 'Client Name',
-                value : 'client.name'},
-              { label : 'Item Date',
-                value : (field) => moment(field).format('DD/MM/YY'),
-                stringify: true},
-              { label : 'Description',
-                value : 'items.desc'},
-              { label : 'Amount',
-                value : 'items.fee'},
-              { label : 'Date Paid',
-                value : (field) => moment(field).format('DD/MM/YY'),
-                stringify: true}
-            ];
-  filepath =`./public/Earnings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
 
-  data.forEach((item) => {
-    item.items.fee = parseFloat(item.items.fee).toFixed(2);
-  })
 
   const json2csvParser = new Json2csvParser({ fields });
   const csv = json2csvParser.parse(data);

@@ -1,5 +1,7 @@
 const {check}     = require('express-validator/check');
 const {Client}    = require("../models/client");
+const {itemType}  = require("../models/invoice");
+const {categories}= require("../models/expense");
 
 module.exports = {
   invoice: [
@@ -39,7 +41,7 @@ module.exports = {
       .withMessage('items dates must be today or earlier'),
 
     check('items.*.type')
-      .isIn(['Labour', 'Materials', 'Expense'])
+      .isIn(itemType)
       .withMessage('items type should be Labour, Materials or Expense'),
 
     check('items.*.desc')
@@ -260,8 +262,8 @@ module.exports = {
         })
         .withMessage("must be later than start date."),
       check('type')
-        .isIn(['outgoing', 'incoming'])
-        .withMessage('only outgoing or incoming available')
+        .isIn(['deductions', 'incoming'])
+        .withMessage('only deductions or incoming available')
       ],
 
   expense: [
@@ -271,12 +273,7 @@ module.exports = {
       .isBefore(new Date().toISOString())
       .withMessage('dates must be today or earlier.'),
     check('category')
-      .isIn([ "Office, property and equipment",
-              "Car, van and travel expenses",
-              "Staff expenses", "Reselling goods",
-              "Legal and financial costs",
-              "Mktg, entertainment and subs"
-            ])
+      .isIn(categories)
       .withMessage('select a category.'),
     check('desc')
       .matches(/(\w(\s)?)+/)

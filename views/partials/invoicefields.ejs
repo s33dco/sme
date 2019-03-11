@@ -54,7 +54,7 @@
 <div id="invoiceItems">
   <% if (Array.isArray(data.items) && data.items.length) { %>
     <% data.items.forEach((item, index)=>{ %>
-      <fieldset id= "item-<%=index%>" >
+      <fieldset id= "item-<%=index%>">
         <div class='form-field'>
           <input class="input" id= "items[<%=index%>][date]" name= "items[<%=index%>][date]" type="date" value="<%=moment(item.date).format("YYYY-MM-DD")%>"/>
         </div>
@@ -75,9 +75,11 @@
         <div class='form-field'>
           <input class='input' id='items[<%=index%>][fee]' name='items[<%=index%>][fee]' type='number' value="<%=item.fee%>">
         </div>
+
         <div class="form-actions">
           <button onclick="remove_fieldset(<%=index%>)" class="btn danger"  type="button">remove</button>
         </div>
+
       </fieldset>
     <%  }); %>
   <% } %>
