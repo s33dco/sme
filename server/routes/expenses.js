@@ -9,9 +9,10 @@ const auth                  = require("../middleware/auth");
 const admin                 = require("../middleware/admin");
 const logger                = require('../startup/logger');
 const mongoose              = require('mongoose');
+const moment                = require('moment');
 
 router.get('/', [auth, admin], async (req, res) => {
-  const expenses = await Expense.listExpensesByDate();
+  const expenses = await Expense.listExpenses();
 
   res.render('expenses/expenses', {
     pageTitle: "Expenses",
@@ -65,13 +66,12 @@ router.post('/',  [auth, admin, validate.expense], async (req, res) => {
     });
   };
 
-
   const expense = await new Expense({
-                  date      : req.body.date,
+                  date      : moment(req.body.date).startOf('day'),
                   category  : req.body.category,
                   desc      : req.body.desc,
-                  amount    : req.body.amount}).save();
-
+                  amount    : req.body.amount})
+                  .save();
 
   req.flash('success', `Expense created !`)
   res.redirect(`/expenses`);
@@ -173,7 +173,7 @@ router.put('/:id', [auth, admin, validateId, validate.expense], async (req, res)
   } else {
 
     const expense = await Expense.findOneAndUpdate({_id: req.params.id},
-      { date      : req.body.date,
+      { date      : moment(req.body.date).startOf('day'),
         category  : req.body.category,
         desc      : req.body.desc,
         amount    : req.body.amount},

@@ -247,7 +247,7 @@ module.exports = {
   download: [
       check('start')
         .isISO8601()
-        .withMessage('date is wrong')
+        .withMessage('select a date')
         .isBefore(new Date().toISOString())
         .withMessage('dates must be today or earlier'),
       check('end')

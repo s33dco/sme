@@ -116,6 +116,8 @@ router.get('/download', [auth, validate.download], async (req, res) => {
       item.items.fee = parseFloat(item.items.fee).toFixed(2);
     })
 
+    console.log(data)
+
   } else {
 
     data  = await Expense.listOfExpensesBetween(start, end);
@@ -126,9 +128,8 @@ router.get('/download', [auth, validate.download], async (req, res) => {
     }
 
     fields = [
-                { label : 'Expense Date',                               //// TODO: why invalid date
-                  value : (field) => moment(field).format('DD/MM/YY'),
-                  stringify: true},
+                { label : 'Expense Date',
+                  value : 'date'},
                 { label : 'Category',
                   value : 'category'},
                 { label : 'Description',
@@ -141,6 +142,7 @@ router.get('/download', [auth, validate.download], async (req, res) => {
 
     data.forEach((item) => {
       item.amount = parseFloat(item.amount).toFixed(2);
+      item.date = moment(item.date).format('DD/MM/YY');
     })
     console.log(data)
   }

@@ -13,7 +13,7 @@ const categories =  [ "Office, property and equipment",
                       "Legal and financial costs",
                       "Mktg, entertainment and subs"];
 
-expenseSchema.statics.listExpensesByDate = function () {
+expenseSchema.statics.listExpenses = function () {
   return this.aggregate([
     {"$project" : { _id:1, date:1, desc:1, amount:1, category:1}},
     {"$sort": {date : 1}}
@@ -54,7 +54,7 @@ expenseSchema.statics.sumOfExpensesBetween = async function (start, end) {
 expenseSchema.statics.listOfExpensesBetween = async function (start, end) {
   return await this.aggregate([
     {"$match" : {"date": {"$gte": new Date(start), "$lte": new Date(end)}}},
-    {"$project" : { date:1, category:1, desc:1, amount:1 }},
+    {"$project" : { _id:0, date:1, category:1, desc:1, amount:1 }},
   ]);
 };
 
