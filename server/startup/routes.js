@@ -2,7 +2,6 @@ const config          = require('config');
 const path            = require('path')
 const express         = require('express')
 const methodOverride  = require('method-override')
-const helmet          = require('helmet')
 const layout          = require('express-layout')
 const morgan          = require('morgan');
 const bodyParser      = require('body-parser')
@@ -37,7 +36,6 @@ module.exports = (app) => {
 
   const middlewares = [
     methodOverride('_method'),
-    helmet(),
     layout(),
     morgan('dev', { stream: logger.stream }),
     express.static(path.join(__dirname, '../../public')),
