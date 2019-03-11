@@ -6,15 +6,14 @@
 
 <% if (invoices.length > 0) { %>
 
-  <h1>Previous Invoices.</h1>
-  <% invoices.forEach((invoice) => { %>
-    <div class="invoice">
-      <a href="/invoices/<%=invoice._id.invoice_id%>">
-        Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %>
-      </a>
-      <p>
-        <a href="/clients/<%= invoice._id.clientLink %>" class='capitalize'><%= invoice._id.client %></a>, £<%= invoice.total%></p><br>
+  <div class="actionBox">
+    <h3 class='title centre'><a class='toggle' href="#previousInvoices">Previous Invoices</a></h3>
+    <div class="toggle-content" id="previousInvoices">
+      <% invoices.forEach((invoice) => { %>
+        <div class="summary-details">
+          <p class='title'><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %></a></p>
+          <p><a href="/clients/<%= invoice._id.clientLink %>" class='capitalize'><%= invoice._id.client %></a>, £<%= invoice.total%></p>
+        </div>
+      <% }); %>
     </div>
-  <% }); %>
-
 <% } %>

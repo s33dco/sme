@@ -8,22 +8,31 @@
   <h4><%=client.email%></h4>
   <h2>£<%= total %> previously billed.</h2>
 </header>
-<% itemsList.forEach((item) => { %>
-  <div class="item">
-    <h4><%= moment(item.items.date).format("Do MMMM YYYY") %>
-       (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</h4>
-    <p><%= item.items.desc %></p>
-    <p>£<%= item.items.fee %>
 
-      <% if (item.paid) { %>
-        ( paid <%= moment(item.datePaid).format("Do MMMM YYYY")%> )
-      <% } else { %>
-        ( outstanding )
-      <% } %>
+<div class="actionBox">
 
-    </p>
+  <h3 class='title centre'><a class='toggle' href="#previousItems">Previous Items</a></h3>
+  <div class="toggle-content" id="previousItems">
+    <% itemsList.forEach((item) => { %>
+      <div class="summary-details">
+        <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %>
+           (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+           <p><%= item.items.desc %></p>
+           <p>£<%= item.items.fee %>
+
+          <% if (item.paid) { %>
+            ( paid <%= moment(item.datePaid).format("Do MMMM YYYY")%> )
+          <% } else { %>
+            ( outstanding )
+          <% } %>
+
+        </p>
+      </div>
+    <% }); %>
   </div>
-<% }); %>
+</div>
+
+
 <% if (admin) { %>
   <div class="edit">
     <form method="get" action="/clients/edit/<%=client._id%>" novalidate>

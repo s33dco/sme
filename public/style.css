@@ -169,3 +169,50 @@ section header
   font-weight : bold;
   text-transform: capitalize;
 }
+ p.owed {
+   color: red;
+ }
+
+
+ .toggle-content {
+ 	display: none;
+ 	height: 0;
+ 	overflow: hidden;
+ 	transition: height 350ms ease-in-out;
+ }
+
+ .toggle-content.is-visible {
+ 	display: block;
+ 	height: auto;
+ }
+
+div.report-items {
+  margin-bottom: 2.5vh;
+}
+
+ a.list-header {
+   margin : 2em 0;
+   padding : 1em 0;
+ }
+
+.actionBox {
+  max-width: 600px;
+  padding: 20px;
+  background: #f8f8f8;
+  border: 1px solid rgba(0,0,0,.1);
+  border-color: rgba(0,0,0,.05) rgba(0,0,0,.08) rgba(0,0,0,.1);
+  border-radius: 3px;
+  box-shadow: 0 3px 4px rgba(0,0,0,.05);
+}
+
+.centre {
+  text-align: center;
+}
+
+div.summary-details {
+  margin: 5vh;
+}
+
+header {
+  margin: 5vh;
+}

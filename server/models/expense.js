@@ -37,7 +37,7 @@ expenseSchema.statics.sumOfExpenses = async function () {
   }
 };
 
-expenseSchema.statics.sumOfExpensesBetween = async function (start, end) {
+expenseSchema.statics.sumOfDeductionsBetween = async function (start, end) {
   const result = await this.aggregate([
     {"$match" : {"date": {"$gte": new Date(start), "$lte": new Date(end)}}},
     {"$project" : { amount:1 }},

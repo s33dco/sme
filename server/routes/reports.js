@@ -39,13 +39,13 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const itemsInvoiced     = await Invoice.countItemsInvoicedBetween(start,end);
   const itemsPaid         = await Invoice.countItemsPaidBetween(start,end);
   const owed              = await Invoice.sumOfOwedInvoicesBetween(start,end);
-  const labour            = await Invoice.sumOfLabourBetween(start,end);
-  const labourList        = await Invoice.listLabourBetween(start,end);
-  const expenses          = await Invoice.sumOfExpensesBetween(start,end);
-  const expensesList      = await Invoice.listExpensesBetween(start,end);
-  const materials         = await Invoice.sumOfMaterialsBetween(start,end);
-  const materialsList     = await Invoice.listMaterialsBetween(start,end);
-  const deductions        = await Expense.sumOfExpensesBetween(start,end);
+  const labour            = await Invoice.sumOfLabourPaidBetween(start,end);
+  const labourList        = await Invoice.listLabourPaidBetween(start,end);
+  const expenses          = await Invoice.sumOfExpensesPaidBetween(start,end);
+  const expensesList      = await Invoice.listExpensesPaidBetween(start,end);
+  const materials         = await Invoice.sumOfMaterialsPaidBetween(start,end);
+  const materialsList     = await Invoice.listMaterialsPaidBetween(start,end);
+  const deductions        = await Expense.sumOfDeductionsBetween(start,end);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",

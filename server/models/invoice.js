@@ -75,8 +75,6 @@ InvoiceSchema.statics.sumOfInvoice = async function (id){
   return result[0].total;
 };
 
-
-
 InvoiceSchema.statics.itemsByDateAndType = async function (id){
   const result = await this.aggregate([
     {"$match" : { '_id' : mongoose.Types.ObjectId(id) }},
@@ -319,6 +317,20 @@ InvoiceSchema.statics.sumOfOwedInvoicesBetween = async function (start, end) {
     }
 };
 
+InvoiceSchema.statics.listOfMadeUnpaidInvoicesBetween = async function (start, end) {
+   return this.aggregate([
+     {"$match" : { paid : false}},
+     {"$project" : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},
+     {"$match" : {invDate: {"$gte": new Date(start), "$lte": new Date(end)}}},
+     {"$unwind" : "$items"},
+     {"$sort": {"items.date" : -1}},
+     {"$group": {
+      "_id" : {invoice: "$invNo", date: "$invDate", invoice_id: "$_id", client: "$client.name", clientLink: "$client._id"},
+      "total": {"$sum": "$items.fee"}
+     }}
+   ]);
+};
+
 InvoiceSchema.statics.countItemsInvoicedBetween = async function (start, end){
   const result = await this.aggregate([
     {"$project" : {items:1}},
@@ -370,22 +382,24 @@ InvoiceSchema.statics.listUnpaidItemsBetween = function (start, end) {
 
 // materials by date
 
-InvoiceSchema.statics.listMaterialsBetween = function (start, end) {
+InvoiceSchema.statics.listMaterialsPaidBetween = function (start, end) {
   return this.aggregate([
-    {"$project" : { _id:1 , invNo:1 , items:1}},
+    {"$project" : { _id:1 , invNo:1 , items:1, datePaid:1}},
+    {"$match" : { "datePaid" : {"$gte": new Date(start), "$lte": new Date(end) }}},
     {"$unwind" : "$items"},
     {"$match" : { 'items.type' : 'Materials' }},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
-    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    // {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1, paid:1}},
     {"$sort": {"items.date": 1}}
   ]);
 };
 
-InvoiceSchema.statics.sumOfMaterialsBetween = async function (start, end) {
+InvoiceSchema.statics.sumOfMaterialsPaidBetween = async function (start, end) {
   const result = await this.aggregate([
-    {"$project" : { items:1}},
+    {"$project" : { items:1, datePaid:1}},
+    {"$match" : {"datePaid": {"$gte": new Date(start), "$lte": new Date(end)}}},
     {"$unwind" : "$items"},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    // {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
     {"$match" : { 'items.type' : 'Materials' }},
     {"$project": {"items.fee":1}},
     { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
@@ -399,22 +413,24 @@ InvoiceSchema.statics.sumOfMaterialsBetween = async function (start, end) {
 
 // expenses by date
 
-InvoiceSchema.statics.listExpensesBetween = function (start, end) {
+InvoiceSchema.statics.listExpensesPaidBetween = function (start, end) {
   return this.aggregate([
-    {"$project" : { _id:1 , invNo:1 , items:1}},
+    {"$project" : { _id:1 , invNo:1 , items:1, datePaid:1}},
+    {"$match" : { "datePaid" : {"$gte": new Date(start), "$lte": new Date(end) }}},
     {"$unwind" : "$items"},
     {"$match" : { 'items.type' : 'Expense' }},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
-    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    // {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1, paid:1}},
     {"$sort": {"items.date": 1}}
   ]);
 };
 
-InvoiceSchema.statics.sumOfExpensesBetween = async function (start, end) {
+InvoiceSchema.statics.sumOfExpensesPaidBetween = async function (start, end) {
   const result = await this.aggregate([
-    {"$project" : { items:1}},
+    {"$project" : { items:1, datePaid:1}},
+    {"$match" : {"datePaid": {"$gte": new Date(start), "$lte": new Date(end)}}},
+    {"$project" : {items:1}},
     {"$unwind" : "$items"},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
     {"$match" : { 'items.type' : 'Expense' }},
     {"$project": {"items.fee":1}},
     { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
@@ -429,25 +445,27 @@ InvoiceSchema.statics.sumOfExpensesBetween = async function (start, end) {
 
 // Labour by date
 
-InvoiceSchema.statics.listLabourBetween = function (start, end) {
+InvoiceSchema.statics.listLabourPaidBetween = function (start, end) {
   return this.aggregate([
-    {"$project" : { _id:1 , invNo:1 , items:1}},
-    {"$unwind" : "$items"},
-    {"$match" : { 'items.type' : 'Labour' }},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
-    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1}},
+    {"$project" : { _id:1 , invNo:1 , items:1, datePaid:1}},
+    {"$match"   : { "datePaid" : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$unwind"  : "$items"},
+    {"$match"   : { 'items.type' : 'Labour' }},
+    // {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$project" : { invNo:1, "items.date":1, "items.desc":1,"items.fee":1, paid:1}},
     {"$sort": {"items.date": 1}}
   ]);
 };
 
-InvoiceSchema.statics.sumOfLabourBetween = async function (start, end) {
+InvoiceSchema.statics.sumOfLabourPaidBetween = async function (start, end) {
   const result = await this.aggregate([
-    {"$project" : { items:1}},
-    {"$unwind" : "$items"},
-    {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
-    {"$match" : { 'items.type' : 'Labour' }},
-    {"$project": {"items.fee":1}},
-    { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
+    {"$project" : { items:1, datePaid:1}},
+    {"$match" : {"datePaid": {"$gte": new Date(start), "$lte": new Date(end)}}},
+    {"$unwind"  : "$items"},
+    // {"$match" : { 'items.date' : {"$gte": new Date(start), "$lte": new Date(end) }}},
+    {"$match"   : { 'items.type' : 'Labour' }},
+    {"$project" : {"items.fee":1}},
+    { "$group"  : { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
   ]);
   if (result.length === 0) {
     return "0.00"
