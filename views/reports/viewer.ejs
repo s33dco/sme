@@ -15,12 +15,12 @@
         <div class="report-items">
           <a class='toggle list-header' href="#labour">Labour (£<%=labour%>)</a>
           <div class="toggle-content" id="labour">
-            <div class="actionBox">
-              <%labourList.forEach((item) => { %>
+            <%labourList.forEach((item) => { %>
+              <div class="actionBox">
                 <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
                 <p><%= item.items.desc %></p>
-              <% }); %>
-            </div>
+              </div>
+            <% }); %>
           </div>
         </div>
       <% } %>
