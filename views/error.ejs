@@ -2,6 +2,7 @@
   <h1><%=errorCode%></h1>
   <h3><%=errorTag%></h3>
   <p><%=errorMessage%></p>
+</header>
 
   <% if (errorCode === (403 || 401)) { %>
     <p>Want to give it another go ?</p>
@@ -10,4 +11,3 @@
   <p>Still haven't found what you're looking for ?</p>
   <p>Why don't you head <a href="/">home</a>.</p>
   <% }%>
-</header>

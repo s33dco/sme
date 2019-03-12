@@ -102,6 +102,7 @@
 
 html {
   height: 100%;
+    background: #444;
 }
 
 * {
@@ -127,14 +128,27 @@ header.header {
   width : 100vw;
 }
 
+header.header h1 {
+  text-align: center;
+  font-size: 1.75rem;
+}
+
 main.page{
   background: #fff;
+  line-height: 1.5;
 	flex-grow: 1;
+}
+
+section.content {
+    padding : 0 2.5vw;
+    width: 95vw;
 }
 
 footer.footer,
 footer.footer a{
 	font-size: 1em;
+  text-decoration: none;
+  font-weight: bold;
 	margin: 2.5vh 0 ;
 	color: #ed6e2f;
   width: 100%;
@@ -144,14 +158,18 @@ footer.footer a{
 /* forms and flashes */
 
 .form-header {
-  width: 100%;
-  max-width: 600px;
+  width : 80vw;
+  padding: 2.5vh 0;
 }
+
+.form-header h1 {
+  text-align: center;
+  font-size: 1.75rem;
+}
+
 form {
-  width: 100%;
-  width: 100%;
-  max-width: 600px;
-  padding: 20px;
+
+  padding: 5vh 5vw;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,.1);
   border-color: rgba(0,0,0,.05) rgba(0,0,0,.08) rgba(0,0,0,.1);
@@ -168,8 +186,8 @@ label {
 }
 .input {
   width: 100%;
-  margin-bottom: 5px;
-  padding: 10px;
+  margin-bottom: 2vh;
+  padding: 1.25vh 1vw;
   border: 1px solid rgba(0,0,0,.1);
   border-radius: 3px;
   background: #fff;
@@ -180,7 +198,7 @@ label {
   border-color: rgba(0,0,0,.3);
 }
 .form-field {
-  margin-bottom: 10px;
+  margin-bottom: 2.5vh;
 }
 .error, .errors-list {
   font-size: 14px;
@@ -188,7 +206,7 @@ label {
 }
 .errors-list {
   margin: 0 0 1.5em;
-  padding: 0 0 0 15px;
+  padding: 0 0 0 5vw;
 }
 .form-field-invalid .input {
   border-color: #C00;
@@ -345,7 +363,7 @@ label {
 section header
 {
   text-align: center;
-    margin: 5vh;
+  margin: 2.5vh 0 ;
 }
 
 /* typography */
@@ -362,31 +380,30 @@ section header
    color: red;
  }
 
+.toggle-content {
+	display: none;
+	height: 0;
+	overflow: hidden;
+	transition: height 350ms ease-in-out;
+}
 
- .toggle-content {
- 	display: none;
- 	height: 0;
- 	overflow: hidden;
- 	transition: height 350ms ease-in-out;
- }
-
- .toggle-content.is-visible {
- 	display: block;
- 	height: auto;
- }
+.toggle-content.is-visible {
+	display: block;
+	height: auto;
+}
 
 div.report-items {
   margin-bottom: 2.5vh;
 }
 
- a.list-header {
-   margin : 2em 0;
-   padding : 1em 0;
- }
+a.list-header {
+ margin : 2vh 0;
+ padding : 2vh 0;
+}
 
 .actionBox {
-  max-width: 600px;
-  padding: 10px;
+  width : 100%;
+  padding: 2.5vh 5vw;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,.1);
   border-color: rgba(0,0,0,.05) rgba(0,0,0,.08) rgba(0,0,0,.1);
@@ -400,8 +417,4 @@ div.report-items {
 
 div.summary-details {
   margin: 5vh;
-}
-
-header {
-
 }

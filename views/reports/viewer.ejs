@@ -55,14 +55,18 @@
     </div>
 </div>
 
-    <h3>Deductions (HMRC expenses) £<%=deductions%> <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a></h3>
 
 
+  <div class="actionBox">
+    <h3 class="centre"><a class='toggle' href="#deductions">Deductions (HMRC expenses) £<%=deductions%> <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a></h3>
+      <div class="toggle-content" id="deductions">
+      </div>
+  </div>
 
-
-
-
-
-    <% if (owed) { %>
-      <h3>Invoices owed £<%=owed%></h3>
-    <% } %>
+  <% if (owed) { %>
+    <div class="actionBox">
+      <h3 class="centre"><a class='toggle' href="#owed">Invoices owed £<%=owed%></h3>
+        <div class="toggle-content" id="owed">
+        </div>
+    </div>
+  <% } %>
