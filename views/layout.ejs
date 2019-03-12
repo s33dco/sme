@@ -6,23 +6,28 @@
     <link rel="stylesheet" href="/style.css" type="text/css" />
     <script src="/main.js" charset="utf-8"></script>
   </head>
-  <body>
-    <% include partials/header %>
-    <main>
-    <% if (typeof messages !== 'undefined') { %>
-      <% if (messages.success) { %>
-        <div class="flash flash-success centre"><%= messages.success %></div>
+  <div class="wrapper">
+    <body>
+      <header class='header'>
+        <% include partials/header %>
+      </header>
+      <main class='page'>
+      <% if (typeof messages !== 'undefined') { %>
+        <% if (messages.success) { %>
+          <div class="flash flash-success centre"><%= messages.success %></div>
+        <% } %>
+        <% if (messages.alert) { %>
+          <div class="flash flash-alert centre"><%= messages.alert %></div>
+        <% } %>
       <% } %>
-      <% if (messages.alert) { %>
-        <div class="flash flash-alert centre"><%= messages.alert %></div>
-      <% } %>
-    <% } %>
-      <section>
-        <%- body %>
-      </section>
-    </main>
-    <footer class="footer">
-      <% include partials/footer %>
-    </footer>
-  </body>
+        <section class='content'>
+          <%- body %>
+        </section>
+      </main>
+      <footer class="footer">
+        <% include partials/footer %>
+      </footer>
+    </body>
+  </div>
+
 </html>
