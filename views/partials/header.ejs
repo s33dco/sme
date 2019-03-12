@@ -1,50 +1,41 @@
 <nav>
-  <ul class= 'topnav'>
-
-
-<% if (typeof loggedIn === "undefined") { %>
-    <li>
-      <a href="/">home</a>
-    </li>
-    <li>
-      <a href="/contact">contact</a>
-    </li>
-
-
-<% } else { %>
-    <li>
-      <a href="/dashboard">dashboard</a>
-    </li>
-    <li>
-      <a href="/invoices">invoices</a>
-    </li>
-    <li>
-      <a href="/expenses">expenses</a>
-    </li>
-    <li>
-      <a href="/reports">reports</a>
-    </li>
-    <li>
-      <a href="/clients">clients</a>
-    </li>
-
-    <% if (fullAdmin) { %>
-      <li>
-        <a href="/users">users</a>
-      </li>
-      <li>
-        <a href="/details">invoice info</a>
-      </li>
-
+  <input type="checkbox" id="mobile-menu" class="mobile-menu-check">
+  <label for="mobile-menu" class="show-mobile-menu">MENU</label>
+  <ul class="header-nav nav-links">
+    <% if (typeof loggedIn === "undefined") { %>
+        <li>
+          <a href="/">home</a>
+        </li>
+        <li>
+          <a href="/contact">contact</a>
+        </li>
+    <% } else { %>
+        <li>
+          <a href="/dashboard">dashboard</a>
+        </li>
+        <li>
+          <a href="/invoices">invoices</a>
+        </li>
+        <li>
+          <a href="/expenses">expenses</a>
+        </li>
+        <li>
+          <a href="/reports">reports</a>
+        </li>
+        <li>
+          <a href="/clients">clients</a>
+        </li>
+        <% if (fullAdmin) { %>
+          <li>
+            <a href="/users">users</a>
+          </li>
+          <li>
+            <a href="/details">invoice info</a>
+          </li>
+        <% } %>
+        <li>
+          <a href="/logout">log out</a>
+        </li>
     <% } %>
-
-    <li>
-      <a href="/logout">log out</a>
-    </li>
-<% } %>
-
-
-
-
   </ul>
 </nav>

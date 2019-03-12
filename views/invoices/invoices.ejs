@@ -1,6 +1,6 @@
 <% if (admin) { %>
   <header>
-    <a href="/invoices/new">Make a new invoice.</a>
+    <h1><a href="/invoices/new">Make a new invoice.</a></h1>
   </header>
 <% } %>
 
@@ -10,7 +10,7 @@
     <h3 class='title centre'><a class='toggle' href="#previousInvoices">Previous Invoices</a></h3>
     <div class="toggle-content" id="previousInvoices">
       <% invoices.forEach((invoice) => { %>
-        <div class="summary-details">
+        <div class="actionBox">
           <p class='title'><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %>, <%= moment(invoice._id.date).format("Do MMMM YYYY") %></a></p>
           <p><a href="/clients/<%= invoice._id.clientLink %>" class='capitalize'><%= invoice._id.client %></a>, £<%= invoice.total%></p>
         </div>

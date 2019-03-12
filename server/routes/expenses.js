@@ -13,11 +13,15 @@ const moment                = require('moment');
 
 router.get('/', [auth, admin], async (req, res) => {
   const expenses = await Expense.listExpenses();
+  const totalExpenses = await Expense.sumOfExpenses();
+
+  console.log(totalExpenses);
 
   res.render('expenses/expenses', {
     pageTitle: "Expenses",
     pageDescription: "Expenses.",
     expenses,
+    totalExpenses,
     admin : req.user.isAdmin
   })
 

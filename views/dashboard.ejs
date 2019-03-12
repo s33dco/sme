@@ -1,32 +1,34 @@
 <header>
-  <h1>Dashboard</h1>
   <div class="summary">
-    <p>Average Weekly Income (gross): £<%=avWeekEarningsGross%></p>
-    <p>Average Weekly Income (nett): £<%=averageNettPerWeek%></p>
-    <p>Total Income : £<%=moneyIn%></p>
-    <p>Total Outgoings : £<%=sumOfOutgoings%></p>
-    <p>Invoices : <%=invoices%></p>
-    <p>Items : <%=items%></p>
-    <p>Clients : <%=numberOfClients%></p>
+    <p class="centre">Average Weekly Income (gross): £<%=avWeekEarningsGross%></p>
+    <p class="centre">Average Weekly Income (nett): £<%=averageNettPerWeek%></p>
+    <p class="centre">Total Income : £<%=moneyIn%></p>
+    <p class="centre">Total Outgoings : £<%=sumOfOutgoings%></p>
+    <p class="centre">Invoices : <%=invoices%></p>
+    <p class="centre">Items : <%=items%></p>
+    <p class="centre">Clients : <%=numberOfClients%></p>
   </div>
 </<header>
 
 <% if (unpaidInvoiceList.length > 0) { %>
-  <div class="outstanding-invoices">
-    <h3>Unpaid Invoices £<%=moneyDue%>.</h3>
-    <% unpaidInvoiceList.forEach((invoice) => { %>
-      <form method="post" action="/invoices/paid?_method=POST"  novalidate>
-        <p><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> for
-          <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>
-        </p>
-        <p>£<%= invoice.total%> due <%= moment(invoice._id.date).fromNow()%>.</p>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      	<input type="hidden" name="id" value="<%= invoice._id.invoice_id %>">
-        <% if (fullAdmin) { %>
-        <div class="form-actions">
-          <button class="btn" type="submit">Mark as Paid</button>
-        </div>
-        <% } %>
-      </form>
-  <% }); %>
+  <div class="actionBox">
+    <h3 class='title centre'><a class='toggle' href="#outstanding">Unpaid Invoices £<%=moneyDue%></a></h3>
+    <div class="toggle-content" id="outstanding">
+      <% unpaidInvoiceList.forEach((invoice) => { %>
+        <form method="post" action="/invoices/paid?_method=POST"  novalidate>
+          <p><a href="/invoices/<%=invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> for
+            <a href="/clients/<%= invoice._id.clientLink %>"><%= invoice._id.client %></a>
+          </p>
+          <p>£<%= invoice.total%> due <%= moment(invoice._id.date).fromNow()%>.</p>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        	<input type="hidden" name="id" value="<%= invoice._id.invoice_id %>">
+          <% if (fullAdmin) { %>
+            <div class="form-actions">
+              <button class="btn" type="submit">Mark as Paid</button>
+            </div>
+          <% } %>
+        </form>
+      <% }); %>
+    </div>
+  </div>
 <% } %>

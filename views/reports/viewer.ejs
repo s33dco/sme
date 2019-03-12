@@ -16,8 +16,10 @@
           <a class='toggle list-header' href="#labour">Labour (£<%=labour%>)</a>
           <div class="toggle-content" id="labour">
             <%labourList.forEach((item) => { %>
-              <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
-              <p><%= item.items.desc %></p>
+              <div class="actionBox">
+                <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
+                <p><%= item.items.desc %></p>
+              </div>
             <% }); %>
           </div>
         </div>
@@ -28,8 +30,10 @@
           <a class='toggle list-header' href="#materials">Materials (£<%=materials%>)</a>
           <div class="toggle-content" id="materials">
             <%materialsList.forEach((item) => { %>
-              <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
-              <p><%= item.items.desc %></p>
+              <div class="actionBox">
+                <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
+                <p><%= item.items.desc %></p>
+              </div>
             <% }); %>
           </div>
         </div>
@@ -40,13 +44,14 @@
           <a class='toggle list-header' href="#expenses">Expenses (£<%=expenses%>)</a>
           <div class="toggle-content" id="expenses">
             <%expensesList.forEach((item) => { %>
-            <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
-            <p><%= item.items.desc %>, £<%= item.items.fee%></p>
+              <div class="actionBox">
+                <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
+                <p><%= item.items.desc %>, £<%= item.items.fee%></p>
+              </div>
           <% }); %>
           </div>
         </div>
       <% } %>
-
     </div>
 </div>
 

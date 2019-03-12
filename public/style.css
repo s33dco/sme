@@ -16,11 +16,6 @@ body {
   box-sizing: border-box;
 }
 
-h2 {
-  margin: 0 0 1em;
-  font-size: 20px;
-}
-
 
 /* forms and flashes */
 
@@ -128,35 +123,105 @@ label {
   color: #721c24;
 }
 
+/* start mobile menu */
 
-/* menus */
+  input#mobile-menu.mobile-menu-check {
+  	display :none;
+  }
 
-ul {
-  list-style: none;
-
-}
-
-.topnav li {
-
-  padding : .25vh 0;
-  margin : .25vh 0;
-
-}
-
-.topnav a {
+  .nav-links a,
+  .show-mobile-menu {
+    font-size: 1.5rem;
+    font-weight: bold;
     text-decoration: none;
+    text-transform: uppercase;
+    color: #ed6e2f;
+    padding : 1em 1em;
+  }
 
-}
+  label.show-mobile-menu{
+    font-size: 1.5rem;
+  	margin: 0;
+  	padding: 1.5rem;
+  	background-color: #444;
+  }
 
-.topnav a:hover,
-.topnav a:focus {
-  outline: none;
-  color: #2AA172;
-}
+  .show-mobile-menu {
+    display: block;
+    text-align: center;
+    margin-top: 0.5vh;
+    padding: 0 1.5em 1.5rem;
+    position: relative;
+  }
+  .header-nav {
+    background-color: #444;
+    box-sizing: border-box;
+    left: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    text-align: center;
+    top: 3rem;
+    transition: all 0.5s ease-in-out;
+    width: 100vw;
+    z-index: 9;
+  }
+  .header-nav li {
+    display: block;
+    margin-top: 1.5em;
+  }
+  .header-nav li ~ li {
+    border: 0;
+    padding: 0;
+  }
+  .header-nav li:last-child {
+    margin-bottom: 1.5em;
+  }
+
+  .header-nav .dropdown:hover .drop-menu,
+  .header-nav .drop-trigger:after {
+    display: none;
+  }
+  .header-nav .drop-trigger {
+    padding-right: 0;
+  }
+  .mobile-menu-check:checked ~ .header-nav {
+    max-height: 1000px;
+  }
+  .mobile-menu-check:checked ~ .show-mobile-menu:after {
+    background-color: #444;
+    color: #ed6e2f;
+    content: "CLOSE";
+    left: 0;
+    position: absolute;
+    top: 1em;
+    width: 100%;
+    text-align: center;
+  }
+	 .mobile-menu-check:checked ~ nav {
+	   max-height: 1000px;
+	}
+/* end of mobile menu */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 section header
 {
   text-align: center;
+    margin: 5vh;
 }
 
 /* typography */
@@ -169,7 +234,7 @@ section header
   font-weight : bold;
   text-transform: capitalize;
 }
- p.owed {
+.owed {
    color: red;
  }
 
@@ -197,7 +262,7 @@ div.report-items {
 
 .actionBox {
   max-width: 600px;
-  padding: 20px;
+  padding: 10px;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,.1);
   border-color: rgba(0,0,0,.05) rgba(0,0,0,.08) rgba(0,0,0,.1);
@@ -214,5 +279,5 @@ div.summary-details {
 }
 
 header {
-  margin: 5vh;
+
 }

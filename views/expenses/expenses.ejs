@@ -1,20 +1,21 @@
 <% if (admin) { %>
   <header>
-    <a href="/expenses/new">add a new expense.</a>
+    <h1><a href="/expenses/new">add a new expense.</a></h1>
+    <p>for guidance see the <a href="https://www.gov.uk/expenses-if-youre-self-employed">hmrc website</a></p>
   </header>
 <% } %>
 
-<p>for guidance see the <a href="https://www.gov.uk/expenses-if-youre-self-employed">hmrc website</a></p>
+
 
 <% if (expenses.length > 0) { %>
   <div class="actionBox">
-    <h3 class='title centre'><a class='toggle' href="#previousExpenses">Previous Expenses</a></h3>
+    <h3 class='title centre'><a class='toggle' href="#previousExpenses">Previous Expenses £<%=totalExpenses%></a></h3>
     <div class="toggle-content" id="previousExpenses">
       <% expenses.forEach((expense) => { %>
-        <div class="expenses">
+        <div class="actionBox">
           <a href="/expenses/<%=expense._id%>">
-          <p class='title'><a href="/expenses/<%=expense._id%>"><%=expense.category%>, £<%=expense.amount%></p>
-                  </a>
+            <p class='title'><a href="/expenses/<%=expense._id%>"><%=expense.category%>, £<%=expense.amount%></p>
+          </a>
           <p><%=moment(expense.date).format("Do MMMM YYYY")%>, <%=expense.desc%>.</p>
         </div>
       <% }); %>
