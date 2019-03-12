@@ -432,6 +432,9 @@ a.list-header {
   box-shadow: 0 3px 4px rgba(0,0,0,.05);
 }
 
+ li.list {
+  margin : 2.5vh 0vw;
+}
 .centre {
   text-align: center;
 }
