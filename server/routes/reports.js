@@ -47,6 +47,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const materialsList     = await Invoice.listMaterialsPaidBetween(start,end);
   const deductions        = await Expense.sumOfDeductionsBetween(start,end);
 
+  console.log(labourList);
+
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
     pageDescription : `Report Results`,

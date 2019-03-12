@@ -2,9 +2,9 @@
   <h1>Invoice <%= invoice.invNo %>.</h1>
 </header>
 
-<div class="invoice-header">
-  <p>Invoice Date : <%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
-  <p>Client : <a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
+<div class="actionBox">
+  <p class='title'><%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
+  <p><a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
 
   <p class='capitalize'><%=invoice.client.address1%></p>
   <p class='capitalize'><%=invoice.client.address2%></p>
@@ -13,52 +13,48 @@
   <% } %>
   <p><%=invoice.client.postcode%></p>
 
-  <p>Email : <%= invoice.client.email %></p>
-  <p>Telephone : <%= invoice.client.phone %></p>
+  <p><%= invoice.client.email %></p>
+  <p><%= invoice.client.phone %></p>
 </div>
 
-<div class="invoice-message">
+<div class="actionBox">
   <h4><%= invoice.message%> </h4>
 </div>
 
-<div class="items-day">
+<div class="actionBox">
   <% itemsByDateAndType.forEach((item) => { %>
-    <h4><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</h4>
-    <% item.item.forEach((charge)=> { %>
-      <p><%= charge.type %> £<%= charge.fee %>, <%= charge.desc %></p>
-    <% }) %>
+    <div class="actionBox">
+      <h4><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</h4>
+      <% item.item.forEach((charge)=> { %>
+        <p class='title'><%= charge.type %> £<%= charge.fee %></p>
+        <p><%= charge.desc %></p>
+      <% }) %>
+    </div>
   <% }) %>
 </div>
 
-<div class="total-due">
+<div class="actionBox">
     <h3>Total Due £<%= total %></h3>
     <% if (invoice.paid) { %>
     <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
     <% } %>
 </div>
 
-<div class="signature">
+<div class="actionBox">
   <h4><%= invoice.details.farewell %>,</h4>
   <h4 class='capitalize'><%= invoice.details.contact %></h4>
   <p><%= invoice.details.email %></p>
   <p><%= invoice.details.phone %></p>
 </div>
 
-<div class="pay-details">
+<div class="actionBox">
   <h3>Payee Details.</h3>
   <p>UTR : <%= invoice.details.utr %></p>
   <p class='capitalize'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
   <h4>(<%= invoice.details.terms %>)</h4>
 </div>
 
-<div class="address">
-  <p class='capitalize'><%=invoice.details.address1%></p>
-  <p class='capitalize'><%=invoice.details.address2%></p>
-  <% if (invoice.details.address3){ %>
-    <p class='capitalize'><%=invoice.details.address3%></p>
-  <% } %>
-  <p><%=invoice.details.postcode%></p>
-</div>
+
 
 <form method="post" action="/invoices/email?_method=post" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
