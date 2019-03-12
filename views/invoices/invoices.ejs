@@ -1,13 +1,9 @@
-<% if (admin) { %>
-  <header>
-    <a class='btn' href="/invoices/new">Make a new invoice.</a>
-  </header>
-<% } %>
+<header>
+  <h1>Invoices</h1>
+</header>
 
 <% if (invoices.length > 0) { %>
-
-  <div class="actionBox">
-    <h3 class='title centre'><a class='toggle' href="#previousInvoices">Previous Invoices</a></h3>
+    <a class='toggle btn info' href="#previousInvoices">Previous Invoices</a>
     <div class="toggle-content" id="previousInvoices">
       <% invoices.forEach((invoice) => { %>
         <div class="actionBox">
@@ -16,4 +12,8 @@
         </div>
       <% }); %>
     </div>
+<% } %>
+
+<% if (admin) { %>
+  <a class='btn' href="/invoices/new">Make a new invoice.</a>
 <% } %>

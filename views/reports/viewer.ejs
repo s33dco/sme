@@ -7,10 +7,10 @@
     <p class="centre"><%=itemsInvoiced%> items were invoiced, (<%=itemsPaid%> paid).</p>
 </div>
 
-<div class="actionBox">
-    <h3 class="centre"><a class='toggle' href="#money-in">Money Received</a> £<%=incomings%> <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a></h3>
-    <div class="toggle-content" id="money-in">
+<div class="moneyIn">
 
+    <a class='toggle btn info' href="#money-in">Money Received £<%=incomings%></a>
+    <div class="toggle-content" id="money-in">
       <% if (labourList.length > 0) { %>
         <div class="report-items">
           <a class='toggle list-header' href="#labour">Labour (£<%=labour%>)</a>
@@ -52,21 +52,19 @@
           </div>
         </div>
       <% } %>
+      <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a>
     </div>
 </div>
 
+<div class="moneyOut">
+  <a class='toggle btn info' href="#deductions">HMRC Deductions £<%=deductions%></a>
+    <div class="toggle-content" id="deductions">
+      <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a>
+    </div>
+</div>
 
-
-  <div class="actionBox">
-    <h3 class="centre"><a class='toggle' href="#deductions">Deductions (HMRC expenses)</a> £<%=deductions%> <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a></h3>
-      <div class="toggle-content" id="deductions">
-      </div>
-  </div>
-
-  <% if (owed) { %>
-    <div class="actionBox">
-      <h3 class="centre"><a class='toggle' href="#owed">Invoices owed £<%=owed%></h3>
-        <div class="toggle-content" id="owed">
-        </div>
+<% if (owed) { %>
+    <a class='toggle btn info' href="#owed">Invoices owed £<%=owed%></a>
+    <div class="toggle-content" id="owed">
     </div>
   <% } %>

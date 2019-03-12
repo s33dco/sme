@@ -1,18 +1,20 @@
 <header>
-  <div class="summary">
-    <p class="centre">Average Weekly Income (gross): £<%=avWeekEarningsGross%></p>
-    <p class="centre">Average Weekly Income (nett): £<%=averageNettPerWeek%></p>
-    <p class="centre">Total Income : £<%=moneyIn%></p>
-    <p class="centre">Total Outgoings : £<%=sumOfOutgoings%></p>
-    <p class="centre">Invoices : <%=invoices%></p>
-    <p class="centre">Items : <%=items%></p>
-    <p class="centre">Clients : <%=numberOfClients%></p>
-  </div>
+  <h1>Dashboard</h1>
 </<header>
 
+<div class="summary">
+  <p class="centre">Average Weekly Income (gross): £<%=avWeekEarningsGross%></p>
+  <p class="centre">Average Weekly Income (nett): £<%=averageNettPerWeek%></p>
+  <p class="centre">Total Income : £<%=moneyIn%></p>
+  <p class="centre">Total Outgoings : £<%=sumOfOutgoings%></p>
+  <p class="centre">Invoices : <%=invoices%></p>
+  <p class="centre">Items : <%=items%></p>
+  <p class="centre">Clients : <%=numberOfClients%></p>
+</div>
+
 <% if (unpaidInvoiceList.length > 0) { %>
-  <div class="actionBox">
-    <h3 class='title centre'><a class='toggle' href="#outstanding">Unpaid Invoices £<%=moneyDue%></a></h3>
+
+    <a class='toggle btn info' href="#outstanding">Unpaid Invoices £<%=moneyDue%></a>
     <div class="toggle-content" id="outstanding">
       <% unpaidInvoiceList.forEach((invoice) => { %>
         <form method="post" action="/invoices/paid?_method=POST"  novalidate>
@@ -30,5 +32,5 @@
         </form>
       <% }); %>
     </div>
-  </div>
+
 <% } %>

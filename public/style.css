@@ -169,7 +169,7 @@ footer.footer a{
 
 form {
 
-  padding: 5vh 5vw;
+  padding: 2.5vh 5vw;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,.1);
   border-color: rgba(0,0,0,.05) rgba(0,0,0,.08) rgba(0,0,0,.1);
@@ -215,6 +215,7 @@ label {
   margin-top: 20px;
 }
 .btn {
+  margin : 4vh 0;
   display: block;
   width: 100%;
   padding: 10px;
@@ -230,6 +231,7 @@ label {
 
 a.btn {
   text-decoration: none;
+  text-align: center;
 }
 
 .danger {
@@ -249,13 +251,24 @@ a.btn {
   background: #CC0000;
 }
 
+/* .info {
+  background: #3498db;
+} */
+
 .btn:active {
   transform: translateY(1px);
 }
+
+
+
+
+
 .flash {
-  padding: 15px 20px;
+  margin: 1vh 2vw;
+  padding: 2vh 2vw;
   border: 1px solid;
   border-radius: 3px;
+  width :92vw;
 }
 .flash-success {
   background-color: #d4edda;
@@ -282,7 +295,7 @@ a.btn {
     text-decoration: none;
     text-transform: uppercase;
     color: #ed6e2f;
-    padding : 1em 1em;
+    padding : .75em 1em;
   }
 
   label.show-mobile-menu{
@@ -421,4 +434,8 @@ a.list-header {
 
 .centre {
   text-align: center;
+}
+
+.summary {
+  margin: 2.5vh 2.5vw;
 }
