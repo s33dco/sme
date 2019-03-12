@@ -184,7 +184,7 @@ label {
   color: #555;
   text-transform: uppercase;
 }
-.input {
+.input, select {
   width: 100%;
   margin-bottom: 2vh;
   padding: 1.25vh 1vw;
@@ -226,6 +226,10 @@ label {
   color: #fff;
   cursor: pointer;
   text-shadow: 0 1px 0 rgba(0,0,0,.3), 0 1px 1px rgba(0,0,0,.2);
+}
+
+a.btn {
+  text-decoration: none;
 }
 
 .danger {
@@ -366,6 +370,10 @@ section header
   margin: 2.5vh 0 ;
 }
 
+section header h1 {
+  font-size: 1.75rem;
+}
+
 /* typography */
 
 .capitalize {
@@ -413,8 +421,4 @@ a.list-header {
 
 .centre {
   text-align: center;
-}
-
-div.summary-details {
-  margin: 5vh;
 }
