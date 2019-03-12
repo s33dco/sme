@@ -2,12 +2,10 @@
   <h1 class='capitalize'>Expense Details</h1>
 </header>
 
-<div class="expense-list">
-  <p><%= moment(expense.date).format("Do MMMM YYYY") %></p>
-  <p><%=expense.category%></p>
-  <p>£<%=expense.amount%></p>
+<div class="actionBox">
+  <p class='title'>£<%=expense.amount%> - <%= moment(expense.date).format("Do MMMM YYYY")%></p>
+  <p class=''><%=expense.category%></p>
   <p><%=expense.desc%></p>
-  <p><%=expense._id%></p>
 </div>
 
 <div class="edit">
