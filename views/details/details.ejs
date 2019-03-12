@@ -2,29 +2,37 @@
   <h1>Invoice Information.</h1>
 </header>
 
+<div class="actionBox">
+  <h3>Contact Details.</h3>
+  <p>farewell : <%= detail.farewell %></p>
+  <p class='capitalize'>contact name : <%= detail.contact %></p>
+  <p>contact email : <%= detail.email %></p>
+  <p>contact number : <%= detail.phone %></p>
+</div>
 
-<h3>Contact Details.</h3>
-<p>farewell : <%= detail.farewell %></p>
-<p class='capitalize'>contact name : <%= detail.contact %></p>
-<p>contact email : <%= detail.email %></p>
-<p>contact number : <%= detail.phone %></p>
+<div class="actionBox">
+  <h3>Address Details.</h3>
+  <p class='capitalize'><%= detail.address1 %></p>
+  <p class='capitalize'><%= detail.address2 %></p>
+  <% if (detail.address3) { %>
+   <p class='capitalize'><%= detail.address3 %></p>
+  <% } %>
+  <p class='capitalize'><%= detail.postcode %></p>
+</div>
 
-<h3>Address Details.</h3>
-<p class='capitalize'><%= detail.address1 %></p>
-<p class='capitalize'><%= detail.address2 %></p>
-<% if (detail.address3) { %>
- <p class='capitalize'><%= detail.address3 %></p>
-<% } %>
-<p class='capitalize'><%= detail.postcode %></p>
+<div class="actionBox">
+  <h3>Pay Details.</h3>
+  <p>UTR : <%=detail.utr %></p>
+  <p class='capitalize'>Bank Name : <%= detail.bank %></p>
+  <p>Sort Code : <%= detail.sortcode %></p>
+  <p>Account No: <%= detail.accountNo %></p>
+</div>
 
-<h3>Pay Details.</h3>
-<p>UTR : <%=detail.utr %></p>
-<p class='capitalize'>Bank Name : <%= detail.bank %></p>
-<p>Sort Code : <%= detail.sortcode %></p>
-<p>Account No: <%= detail.accountNo %></p>
+<div class="actionBox">
+  <h3>Invoice Terms.</h3>
+  <p><%= detail.terms %></p>  
+</div>
 
-<h3>Invoice Terms.</h3>
-<p><%= detail.terms %></p>
 
 <form method="get" action="/details/edit" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
