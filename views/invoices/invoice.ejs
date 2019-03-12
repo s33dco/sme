@@ -1,30 +1,34 @@
-<header>
-  <h1>Invoice <%= invoice.invNo %>.</h1>
-</header>
-
 <div class="actionBox">
-  <p class='title'><%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
-  <p><a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
-
-  <p class='capitalize'><%=invoice.client.address1%></p>
-  <p class='capitalize'><%=invoice.client.address2%></p>
-  <% if (invoice.client.address3){ %>
-    <p class='capitalize'><%=invoice.client.address3%></p>
-  <% } %>
-  <p><%=invoice.client.postcode%></p>
-
-  <p><%= invoice.client.email %></p>
-  <p><%= invoice.client.phone %></p>
+  <h3>Invoice and Client Details</h3>
+  <div class="actionBox">
+    <p class='title'>Invoice <%= invoice.invNo %></p>
+    <p class='title'><%= moment(invoice.invDate).format("Do MMMM YYYY") %></p>
+    <p><a href="/clients/<%= invoice.client._id %>" class='capitalize'><%= invoice.client.name %></a></p>
+    <p class='capitalize'><%=invoice.client.address1%></p>
+    <% if (invoice.client.address2){ %>
+      <p class='capitalize'><%=invoice.client.address2%></p>
+    <% } %>
+    <% if (invoice.client.address3){ %>
+      <p class='capitalize'><%=invoice.client.address3%></p>
+    <% } %>
+    <p><%=invoice.client.postcode%></p>
+    <p><%= invoice.client.email %></p>
+    <p><%= invoice.client.phone %></p>
+  </div>
 </div>
 
 <div class="actionBox">
-  <h4><%= invoice.message%> </h4>
+  <h3>Message</h3>
+  <div class="actionBox">
+    <p><%= invoice.message%> </p>
+  </div>
 </div>
 
 <div class="actionBox">
+  <h3>Invoiced Items</h3>
   <% itemsByDateAndType.forEach((item) => { %>
     <div class="actionBox">
-      <h4><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</h4>
+      <p class='title'><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</p>
       <% item.item.forEach((charge)=> { %>
         <p class='title'><%= charge.type %> £<%= charge.fee %></p>
         <p><%= charge.desc %></p>
@@ -34,25 +38,45 @@
 </div>
 
 <div class="actionBox">
-    <h3>Total Due £<%= total %></h3>
-    <% if (invoice.paid) { %>
-    <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
+  <h3>Financial</h3>
+  <div class="actionBox">
+      <p class='title'>Total Due £<%= total %></p>
+      <% if (invoice.paid) { %>
+        <p class='title'>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</p>
+      <% } %>
+  </div>
+</div>
+
+<div class="actionBox">
+  <h3>Business Details</h3>
+  <div class="actionBox">
+    <p><%= invoice.details.farewell %>,</p>
+    <p class='capitalize'><%= invoice.details.contact %></p>
+    <p><%= invoice.details.email %></p>
+    <p><%= invoice.details.phone %></p>
+    <p class='capitalize'><%= invoice.details.address1 %></p>
+    <% if (invoice.details.address2){ %>
+      <p class='capitalize'><%= invoice.details.address2 %></p>
     <% } %>
+    <% if (invoice.details.address3){ %>
+      <p class='capitalize'><%= invoice.details.address3 %></p>
+    <% } %>
+    <p class='capitalize'><%= invoice.details.postcode %></p>
+  </div>
 </div>
 
-<div class="actionBox">
-  <h4><%= invoice.details.farewell %>,</h4>
-  <h4 class='capitalize'><%= invoice.details.contact %></h4>
-  <p><%= invoice.details.email %></p>
-  <p><%= invoice.details.phone %></p>
-</div>
 
 <div class="actionBox">
-  <h3>Payee Details.</h3>
-  <p>UTR : <%= invoice.details.utr %></p>
-  <p class='capitalize'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
-  <h4>(<%= invoice.details.terms %>)</h4>
+  <h3>Payment Details.</h3>
+  <div class="actionBox">
+    <p>UTR : <%= invoice.details.utr %></p>
+    <p class='capitalize'><%= invoice.details.bank %></p>
+    <p class='capitalize'>Sort Code : <%= invoice.details.sortcode %></p>
+    <p class='capitalize'>Account No: <%= invoice.details.accountNo %>.</p>
+    <p class='capitalize'><%= invoice.details.terms %></p>
+  </div>
 </div>
+
 
 
 
