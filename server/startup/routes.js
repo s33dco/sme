@@ -28,7 +28,6 @@ const logger          = require('./logger');
 
 module.exports = (app) => {
 
-  app.locals.title  = config.get('SME_TITLE');
   app.locals.email  = config.get('SME_EMAIL');
   app.locals.moment = require('moment');
   app.set('views', path.join(__dirname, '../../views'))
