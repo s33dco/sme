@@ -170,8 +170,6 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           paid        : false
         }).save()
 
-        console.log(invoice);
-
     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
     res.redirect(`invoices/${invoice._id}`);
   });

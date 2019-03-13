@@ -39,9 +39,7 @@ let detailSchema = new mongoose.Schema({
 
 detailSchema.statics.getBusinessName = async function () {
   const result = await this.findOne({});
-  console.log(result);
   return result.business;
-
 }
 
 let Detail = mongoose.model('Detail', detailSchema);

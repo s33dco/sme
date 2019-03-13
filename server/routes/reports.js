@@ -74,12 +74,6 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
       return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
     }
 
-
-
-
-
-  console.log(owedList);
-
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
     pageDescription : `Report Results`,
