@@ -281,7 +281,6 @@ InvoiceSchema.statics.numberOfInvoicesPaidBetween = async function (start, end )
   } else {
     return result[0].invoices;
   }
-
 };
 
 InvoiceSchema.statics.sumOfPaidInvoicesBetween = async function (start, end) {

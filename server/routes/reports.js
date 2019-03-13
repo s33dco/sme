@@ -22,6 +22,7 @@ router.get('/', auth, (req, res) => {
 
 router.get('/viewer', [auth, validate.reports], async (req, res) => {
   let errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.render('reports/form', {
       data            : req.query,
@@ -60,6 +61,24 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const mktgSum           = await Expense.sumMktgExpensesBetween(start,end);
   const clothingList      = await Expense.listClothingExpensesBetween(start,end);
   const clothingSum       = await Expense.sumClothingExpensesBetween(start,end);
+  const owedList          = await Invoice.listOfMadeUnpaidInvoicesBetween(start,end);
+
+
+
+  const tradingDays       = moment(end).diff(moment(start), 'days');
+
+  const averageWeeklyIncome = () => {
+      return (Math.round(((parseFloat(incomings) * 100) / tradingDays) * 7) / 100).toFixed(2);
+    }
+  const averageWeeklyHMRCIncome   = () => {
+      return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
+    }
+
+
+
+
+
+  console.log(owedList);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -92,7 +111,10 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     legalList,
     legalSum,
     mktgList,
-    mktgSum
+    mktgSum,
+    owedList,
+    weeklyIncome : averageWeeklyIncome(),
+    hmrcWeekly : averageWeeklyHMRCIncome()
   });
 });
 
@@ -143,9 +165,6 @@ router.get('/download', [auth, validate.download], async (req, res) => {
     data.forEach((item) => {
       item.items.fee = parseFloat(item.items.fee).toFixed(2);
     })
-
-    console.log(data)
-
   } else {
 
     data  = await Expense.listOfExpensesBetween(start, end);
@@ -172,7 +191,6 @@ router.get('/download', [auth, validate.download], async (req, res) => {
       item.amount = parseFloat(item.amount).toFixed(2);
       item.date = moment(item.date).format('DD/MM/YY');
     })
-    console.log(data)
   }
 
 

@@ -1,15 +1,29 @@
-<header>
-  <h1>Dashboard</h1>
-</<header>
-
 <div class="actionBox">
-  <p class="centre">Average Weekly Income (gross): £<%=avWeekEarningsGross%></p>
-  <p class="centre">Average Weekly Income (nett): £<%=averageNettPerWeek%></p>
-  <p class="centre">Total Income : £<%=moneyIn%></p>
-  <p class="centre">Total Outgoings : £<%=sumOfOutgoings%></p>
-  <p class="centre">Invoices : <%=invoices%></p>
-  <p class="centre">Items : <%=items%></p>
-  <p class="centre">Clients : <%=numberOfClients%></p>
+  <header>
+    <h1>Dashboard</h1>
+  </<header>
+
+
+  <div class="actionBox">
+    <h3>Average Weekly Income</h3>
+      <p class="centre">Invoiced: £<%=avWeekEarningsGross%></p>
+      <p class="centre">HMRC declared: £<%=averageNettPerWeek%></p>
+  </div>
+
+  <div class="actionBox">
+    <h3>Totals to Date</h3>
+    <p class="centre">Invoiced : £<%=moneyIn%></p>
+    <p class="centre">HMRC declared : £<%=totalHMRC%></p>
+  </div>
+
+  <div class="actionBox">
+    <h3>Invoice Statistics</h3>
+    <p class="centre">Created : <%=invoices%></p>
+    <p class="centre">Items : <%=items%></p>
+    <p class="centre">Clients : <%=numberOfClients%></p>
+  </div>
+
+
 </div>
 
 <% if (unpaidInvoiceList.length > 0) { %>

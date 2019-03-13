@@ -1,18 +1,34 @@
-<header>
-  <h3><%= moment(start).format("Do MMMM YYYY") %> - <%= moment(end).format("Do MMMM YYYY") %>.</h3>
-</header>
-
 <div class="actionBox">
-    <p class="centre"><%=invoicesProduced%> invoices were created, (<%=invoicesPaid%> paid).</p>
-    <p class="centre"><%=itemsInvoiced%> items were invoiced, (<%=itemsPaid%> paid).</p>
+  <header>
+    <h3 class="centre"><%= moment(start).format("Do MMMM YYYY") %> - <%= moment(end).format("Do MMMM YYYY") %>.</h3>
+  </header>
+
+  <div class="actionBox">
+    <h3 class="centre">Average Weekly Income</h3>
+    <p class="centre">Invoiced : £<%=weeklyIncome%></p>
+    <p class="centre">HMRC declared : £<%=hmrcWeekly%></p>
+  </div>
+
+  <div class="actionBox">
+    <h3 class="centre">Invoice Statistics</h3>
+    <p class="centre">Created : <%=invoicesProduced%> (<%=invoicesPaid%> paid)</p>
+    <p class="centre">Items : <%=itemsInvoiced%> (<%=itemsPaid%> paid)</p>
+  </div>
+
 </div>
+
+
+
+
+
+
 
 <div class="moneyIn">
   <a class='toggle btn info' href="#money-in">Money Received £<%=incomings%></a>
   <div class="toggle-content" id="money-in">
     <% if (labourList.length > 0) { %>
-      <div class="report-items">
-        <a class='toggle list-header' href="#labour">Labour (£<%=labour%>)</a>
+      <div class="actionBox">
+        <a class='toggle title' href="#labour">Labour (£<%=labour%>)</a>
         <div class="toggle-content" id="labour">
           <%labourList.forEach((item) => { %>
             <div class="actionBox">
@@ -24,8 +40,8 @@
       </div>
     <% } %>
     <% if (materialsList.length > 0) { %>
-      <div class="report-items">
-        <a class='toggle list-header' href="#materials">Materials (£<%=materials%>)</a>
+      <div class="actionBox">
+        <a class='toggle title' href="#materials">Materials (£<%=materials%>)</a>
         <div class="toggle-content" id="materials">
           <%materialsList.forEach((item) => { %>
             <div class="actionBox">
@@ -37,8 +53,8 @@
       </div>
     <% } %>
     <% if (expensesList.length > 0) { %>
-      <div class="report-items">
-        <a class='toggle list-header' href="#expenses">Expenses (£<%=expenses%>)</a>
+      <div class="actionBox">
+        <a class='toggle title' href="#expenses">Expenses (£<%=expenses%>)</a>
         <div class="toggle-content" id="expenses">
           <%expensesList.forEach((item) => { %>
             <div class="actionBox">
@@ -49,7 +65,7 @@
         </div>
       </div>
     <% } %>
-    <a href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">(export)</a>
+    <a class='btn export' href="/reports/download?type=incoming&start=<%=start%>&end=<%=end%>">Export received <%= moment(start).format("Do MMMM YYYY") %> - <%= moment(end).format("Do MMMM YYYY") %> to a .csv file</a>
   </div>
 </div>
 
@@ -154,13 +170,18 @@
       </div>
     </div>
     <% } %>
-
-    <a href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">(export)</a>
+    <a class='btn export' href="/reports/download?type=deductions&start=<%=start%>&end=<%=end%>">Export HMRC deductions <%= moment(start).format("Do MMMM YYYY") %> - <%= moment(end).format("Do MMMM YYYY") %> to a .csv file</a>
   </div>
 </div>
 
 <% if (owed) { %>
-    <a class='toggle btn info' href="#owed">Invoices owed £<%=owed%></a>
-    <div class="toggle-content" id="owed">
-    </div>
-  <% } %>
+  <a class='toggle btn info' href="#owed">Invoices owed £<%=owed%></a>
+  <div class="toggle-content" id="owed">
+    <% owedList.forEach((invoice) => { %>
+      <div class="actionBox">
+        <p class='title'><a href="/invoices/<%= invoice._id.invoices_id%>">Invoice <%= invoice._id.invoice %></a></p>
+        <p class='title'><a href="/clients/<%= invoice._id.clientLink%>"><%= invoice._id.client %></a>, £<%= invoice.total%></p>
+      </div>
+    <% }); %>
+  </div>
+<% } %>

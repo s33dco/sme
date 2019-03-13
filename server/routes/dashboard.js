@@ -31,9 +31,12 @@ router.get('/', auth, async (req, res) => {
       const invoices            = noInvoices;
       const sumOfOutgoings      = outgoings
       const avWeekEarningsGross = await Invoice.averageWeeklyGrossEarnings(tradingDays);
-      const averageNettPerWeek  = () => {
-        return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(sumOfOutgoings) * 100)) / tradingDays) * 7) / 100).toFixed(2);
-      }
+      const averageHMRCPerWeek  = () => {
+          return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(sumOfOutgoings) * 100)) / tradingDays) * 7) / 100).toFixed(2);
+        }
+      const totalHMRCToDate     = () => {
+          return (Math.round((((parseFloat(moneyIn) * 100) - (parseFloat(sumOfOutgoings)) * 100))/ 100)).toFixed(2);
+        }
 
       res.render('dashboard', {
         pageTitle: "Dashboard",
@@ -48,7 +51,8 @@ router.get('/', auth, async (req, res) => {
         items,
         invoices,
         sumOfOutgoings,
-        averageNettPerWeek: averageNettPerWeek()
+        averageNettPerWeek: averageHMRCPerWeek(),
+        totalHMRC : totalHMRCToDate()
       });
     })
     .catch((e) => {

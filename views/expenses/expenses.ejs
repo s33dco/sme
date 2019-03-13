@@ -1,9 +1,11 @@
-<% if (admin) { %>
-  <header>
-    <h1>HMRC Expenses</h1>
-    <p>For guidance on permitted expenses refer to the <a href="https://www.gov.uk/expenses-if-youre-self-employed">hmrc website</a></p>
-  </header>
-<% } %>
+<div class="actionBox">
+  <% if (admin) { %>
+    <header>
+      <h1>HMRC Expenses</h1>
+      <p>For guidance on permitted expenses refer to the <a href="https://www.gov.uk/expenses-if-youre-self-employed">hmrc website</a></p>
+    </header>
+  <% } %>
+</div>
 
 <% if (expenses.length > 0) { %>
   <a class='toggle btn info' href="#previousExpenses">Previous Expenses £<%=totalExpenses%></a>

@@ -1,8 +1,7 @@
-<header>
-  <h1 class='capitalize'>Expense Details</h1>
-</header>
-
 <div class="actionBox">
+  <header>
+    <h1 class='capitalize'>Expense Details</h1>
+  </header>
   <p class='title'><%= moment(expense.date).format("Do MMMM YYYY")%></p>
   <p class='title'><%=expense.category%></p>
   <p class='title'>£<%=expense.amount%></p>
