@@ -3,8 +3,9 @@
 </header>
 
 <div class="actionBox">
-  <p class='title'>£<%=expense.amount%> - <%= moment(expense.date).format("Do MMMM YYYY")%></p>
-  <p class=''><%=expense.category%></p>
+  <p class='title'><%= moment(expense.date).format("Do MMMM YYYY")%></p>
+  <p class='title'><%=expense.category%></p>
+  <p class='title'>£<%=expense.amount%></p>
   <p><%=expense.desc%></p>
 </div>
 

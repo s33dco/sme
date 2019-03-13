@@ -46,8 +46,20 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const materials         = await Invoice.sumOfMaterialsPaidBetween(start,end);
   const materialsList     = await Invoice.listMaterialsPaidBetween(start,end);
   const deductions        = await Expense.sumOfDeductionsBetween(start,end);
-
-  console.log(labourList);
+  const officeList        = await Expense.listOfficeExpensesBetween(start,end);
+  const officeSum         = await Expense.sumOfficeExpensesBetween(start,end);
+  const carList           = await Expense.listCarExpensesBetween(start,end);
+  const carSum            = await Expense.sumCarExpensesBetween(start,end);
+  const resellingList     = await Expense.listResellingExpensesBetween(start,end);
+  const resellingSum      = await Expense.sumResellingExpensesBetween(start,end);
+  const staffList         = await Expense.listStaffExpensesBetween(start,end);
+  const staffSum          = await Expense.sumStaffExpensesBetween(start,end);
+  const legalList         = await Expense.listLegalExpensesBetween(start,end);
+  const legalSum          = await Expense.sumLegalExpensesBetween(start,end);
+  const mktgList          = await Expense.listMktgExpensesBetween(start,end);
+  const mktgSum           = await Expense.sumMktgExpensesBetween(start,end);
+  const clothingList      = await Expense.listClothingExpensesBetween(start,end);
+  const clothingSum       = await Expense.sumClothingExpensesBetween(start,end);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -66,7 +78,21 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     expensesList,
     materials,
     materialsList,
-    deductions
+    deductions,
+    officeList,
+    officeSum,
+    carList,
+    carSum,
+    resellingList,
+    resellingSum,
+    clothingList,
+    clothingSum,
+    staffList,
+    staffSum,
+    legalList,
+    legalSum,
+    mktgList,
+    mktgSum
   });
 });
 
