@@ -31,11 +31,11 @@ router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
     detail = {};
   }
 
-  let {utr, email, phone, bank, sortcode,
+  let {business, utr, email, phone, bank, sortcode,
     accountNo, terms, contact, farewell, address1, address2, address3, postcode} = detail;
 
   res.render('details/editdetails', {
-    data            : {utr, email, phone, bank, sortcode,
+    data            : {business, utr, email, phone, bank, sortcode,
                         accountNo, terms, contact, farewell,
                         address1, address2, address3, postcode},
     errors          : {},
@@ -62,6 +62,7 @@ router.post('/', [auth, admin, validate.detail], async (req, res) => {
     await Detail.updateOne({},{
         $set:
          {
+            business : req.body.business,
             utr      : req.body.utr,
             email    : req.body.email,
             phone    : req.body.phone,

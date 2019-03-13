@@ -96,8 +96,6 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
         clients
       }
 
-      console.log('these are the errors', errors.mapped());
-
       return res.render('invoices/newinvoice', {
           data            : req.body,
           errors          : errors.mapped(),
@@ -154,6 +152,7 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           },
           items      : req.body.items,
           details    : {
+              business    : detail.business,
               utr         : detail.utr,
               email       : detail.email,
               phone       : detail.phone,
@@ -171,6 +170,7 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           paid        : false
         }).save()
 
+        console.log(invoice);
 
     req.flash('success', `Invoice ${invoice.invNo} for ${invoice.client.name} created !`)
     res.redirect(`invoices/${invoice._id}`);
@@ -434,6 +434,7 @@ router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res
                           postcode : client.postcode,
                         },
               details   : {
+                  business    : detail.business,
                   utr         : detail.utr,
                   email       : detail.email,
                   phone       : detail.phone,

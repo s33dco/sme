@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
 
-let DetailSchema = new mongoose.Schema({
-    utr       : {type:String},
-    email     : {type:String},
-    phone     : {type:String},
-    bank      : {type:String,    lowercase: true,},
-    sortcode  : {type:String},
-    accountNo : {type:String},
-    terms     : {type:String,    lowercase: true,},
-    farewell  : {type:String,    lowercase: true,},
-    contact   : {type:String,    lowercase: true,},
+let detailSchema = new mongoose.Schema({
+    business  : {type:String, required: true},
+    utr       : {type:String, required: true},
+    email     : {type:String, required: true},
+    phone     : {type:String, required: true},
+    bank      : {type:String, lowercase: true, required: true},
+    sortcode  : {type:String, required: true},
+    accountNo : {type:String, required: true},
+    terms     : {type:String, required: true, lowercase: true,},
+    farewell  : {type:String, required: true, lowercase: true,},
+    contact   : {type:String, required: true, lowercase: true,},
     address1: {
       type: String,
       required: true,
@@ -36,6 +37,12 @@ let DetailSchema = new mongoose.Schema({
     }
   });
 
+detailSchema.statics.getBusinessName = async function () {
+  const result = await this.findOne({});
+  console.log(result);
+  return result.business;
 
-let Detail = mongoose.model('Detail', DetailSchema);
+}
+
+let Detail = mongoose.model('Detail', detailSchema);
 module.exports = {Detail};

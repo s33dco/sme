@@ -24,6 +24,8 @@ let InvoiceSchema = new mongoose.Schema({
   message     : { type: String},
 
   details     : {
+    business  : { type: String,
+                  required: true},
     utr       : { type: String,
                   required: true},
     email     : { type: String,

@@ -145,6 +145,9 @@ module.exports = {
     ],
 
   detail: [
+    check('business')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
     check('farewell')
       .matches(/(\w(\s)?)+/)
       .withMessage('just words'),

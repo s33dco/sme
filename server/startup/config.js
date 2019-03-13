@@ -22,12 +22,6 @@ module.exports = () => {
     if (!config.get('SUPER_SECRET_COOKIE')) {
       throw new Error('FATAL ERROR: SUPER_SECRET_COOKIE is not defined.');
     }
-    if (!config.get('SME_TITLE')) {
-      throw new Error('FATAL ERROR: SME_TITLE is not defined.');
-    }
-    if (!config.get('SME_EMAIL')) {
-      throw new Error('FATAL ERROR: SME_EMAIL is not defined.');
-    }
     if (!config.get('SENDGRID_API_PASSWORD')) {
       throw new Error('FATAL ERROR: SENDGRID_API_PASSWORD is not defined.');
     }

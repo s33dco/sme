@@ -16,8 +16,15 @@
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
   <fieldset class='details'>
-
     <h4>Contact Details.</h4>
+    <div class="form-field <%= errors.business ? 'form-field-invalid' : '' %>">
+      <label for="business">Business Name</label>
+      <input class="input" name="business" type="text" value="<%=data.business%>" />
+      <% if (errors.business) { %>
+        <div class="error"><%= errors.business.msg %></div>
+      <% } %>
+    </div>
+
     <div class="form-field <%= errors.farewell ? 'form-field-invalid' : '' %>">
       <label for="farewell">Farewell</label>
       <input class="input" name="farewell" type="text" value="<%=data.farewell%>" />

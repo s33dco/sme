@@ -3,6 +3,7 @@ const router      = express.Router();
 const moment      = require('moment');
 const {Invoice}   = require("../models/invoice");
 const {Expense}   = require("../models/expense");
+const {Detail}    = require("../models/detail");
 const auth        = require("../middleware/auth")
 const logger      = require('../startup/logger');
 
@@ -15,12 +16,14 @@ router.get('/', auth, async (req, res) => {
                                   Invoice.sumOfPaidInvoices(),
                                   Invoice.countItems(),
                                   Invoice.numberOfInvoices(),
-                                  Expense.sumOfExpenses()
+                                  Expense.sumOfExpenses(),
+                                  Detail.getBusinessName()
                                 ]);
 
     promise.then( async ([uniqueClients, firstItem, unpaidInvoices, sumOfOwed,
-                          sumOfPaid, noItems, noInvoices, outgoings]) => {
+                          sumOfPaid, noItems, noInvoices, outgoings, businessName]) => {
 
+      const title               = businessName
       const numberOfClients     = uniqueClients;
       const firstDate           = firstItem;
       const unpaidInvoiceList   = unpaidInvoices;
@@ -52,7 +55,8 @@ router.get('/', auth, async (req, res) => {
         invoices,
         sumOfOutgoings,
         averageNettPerWeek: averageHMRCPerWeek(),
-        totalHMRC : totalHMRCToDate()
+        totalHMRC : totalHMRCToDate(),
+        title
       });
     })
     .catch((e) => {
