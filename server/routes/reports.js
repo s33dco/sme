@@ -62,21 +62,13 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const clothingList      = await Expense.listClothingExpensesBetween(start,end);
   const clothingSum       = await Expense.sumClothingExpensesBetween(start,end);
   const owedList          = await Invoice.listOfMadeUnpaidInvoicesBetween(start,end);
-
-
-
-  const tradingDays       = moment(end).diff(moment(start), 'days');
-
+  const tradingDays       = (moment(end).diff(moment(start), 'days')) + 1;
   const averageWeeklyIncome = () => {
       if (!incomings){return 0};
       return (Math.round(((parseFloat(incomings) * 100) / tradingDays) * 7) / 100).toFixed(2);
     }
   const averageWeeklyHMRCIncome   = () => {
       if (!incomings && !deductions){return 0};
-      if (!incomings && tradingDays === 0) {
-        return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / 1) * 7) / 100).toFixed(2);
-
-      }
       return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
     }
 
