@@ -17,18 +17,14 @@
     <a class='toggle btn info' href="#previousItems">Previous Items</a>
     <div class="toggle-content" id="previousItems">
       <% itemsList.forEach((item) => { %>
+      <% if (item.paid) { %>
         <div class="actionBox">
-          <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %>
-             (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>)</p>
-             <p><%= item.items.desc %></p>
-             <p>£<%= item.items.fee %>
-
-            <% if (item.paid) { %>
-              ( paid <%= moment(item.datePaid).format("Do MMMM YYYY")%> )
-            <% } else { %>
-              ( outstanding )
-            <% } %>
-          </p>
+      <% } else { %>
+        <div class="actionBox owed">
+      <% } %>
+          <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %></p>
+          <p><a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a> £<%= item.items.fee %></p>
+          <p><%= item.items.desc %></p>
         </div>
       <% }); %>
     </div>

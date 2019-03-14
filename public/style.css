@@ -269,6 +269,7 @@ a.btn {
   padding: 2vh 2vw;
   border: 1px solid;
   border-radius: 3px;
+  text-transform: capitalize;
   width :92vw;
 }
 .flash-success {
@@ -398,8 +399,8 @@ section header h1 {
   font-weight : bold;
   text-transform: capitalize;
 }
-.owed {
-   color: red;
+.actionBox .owed {
+  background-color: #f8d7da;
  }
 
 .toggle-content {
@@ -448,9 +449,9 @@ a.list-header {
   font-size: 1.25rem;
 }
 
-  .list a {
-    text-decoration: none;
-  }
+.list a {
+  text-decoration: none;
+}
 
 .centre {
   text-align: center;

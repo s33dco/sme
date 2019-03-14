@@ -177,8 +177,8 @@
   <div class="toggle-content" id="owed">
     <% owedList.forEach((invoice) => { %>
       <div class="actionBox">
-        <p class='title'><a href="/invoices/<%= invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a></p>
-        <p class='title'><a href="/clients/<%= invoice._id.clientLink%>"><%= invoice._id.client %></a>, £<%= invoice.total%></p>
+        <p class='title'><a href="/invoices/<%= invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a> £<%= invoice.total%></p>
+        <p class='title'><a href="/clients/<%= invoice._id.clientLink%>"><%= invoice._id.client %></a></p>
       </div>
     <% }); %>
   </div>
