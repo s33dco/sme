@@ -26,7 +26,8 @@
           <div class="toggle-content" id="labour">
             <%labourList.forEach((item) => { %>
               <div class="actionBox">
-                <p class='title'><%= moment(item.items.date).format("Do MMMM YYYY") %> (<a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a>), £<%= item.items.fee%></p>
+                <p class='title'><a href="/invoices/<%= item._id%>">Invoice <%= item.invNo %></a> £<%= item.items.fee%></p>
+                <p><%= moment(item.items.date).format("Do MMMM YYYY") %></p>
                 <p><%= item.items.desc %></p>
               </div>
             <% }); %>
