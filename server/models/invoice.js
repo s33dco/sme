@@ -166,7 +166,7 @@ InvoiceSchema.statics.sumOfOwedInvoices = async function () {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -182,7 +182,7 @@ InvoiceSchema.statics.sumOfPaidInvoices = async function () {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -266,7 +266,7 @@ InvoiceSchema.statics.numberOfInvoicesProducedBetween = async function (start, e
   ]);
 
   if (result.length === 0) {
-    return 'no'
+    return 0
   } else {
     return result[0].invoices;
   }
@@ -279,7 +279,7 @@ InvoiceSchema.statics.numberOfInvoicesPaidBetween = async function (start, end )
     {"$count": "invoices"}
   ]);
   if (result.length === 0) {
-    return 'none'
+    return 0
   } else {
     return result[0].invoices;
   }
@@ -295,7 +295,7 @@ InvoiceSchema.statics.sumOfPaidInvoicesBetween = async function (start, end) {
    ])
 
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -340,7 +340,7 @@ InvoiceSchema.statics.countItemsInvoicedBetween = async function (start, end){
     {"$count": "invoiceItems"}
   ]);
   if (result.length === 0) {
-    return "no"
+    return 0
   } else {
     return result[0].invoiceItems;
   }
@@ -354,7 +354,7 @@ InvoiceSchema.statics.countItemsPaidBetween = async function (start, end){
     {"$count": "invoiceItems"}
   ]);
   if (result.length === 0) {
-    return "none"
+    return 0
   } else {
     return result[0].invoiceItems;
   }
@@ -406,7 +406,7 @@ InvoiceSchema.statics.sumOfMaterialsPaidBetween = async function (start, end) {
     { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -437,7 +437,7 @@ InvoiceSchema.statics.sumOfExpensesPaidBetween = async function (start, end) {
     { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -469,7 +469,7 @@ InvoiceSchema.statics.sumOfLabourPaidBetween = async function (start, end) {
     { "$group"  : { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }

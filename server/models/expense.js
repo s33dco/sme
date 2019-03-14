@@ -33,7 +33,7 @@ expenseSchema.statics.sumOfExpenses = async function () {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -47,7 +47,7 @@ expenseSchema.statics.sumOfDeductionsBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -59,11 +59,6 @@ expenseSchema.statics.listOfExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, date:1, category:1, desc:1, amount:1 }},
   ]);
 };
-
-
-
-
-
 
 expenseSchema.statics.listOfficeExpensesBetween = async function (start, end) {
   return await this.aggregate([
@@ -81,7 +76,7 @@ expenseSchema.statics.sumOfficeExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -104,7 +99,7 @@ expenseSchema.statics.sumCarExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -127,7 +122,7 @@ expenseSchema.statics.sumStaffExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -150,7 +145,7 @@ expenseSchema.statics.sumResellingExpensesBetween = async function (start, end) 
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -173,7 +168,7 @@ expenseSchema.statics.sumLegalExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -196,7 +191,7 @@ expenseSchema.statics.sumMktgExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
@@ -219,13 +214,11 @@ expenseSchema.statics.sumClothingExpensesBetween = async function (start, end) {
     {"$project" : { _id:0, "total":1}}
   ]);
   if (result.length === 0) {
-    return "0.00"
+    return 0
   } else {
     return result[0].total;
   }
 };
-
-
 
 
 let Expense = mongoose.model('Expense', expenseSchema);
