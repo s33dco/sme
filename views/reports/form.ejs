@@ -1,34 +1,38 @@
-<div class="form-header">
-  <% if (Object.keys(errors).length === 0) { %>
-    <h1>Run reports by date.</h1>
-  <% } else { %>
-    <h2 class="errors-heading">Oops, please correct the following:</h2>
-    <ul class="errors-list">
-      <% Object.values(errors).forEach(error => { %>
-        <li><%= error.msg %></li>
-      <% }) %>
-    </ul>
-  <% } %>
+<div class="actionBox">
+  <header>
+    <h1>Reports.</h1>
+  </header>
+
+  <div class="form-header">
+    <% if (Object.keys(errors).length > 0) { %>
+      <h2 class="errors-heading">Have another go...</h2>
+      <ul class="errors-list">
+        <% Object.values(errors).forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+
+  <form method="get" action="/reports/viewer" novalidate>
+    <div class="form-field <%= errors.start ? 'form-field-invalid' : '' %>">
+      <label for="start">Start Date</label>
+      <input class="input" name="start" type="date" value="<%=moment(data.start).format('YYYY-MM-DD')%>" />
+      <% if (errors.start) { %>
+        <div class="error"><%= errors.start.msg %></div>
+      <% } %>
+    </div>
+
+    <div class="form-field <%= errors.end ? 'form-field-invalid' : '' %>">
+      <label for="end">End Date</label>
+      <input class="input" name="end" type="date" value="<%=moment(data.end).format('YYYY-MM-DD')%>" />
+      <% if (errors.end) { %>
+        <div class="error"><%= errors.end.msg %></div>
+      <% } %>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Run</button>
+    </div>
+  </form>
 </div>
-
-<form method="get" action="/reports/viewer" novalidate>
-  <div class="form-field <%= errors.start ? 'form-field-invalid' : '' %>">
-    <label for="start">Start Date</label>
-    <input class="input" name="start" type="date" value="<%=moment(data.start).format('YYYY-MM-DD')%>" />
-    <% if (errors.start) { %>
-      <div class="error"><%= errors.start.msg %></div>
-    <% } %>
-  </div>
-
-  <div class="form-field <%= errors.end ? 'form-field-invalid' : '' %>">
-    <label for="end">End Date</label>
-    <input class="input" name="end" type="date" value="<%=moment(data.end).format('YYYY-MM-DD')%>" />
-    <% if (errors.end) { %>
-      <div class="error"><%= errors.end.msg %></div>
-    <% } %>
-  </div>
-
-  <div class="form-actions">
-    <button class="btn" type="submit">Run</button>
-  </div>
-</form>

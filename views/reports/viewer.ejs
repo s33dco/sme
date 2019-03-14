@@ -14,14 +14,7 @@
     <p class="centre"><%=invoicesProduced%> created (<%=invoicesPaid%> paid)</p>
     <p class="centre"><%=itemsInvoiced%> items invoiced (<%=itemsPaid%> paid)</p>
   </div>
-
 </div>
-
-
-
-
-
-
 
 <div class="moneyIn">
   <a class='toggle btn info' href="#money-in">Money Received £<%=incomings%></a>
@@ -175,11 +168,11 @@
 </div>
 
 <% if (owed) { %>
-  <a class='toggle btn info' href="#owed">Invoices owed £<%=owed%></a>
+  <a class='toggle btn info' href="#owed">Unpaid Invoices £<%=owed%></a>
   <div class="toggle-content" id="owed">
     <% owedList.forEach((invoice) => { %>
       <div class="actionBox">
-        <p class='title'><a href="/invoices/<%= invoice._id.invoices_id%>">Invoice <%= invoice._id.invoice %></a></p>
+        <p class='title'><a href="/invoices/<%= invoice._id.invoice_id%>">Invoice <%= invoice._id.invoice %></a></p>
         <p class='title'><a href="/clients/<%= invoice._id.clientLink%>"><%= invoice._id.client %></a>, £<%= invoice.total%></p>
       </div>
     <% }); %>

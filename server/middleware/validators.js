@@ -90,18 +90,18 @@ module.exports = {
       .normalizeEmail(),
     check('phone')
       .matches(/^\d+$/)
-      .withMessage("phone digits only")
+      .withMessage("numbers only for phone")
       .isLength({ min: 11 })
       .withMessage("too short!")
       .isLength({ max: 16 })
       .withMessage("too long!"),
     check('address1')
       .matches(/(\w(\s)?)+/)
-      .withMessage('just words and numbers'),
+      .withMessage('just words and numbers for first line of address'),
     check('address2')
       .optional({checkFalsy:true}).isLength({ min: 1 })
       .matches(/(\w(\s)?)+/)
-      .withMessage('just words'),
+      .withMessage('just words in address field'),
     check('address3')
       .optional({checkFalsy:true}).isLength({ min: 1 })
       .matches(/(\w(\s)?)+/)
@@ -244,7 +244,7 @@ module.exports = {
                 return value;
               }
         })
-        .withMessage("must be later than start date.")
+        .withMessage("can't be before start date.")
       ],
 
   download: [
@@ -263,7 +263,7 @@ module.exports = {
                 return value;
               }
         })
-        .withMessage("must be later than start date."),
+        .withMessage("can't be before start date."),
       check('type')
         .isIn(['deductions', 'incoming'])
         .withMessage('only deductions or incoming available')

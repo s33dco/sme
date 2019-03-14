@@ -10,20 +10,22 @@
 
 <div class="actionBox">
   <h3>Contact Details.</h3>
-  <p>farewell : <%= detail.farewell %></p>
-  <p class='capitalize'>contact name : <%= detail.contact %></p>
-  <p>contact email : <%= detail.email %></p>
-  <p>contact number : <%= detail.phone %></p>
+  <p class='capitalize'><%= detail.address1%></p>
+  <% if (detail.address2) { %>
+   <p class='capitalize'><%= detail.address2%></p>
+  <% } %>
+  <% if (detail.address3) { %>
+   <p class='capitalize'><%= detail.address3%></p>
+  <% } %>
+  <p class='capitalize'><%= detail.postcode%></p>
+  <p><%= detail.email %></p>
+  <p><%= detail.phone %></p>
 </div>
 
 <div class="actionBox">
-  <h3>Address Details.</h3>
-  <p class='capitalize'><%= detail.address1 %></p>
-  <p class='capitalize'><%= detail.address2 %></p>
-  <% if (detail.address3) { %>
-   <p class='capitalize'><%= detail.address3 %></p>
-  <% } %>
-  <p class='capitalize'><%= detail.postcode %></p>
+  <h3>Signature.</h3>
+  <p><%= detail.farewell %></p>
+  <p class='capitalize'><%= detail.contact %></p>
 </div>
 
 <div class="actionBox">

@@ -114,7 +114,7 @@ div.wrapper {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  line-height: 1.1;
+  line-height: 1.25;
   min-height: 100vh;
   width: 100vw;
 }
@@ -427,6 +427,14 @@ div.report-items {
   border-radius: 3px;
   box-shadow: 0 3px 4px rgba(0,0,0,.05);
   line-height: 1.75;
+}
+
+.actionBox header h1 {
+  font-size: 1.5em;
+}
+
+.actionBox p {
+  line-height: 2;
 }
 
 a.list-header {

@@ -1,143 +1,146 @@
-<div class="form-header">
-  <% if (Object.keys(errors).length === 0) { %>
+<div class="actionBox">
+  <header>
     <h1>Editing Invoice Info.</h1>
-  <% } else { %>
-    <h2 class="errors-heading">Oops, please correct the following:</h2>
-    <ul class="errors-list">
-      <% Object.values(errors).forEach(error => { %>
-        <li><%= error.msg %></li>
-      <% }) %>
-    </ul>
-  <% } %>
-</div>
-
-<form method="POST" action="/details?_method=POST" novalidate>
-
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-  <fieldset class='details'>
-    <h4>Contact Details.</h4>
-    <div class="form-field <%= errors.business ? 'form-field-invalid' : '' %>">
-      <label for="business">Business Name</label>
-      <input class="input" name="business" type="text" value="<%=data.business%>" />
-      <% if (errors.business) { %>
-        <div class="error"><%= errors.business.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.farewell ? 'form-field-invalid' : '' %>">
-      <label for="farewell">Farewell</label>
-      <input class="input" name="farewell" type="text" value="<%=data.farewell%>" />
-      <% if (errors.farewell) { %>
-        <div class="error"><%= errors.farewell.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.contact ? 'form-field-invalid' : '' %>">
-      <label for="contact">Contact Name</label>
-      <input class="input" name="contact" type="text" value="<%=data.contact%>" />
-      <% if (errors.contact) { %>
-        <div class="error"><%= errors.contact.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
-      <label for="email">Contact Email</label>
-      <input class="input" name="email" type="email" value="<%=data.email%>" />
-      <% if (errors.email) { %>
-        <div class="error"><%= errors.email.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.phone ? 'form-field-invalid' : '' %>">
-      <label for="phone">Contact Phone</label>
-      <input class="input" name="phone" type="text" value="<%=data.phone%>" />
-      <% if (errors.phone) { %>
-        <div class="error"><%= errors.phone.msg %></div>
-      <% } %>
-    </div>
-
-    <h4>Address Details</h4>
-
-      <div class="form-field <%= errors.address1 ? 'form-field-invalid' : '' %>">
-        <label for="address1">Address 1</label>
-        <input class="input" id="address1" name="address1" type="text" value="<%= data.address1 %>" />
-        <% if (errors.address1) { %>
-          <div class="error"><%= errors.address1.msg %></div>
-        <% } %>
-      </div>
-
-      <div class="form-field <%= errors.address2 ? 'form-field-invalid' : '' %>">
-        <label for="address2">Address 2</label>
-        <input class="input" id="address2" name="address2" type="text" value="<%= data.address2 %>" />
-        <% if (errors.address2) { %>
-          <div class="error"><%= errors.address2.msg %></div>
-        <% } %>
-      </div>
-
-      <div class="form-field <%= errors.address3 ? 'form-field-invalid' : '' %>">
-        <label for="address3">Address 3</label>
-        <input class="input" id="address3" name="address3" type="text" value="<%= data.address3 %>" />
-        <% if (errors.address3) { %>
-          <div class="error"><%= errors.address3.msg %></div>
-        <% } %>
-      </div>
-
-      <div class="form-field <%= errors.postcode ? 'form-field-invalid' : '' %>">
-        <label for="postcode">Postcode</label>
-        <input class="input" id="postcode" name="postcode" type="text" value="<%= data.postcode %>" />
-        <% if (errors.postcode) { %>
-          <div class="error"><%= errors.postcode.msg %></div>
-        <% } %>
-      </div>
-
-
-
-    <h4>Pay Details</h4>
-
-    <div class="form-field <%= errors.utr ? 'form-field-invalid' : '' %>">
-      <label for="utr">Tax Reference</label>
-      <input class="input" name="utr" type="text" value="<%=data.utr%>" />
-      <% if (errors.utr) { %>
-        <div class="error"><%= errors.utr.msg %></div>
-      <% } %>
-    </div>
-    <div class="form-field <%= errors.bank ? 'form-field-invalid' : '' %>">
-      <label for="bank">Bank Name</label>
-      <input class="input" name="bank" type="text" value="<%=data.bank%>" />
-      <% if (errors.bank) { %>
-        <div class="error"><%= errors.bank.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.sortcode ? 'form-field-invalid' : '' %>">
-      <label for="sortcode">Sort Code</label>
-      <input class="input" name="sortcode" type="text" value="<%=data.sortcode%>" />
-      <% if (errors.sortcode) { %>
-        <div class="error"><%= errors.sortcode.msg %></div>
-      <% } %>
-    </div>
-
-    <div class="form-field <%= errors.accountNo ? 'form-field-invalid' : '' %>">
-      <label for="accountNo">Account Number</label>
-      <input class="input" name="accountNo" type="text" value="<%=data.accountNo%>" />
-      <% if (errors.accountNo) { %>
-        <div class="error"><%= errors.accountNo.msg %></div>
-      <% } %>
-    </div>
-
-    <h4>Invoice Terms.</h4>
-    <div class="form-field <%= errors.terms ? 'form-field-invalid' : '' %>">
-      <label for="terms">Payment Terms</label>
-      <textarea class="input" name="terms" type="text" rows='4'><%=data.terms%></textarea>
-      <% if (errors.terms) { %>
-        <div class="error"><%= errors.terms.msg %></div>
-      <% } %>
-    </div>
-
-  </fieldset>
-
-  <div class="form-actions">
-    <button class="btn" type="submit">Update</button>
+  </header>
+  <div class="form-header">
+    <% if (Object.keys(errors).length > 0) { %>
+      <h2 class="errors-heading">Have another go...</h2>
+      <ul class="errors-list">
+        <% Object.values(errors).forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
   </div>
-</form>
+
+  <form method="POST" action="/details?_method=POST" novalidate>
+
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <fieldset class='details'>
+      <h4>Contact Details.</h4>
+      <div class="form-field <%= errors.business ? 'form-field-invalid' : '' %>">
+        <label for="business">Business Name</label>
+        <input class="input" name="business" type="text" value="<%=data.business%>" />
+        <% if (errors.business) { %>
+          <div class="error"><%= errors.business.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.farewell ? 'form-field-invalid' : '' %>">
+        <label for="farewell">Farewell</label>
+        <input class="input" name="farewell" type="text" value="<%=data.farewell%>" />
+        <% if (errors.farewell) { %>
+          <div class="error"><%= errors.farewell.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.contact ? 'form-field-invalid' : '' %>">
+        <label for="contact">Contact Name</label>
+        <input class="input" name="contact" type="text" value="<%=data.contact%>" />
+        <% if (errors.contact) { %>
+          <div class="error"><%= errors.contact.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
+        <label for="email">Contact Email</label>
+        <input class="input" name="email" type="email" value="<%=data.email%>" />
+        <% if (errors.email) { %>
+          <div class="error"><%= errors.email.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.phone ? 'form-field-invalid' : '' %>">
+        <label for="phone">Contact Phone</label>
+        <input class="input" name="phone" type="text" value="<%=data.phone%>" />
+        <% if (errors.phone) { %>
+          <div class="error"><%= errors.phone.msg %></div>
+        <% } %>
+      </div>
+
+      <h4>Address Details</h4>
+
+        <div class="form-field <%= errors.address1 ? 'form-field-invalid' : '' %>">
+          <label for="address1">Address 1</label>
+          <input class="input" id="address1" name="address1" type="text" value="<%= data.address1 %>" />
+          <% if (errors.address1) { %>
+            <div class="error"><%= errors.address1.msg %></div>
+          <% } %>
+        </div>
+
+        <div class="form-field <%= errors.address2 ? 'form-field-invalid' : '' %>">
+          <label for="address2">Address 2</label>
+          <input class="input" id="address2" name="address2" type="text" value="<%= data.address2 %>" />
+          <% if (errors.address2) { %>
+            <div class="error"><%= errors.address2.msg %></div>
+          <% } %>
+        </div>
+
+        <div class="form-field <%= errors.address3 ? 'form-field-invalid' : '' %>">
+          <label for="address3">Address 3</label>
+          <input class="input" id="address3" name="address3" type="text" value="<%= data.address3 %>" />
+          <% if (errors.address3) { %>
+            <div class="error"><%= errors.address3.msg %></div>
+          <% } %>
+        </div>
+
+        <div class="form-field <%= errors.postcode ? 'form-field-invalid' : '' %>">
+          <label for="postcode">Postcode</label>
+          <input class="input" id="postcode" name="postcode" type="text" value="<%= data.postcode %>" />
+          <% if (errors.postcode) { %>
+            <div class="error"><%= errors.postcode.msg %></div>
+          <% } %>
+        </div>
+
+
+
+      <h4>Pay Details</h4>
+
+      <div class="form-field <%= errors.utr ? 'form-field-invalid' : '' %>">
+        <label for="utr">Tax Reference</label>
+        <input class="input" name="utr" type="text" value="<%=data.utr%>" />
+        <% if (errors.utr) { %>
+          <div class="error"><%= errors.utr.msg %></div>
+        <% } %>
+      </div>
+      <div class="form-field <%= errors.bank ? 'form-field-invalid' : '' %>">
+        <label for="bank">Bank Name</label>
+        <input class="input" name="bank" type="text" value="<%=data.bank%>" />
+        <% if (errors.bank) { %>
+          <div class="error"><%= errors.bank.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.sortcode ? 'form-field-invalid' : '' %>">
+        <label for="sortcode">Sort Code</label>
+        <input class="input" name="sortcode" type="text" value="<%=data.sortcode%>" />
+        <% if (errors.sortcode) { %>
+          <div class="error"><%= errors.sortcode.msg %></div>
+        <% } %>
+      </div>
+
+      <div class="form-field <%= errors.accountNo ? 'form-field-invalid' : '' %>">
+        <label for="accountNo">Account Number</label>
+        <input class="input" name="accountNo" type="text" value="<%=data.accountNo%>" />
+        <% if (errors.accountNo) { %>
+          <div class="error"><%= errors.accountNo.msg %></div>
+        <% } %>
+      </div>
+
+      <h4>Invoice Terms.</h4>
+      <div class="form-field <%= errors.terms ? 'form-field-invalid' : '' %>">
+        <label for="terms">Payment Terms</label>
+        <textarea class="input" name="terms" type="text" rows='4'><%=data.terms%></textarea>
+        <% if (errors.terms) { %>
+          <div class="error"><%= errors.terms.msg %></div>
+        <% } %>
+      </div>
+
+    </fieldset>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Update</button>
+    </div>
+  </form>
+</div>

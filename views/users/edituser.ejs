@@ -1,21 +1,24 @@
-<div class="form-header">
-  <% if (Object.keys(errors).length === 0) { %>
+<div class="actionBox">
+  <header>
     <h1>Editing <%=data.firstName%> <%=data.lastName%>.</h1>
-  <% } else { %>
-    <h2 class="errors-heading">Oops, please correct the following:</h2>
-    <ul class="errors-list">
-      <% Object.values(errors).forEach(error => { %>
-        <li><%= error.msg %></li>
-      <% }) %>
-    </ul>
-  <% } %>
-</div>
-
-<form method="post" action="/users/<%= data._id%>?_method=put" novalidate>
-
-  <% include ../partials/userfields %>
-
-  <div class="form-actions">
-    <button class="btn" type="submit">Update</button>
+  </header>
+  <div class="form-header">
+    <% if (Object.keys(errors).length > 0) { %>
+      <h2 class="errors-heading">Have another go...</h2>
+      <ul class="errors-list">
+        <% Object.values(errors).forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
   </div>
-</form>
+
+  <form method="post" action="/users/<%= data._id%>?_method=put" novalidate>
+
+    <% include ../partials/userfields %>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Update</button>
+    </div>
+  </form>
+</div>
