@@ -5,7 +5,7 @@
 </div>
 
 <% if (invoices.length > 0) { %>
-    <a class='toggle btn info' href="#previousInvoices">Previous Invoices</a>
+    <a class='toggle btn info' href="#previousInvoices">Previous Invoices (<%=invoices.length%>)</a>
     <div class="toggle-content" id="previousInvoices">
       <% invoices.forEach((invoice) => { %>
         <div class="actionBox">

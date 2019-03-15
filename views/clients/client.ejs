@@ -14,7 +14,7 @@
 
 <% if (itemsList.length > 0) { %>
   <div class="actionBox">
-    <a class='toggle btn info' href="#previousItems">Previous Items</a>
+    <a class='toggle btn info' href="#previousItems">Previous Items (<%= itemsList.length %>)</a>
     <div class="toggle-content" id="previousItems">
       <% itemsList.forEach((item) => { %>
       <% if (item.paid) { %>
