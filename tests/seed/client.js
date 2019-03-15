@@ -17,8 +17,8 @@ const makeFrank = (async () => {
     name: 'frank',
     email: 'frank@frank.com',
     phone: '07724367851',
-    address1: faker.address.streetAddress(),
-    address2: faker.address.county(),
+    address1: 'Frank street',
+    address2: 'Franksville',
     postcode: 'ab1 1ba'
   }).save();
 });

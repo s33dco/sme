@@ -40,7 +40,7 @@
 
   <div class="form-field <%= errors.amount ? 'form-field-invalid' : '' %>">
     <label for="amount">Amount.</label>
-    <input class='input' id='amount' name='amount' type='text' value="<%=data.amount%>">
+    <input class='input' id='amount' name='amount' type='number' value="<%=data.amount%>">
     <% if (errors.amount) { %>
       <div class="error"><%= errors.amount.msg %></div>
     <% } %>
