@@ -94,28 +94,28 @@ describe('Invoice', () => {
     it('sumOfInvoice() should add up the items on an invoice', async () => {
       const invoice = await Invoice.findOne({});
       const res = await Invoice.sumOfInvoice(invoice._id);
-      expect(res).toBe(100.00);
+      expect(res.toJSON()).toMatchObject({"$numberDecimal": "100.00"});
     });
 
     it('sumOfPaidInvoices() should sum paid invoices', async () => {
       const res = await Invoice.sumOfPaidInvoices();
-      expect(res).toContain(500);
+      expect(res.toJSON()).toMatchObject({"$numberDecimal": "500.00"});
     });
 
     it('sumOfOwedInvoices() should sum unpaid invoices', async () => {
       const res = await Invoice.sumOfOwedInvoices();
-      expect(res).toEqual(500);
+      expect(res.toJSON()).toMatchObject({"$numberDecimal": "500.00"});
     });
 
     it('totalBilledtoClient() should return the sum of all invoice items for clientId', async () => {
       let clientId = clientIds.pop();
       const res = await Invoice.totalBilledtoClient(clientId);
-      expect(res).toEqual(200);
+      expect(res.toJSON()).toMatchObject({"$numberDecimal": "200.00"});
     });
 
     it('should work out the average daily earnings', async () => {
-      const res = await Invoice.averageWeeklyEarnings(12);
-      expect(res).toEqual(200);
+      const res = await Invoice.averageWeeklyGrossEarnings(7);
+      expect(res.toJSON()).toMatchObject({"$numberDecimal": "500"});
     });
 
     // InvoiceSchema.statics.newestInvoiceNumber

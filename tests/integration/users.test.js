@@ -470,7 +470,7 @@ describe('/users', () => {
                       .send(properties);
 
       expect(res.status).toBe(200);
-      expect(res.text).toMatch(/Oops/)
+      expect(res.text).toMatch(/Have another go/)
       let count = await User.find().countDocuments();
       expect(count).toBe(3)
     });
@@ -537,7 +537,7 @@ describe('/users', () => {
                               .send(properties);
       expect(res.status).toBe(302);
       const {firstName} = await User.findOne({_id : userId });
-      expect(firstName).toMatch(/Tarquin/);
+      expect(firstName).toMatch(/tarquin/);
     });
 
     it('redisplays form with invalid form data', async ()=> {
@@ -551,7 +551,7 @@ describe('/users', () => {
                               .set('Cookie', cookies)
                               .send(properties);
       expect(res.status).toBe(200);
-      expect(res.text).toMatch(/Oops/);
+      expect(res.text).toMatch(/Have another go/);
     });
 
     it('returns 403 with invalid _csrf token', async ()=> {

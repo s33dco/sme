@@ -14,12 +14,16 @@ const makeUnpaidInvoice =  async (id) => {
                 _id         : id,
                 name        : 'client name',
                 email       : faker.internet.email(),
-                phone       : "07967355526"
+                phone       : "07967355526",
+                address1: faker.address.streetAddress(),
+                address2: faker.address.county(),
+                postcode: faker.address.zipCode()
             },
-            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:'20.00'},
-                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:'40.00'},
-                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:'40.00'}],
+            items      : [{date: faker.date.between(then(), now()), type:'Labour',desc:'working hard', fee:'20.00'},
+                          {date: faker.date.between(then(), now()), type:'Materials',desc:'working very hard', fee:'40.00'},
+                          {date: faker.date.between(then(), now()), type:'Expense',desc:'work even harder', fee:'40.00'}],
             details    : {
+                business    : faker.company.companyName(),
                 utr         : "1234567891",
                 email       : "myemail@email.com",
                 phone       : "07865356742",
@@ -27,7 +31,11 @@ const makeUnpaidInvoice =  async (id) => {
                 sortcode    : "00-00-00",
                 accountNo   : "12345678",
                 terms       : "cash is king",
-                contact     : "myemail@example.com"
+                contact     : "myemail@example.com",
+                address1    : faker.address.streetAddress(),
+                address2    : faker.address.county(),
+                postcode    : faker.address.zipCode(),
+                farewell    : 'see ya later'
             },
             paid        : false
           }).save();
@@ -42,20 +50,28 @@ const makePaidInvoice =  async (id) => {
                 _id         : id,
                 name        : 'client name',
                 email       : faker.internet.email(),
-                phone       : "07967355526"
+                phone       : "07967355526",
+                address1: faker.address.streetAddress(),
+                address2: faker.address.county(),
+                postcode: faker.address.zipCode()
             },
-            items      : [{date: faker.date.between(then(), now()), desc:'working hard', fee:'20.00'},
-                          {date: faker.date.between(then(), now()), desc:'working very hard', fee:'40.00'},
-                          {date: faker.date.between(then(), now()), desc:'work even harder', fee:'40.00'}],
+            items      : [{date: faker.date.between(then(), now()), type:'Labour',desc:'working hard', fee:'20.00'},
+                          {date: faker.date.between(then(), now()), type:'Materials',desc:'working very hard', fee:'40.00'},
+                          {date: faker.date.between(then(), now()), type:'Expense',desc:'work even harder', fee:'40.00'}],
             details    : {
-                utr         : "1234567891",
-                email       : "myemail@email.com",
-                phone       : "07865356742",
-                bank        : "the bank",
-                sortcode    : "00-00-00",
-                accountNo   : "12345678",
-                terms       : "cash is king",
-                contact     : "myemail@example.com"
+              business    : faker.company.companyName(),
+              utr         : "1234567891",
+              email       : "myemail@email.com",
+              phone       : "07865356742",
+              bank        : "the bank",
+              sortcode    : "00-00-00",
+              accountNo   : "12345678",
+              terms       : "cash is king",
+              contact     : "myemail@example.com",
+              address1    : faker.address.streetAddress(),
+              address2    : faker.address.county(),
+              postcode    : faker.address.zipCode(),
+              farewell    : 'see ya later'
             },
             paid        : true,
             datePaid    : Date.now(),

@@ -1,5 +1,5 @@
-const {User}  = require('../../server/models/user');
-const faker     = require('faker/locale/en');
+const {User} = require('../../server/models/user');
+const faker  = require('faker/locale/en');
 
 const makeUser = ( async () => {
   return await new User({

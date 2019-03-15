@@ -453,8 +453,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Materials',desc:'jump a stile',fee: '25.00' }]
                   }
 
       const res = await request(app).post('/invoices')
@@ -520,8 +520,8 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -534,14 +534,16 @@ describe('/invoices', () => {
       expect(number).toEqual(2);
     });
 
-    it('displayed form when invalid data submitted and display message', async ()=> {
-      clientId =  client._id;
+    it('redisplay form when invalid data submitted and display message', async ()=> {
+
       await getNewInvoiceForm();
       properties = { _csrf: csrfToken,
-                    clientId: client._id.toHexString(),
+                    clientId: clientId,
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
-                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.'
+                    message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -552,7 +554,7 @@ describe('/invoices', () => {
       expect(res.status).toBe(200);
       number = await Invoice.find().countDocuments();
       expect(number).toEqual(2);
-      expect(res.text).toMatch(/please correct/)
+      expect(res.text).toMatch(/Have another/)
     });
 
     it("returns 200 and error message for an invalid client id", async ()=> {
@@ -562,8 +564,8 @@ describe('/invoices', () => {
                     invDate: moment().format('YYYY-MM-DD'),
                     invNo: 12,
                     message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '25.00' }]
+                    items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                            {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '25.00' }]
                     }
 
       const res = await request(app).post('/invoices')
@@ -575,7 +577,7 @@ describe('/invoices', () => {
       expect(res.text).toMatch(/Select a Client/)
       number = await Invoice.find().countDocuments();
       expect(number).toEqual(2);
-      expect(res.text).toMatch(/please correct/)
+      expect(res.text).toMatch(/Have another go/)
     });
 
     it("returns 200 and error for a valid client id not in db", async ()=> {
@@ -665,8 +667,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'new message',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
 
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
@@ -684,14 +686,14 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: '',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
                               .send(properties);
       expect(res.status).toBe(200);
-      expect(res.text).toMatch(/Oops/);
+      expect(res.text).toMatch(/Have another go/);
     });
 
     it('returns 403 with invalid _csrf token', async ()=> {
@@ -701,8 +703,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -718,8 +720,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -735,8 +737,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')
                               .set('Cookie', cookies)
@@ -751,8 +753,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       invoiceId = 'fake_id';
       const res = await request(app).put(`/invoice/${invoiceId}`)
                               .type('form')
@@ -770,8 +772,8 @@ describe('/invoices', () => {
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
-                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), desc:'run a mile',fee: '50.00' },
-                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), desc:'jump a stile',fee: '50.00' }]};
+                  items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
+                          {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
       invoiceId = mongoose.Types.ObjectId();
       const res = await request(app).put(`/invoices/${invoiceId}`)
                               .type('form')

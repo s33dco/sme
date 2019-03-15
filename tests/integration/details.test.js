@@ -22,6 +22,10 @@ beforeEach( async() => {
   sortcode = details.sortcode;
   accountNo = details.accountNo;
   terms = details.terms;
+  business = details.business;
+  address1 = details.address1;
+  address2 = details.address2;
+  postcode = details.postcode
 });
 
 afterEach( async()=> {
@@ -38,6 +42,7 @@ describe('GET /', async ()=> {
   it('retrieves the details', async () => {
     const res = await getDetails();
     expect(res.status).toBe(200);
+    expect(res.text).toContain(business);
     expect(res.text).toContain(farewell);
     expect(res.text).toContain(contact);
     expect(res.text).toContain(email);
@@ -47,6 +52,9 @@ describe('GET /', async ()=> {
     expect(res.text).toContain(sortcode);
     expect(res.text).toContain(accountNo);
     expect(res.text).toContain(terms);
+    expect(res.text).toContain(address1);
+    expect(res.text).toContain(address2);
+    expect(res.text).toContain(postcode);
   });
 
   it('returns 401 if no token', async () => {
@@ -123,7 +131,11 @@ describe('POST /', async ()=> {
                     bank,
                     sortcode: '23-23-23',
                     accountNo,
-                    terms};
+                    terms,
+                    business,
+                    address1,
+                    address2,
+                    postcode};
     const res = await postForm();
     expect(res.status).toBe(302);
     let {farewell} = await Detail.findOne();
@@ -144,7 +156,7 @@ describe('POST /', async ()=> {
                     terms};
     const res = await postForm();
     expect(res.status).toBe(200);
-    expect(res.text).toMatch(/Oops/);
+    expect(res.text).toMatch(/Have another go/);
   });
 
   it('returns a 403 with invalid csrf token', async () => {

@@ -3,6 +3,7 @@ const faker     = require('faker/locale/en');
 
 const makeDetails = ( async () => {
   return await new Detail({
+    business  : 'my business name',
     utr       : 1234567898,
     email     : faker.internet.email(),
     phone     : '07956245637',
@@ -11,7 +12,10 @@ const makeDetails = ( async () => {
     accountNo : 23456789,
     terms     : 'pay now',
     farewell  : 'yours',
-    contact   : 'it is me'
+    contact   : 'it is me',
+    address1  : faker.address.streetAddress(),
+    address2  : faker.address.county(),
+    postcode  : 'ab1 1ba'
   }).save();
 });
 

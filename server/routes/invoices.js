@@ -77,7 +77,6 @@ router.get('/new', [auth, admin], async (req, res) => {
 
 router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
 
-
     let errors = validationResult(req);
 
     if (!errors.isEmpty()) {
