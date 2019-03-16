@@ -6,10 +6,8 @@
 </header>
 
 <div class="edit">
-  <form method="get" action="/users/edit/<%= user._id %>" novalidate>
-    <div class="form-actions">
-      <button class="btn" type="submit">Edit</button>
-    </div>
+  <form>
+    <a href="/users/edit/<%= user._id %>" class="form-actions btn title">Edit <%=user.firstName%></a>
   </form>
 </div>
 

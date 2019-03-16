@@ -32,12 +32,12 @@
 
 <% if (admin) { %>
   <div class="edit">
-    <form method="get" action="/clients/edit/<%=client._id%>" novalidate>
-      <div class="form-actions">
-        <button class="btn" type="submit">Edit Details</button>
-      </div>
+    <form>
+      <a href="/clients/edit/<%=client._id%>" class="form-actions btn title">
+        Edit <%=client.name%></a>
     </form>
   </div>
+
   <div class="delete">
     <form method="post" action="/clients?_method=delete" novalidate>
       <input type="hidden" name="_csrf" value="<%=csrfToken%>">

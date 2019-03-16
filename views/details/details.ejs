@@ -41,10 +41,6 @@
   <p><%= detail.terms %></p>
 </div>
 
-
-<form method="get" action="/details/edit" novalidate>
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <div class="form-actions">
-    <button class="btn" type="submit">Edit</button>
-  </div>
+<form>
+  <a href="/details/edit" class="form-actions btn title">Edit Details</a>
 </form>

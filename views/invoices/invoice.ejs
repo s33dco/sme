@@ -93,10 +93,9 @@
 
 <% if (admin) { %>
   <div class="edit">
-    <form method="get" action="/invoices/edit/<%= invoice._id %>" novalidate>
-      <div class="form-actions">
-        <button class="btn" type="submit">Edit Invoice</button>
-      </div>
+    <form>
+      <a href="/invoices/edit/<%= invoice._id %>" class="form-actions btn title">
+        Edit Invoice</a>
     </form>
   </div>
 
