@@ -43,7 +43,7 @@ router.get('/', auth, async (req, res) => {
 
       res.render('dashboard', {
         pageTitle: "Dashboard",
-        pageDescription: "Let's get paid!.",
+        pageDescription: "State of play",
         admin : req.user.isAdmin,
         csrfToken: req.csrfToken(),
         numberOfClients,

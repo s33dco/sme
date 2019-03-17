@@ -304,9 +304,9 @@ InvoiceSchema.statics.sumOfPaidInvoicesBetween = async function (start, end) {
 InvoiceSchema.statics.sumOfOwedInvoicesBetween = async function (start, end) {
     const result = await this.aggregate([
        {"$match" : {paid : false}},
+       {"$match" : {'invDate': {"$gte": new Date(start), "$lte": new Date(end)}}},
        {"$project" : {items:1}},
        {"$unwind" : "$items"},
-       {"$match" : {'items.date': {"$gte": new Date(start), "$lte": new Date(end)}}},
        {"$project": {"items.fee":1}},
        { "$group": { "_id":1, "total" : { "$sum" : "$items.fee"  }  }  }
      ])
