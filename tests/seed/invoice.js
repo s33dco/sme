@@ -3,7 +3,7 @@ const faker     = require('faker/locale/en');
 const mongoose  = require('mongoose');
 const moment = require('moment');
 const now = () => { return moment().format('YYYY MM DD') };
-const then = () => { return moment().subtract(14, 'days').calendar();}
+const then = () => { return moment().subtract(13, 'days').calendar();}
 
 const makeUnpaidInvoice =  async (id) => {
   return await new Invoice({

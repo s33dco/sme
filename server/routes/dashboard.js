@@ -25,11 +25,12 @@ router.get('/', auth, async (req, res) => {
 
       const title               = businessName
       const numberOfClients     = uniqueClients;
-      const firstDate           = firstItem;
+      const start               = moment(firstItem).startOf('day').toISOString();
+      const end                 = moment().endOf('day').toISOString();
       const unpaidInvoiceList   = unpaidInvoices;
       const moneyDue            = sumOfOwed;
       const moneyIn             = sumOfPaid;
-      const tradingDays         = moment(Date.now()).diff(moment(firstDate), 'days');
+      const tradingDays         = moment(end).diff(moment(start), 'days') + 1;
       const items               = noItems;
       const invoices            = noInvoices;
       const sumOfOutgoings      = outgoings
