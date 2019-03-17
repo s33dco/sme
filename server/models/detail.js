@@ -8,9 +8,9 @@ let detailSchema = new mongoose.Schema({
     bank      : {type:String, lowercase: true, required: true},
     sortcode  : {type:String, required: true},
     accountNo : {type:String, required: true},
-    terms     : {type:String, required: true, lowercase: true,},
-    farewell  : {type:String, required: true, lowercase: true,},
-    contact   : {type:String, required: true, lowercase: true,},
+    terms     : {type:String, required: true, lowercase: true},
+    farewell  : {type:String, required: true, lowercase: true},
+    contact   : {type:String, required: true, lowercase: true},
     address1: {
       type: String,
       required: true,

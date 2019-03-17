@@ -132,6 +132,13 @@ describe('/reports', () => {
       expect(res.status).toBe(401);
     });
 
+    it('should redisplay form if invalid parameters sent', async () => {
+      const res = await request(app).get(`/reports/viewer?start=tonyHadlee&end=SpandauBallet`)
+              .set('Cookie', `token=${token}`)
+      expect(res.text).toContain('Have another go');
+    });
+
+
   });
 
 

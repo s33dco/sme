@@ -12,5 +12,13 @@ const makeExpense = ( async () => {
 });
 
 
+const makeExpenseCategory = ( async (category) => {
+  return await new Expense({
+    date: moment().format('YYYY-MM-DD'),
+    category: category,
+    desc: 'lots of equipment',
+    amount: 200.00
+  }).save();
+});
 
 module.exports = { makeExpense };
