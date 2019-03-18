@@ -2,7 +2,7 @@
   <% if (Object.keys(errors).length === 0) { %>
     <h1>Send us a message</h1>
   <% } else { %>
-    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <h2 class="errors-heading">Have another go:</h2>
     <ul class="errors-list">
       <% Object.values(errors).forEach(error => { %>
         <li><%= error.msg %></li>
@@ -13,9 +13,17 @@
 
 <form method="post" action="/contact" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
+    <label for="name">Name</label>
+    <input class="input" id="name" name="name" type="text" autofocus value="<%= data.name %>" />
+    <% if (errors.name) { %>
+      <div class="error"><%= errors.message.name %></div>
+    <% } %>
+  </div>
   <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
     <label for="message">Message</label>
-    <textarea class="input" id="message" name="message" rows="4" autofocus><%= data.message %></textarea>
+    <textarea class="input" id="message" name="message" rows="4" ><%= data.message %></textarea>
     <% if (errors.message) { %>
       <div class="error"><%= errors.message.msg %></div>
     <% } %>

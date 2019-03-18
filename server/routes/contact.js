@@ -42,7 +42,7 @@ router.post('/', validate.email, (req, res) => {
       })
     );
 
-    ejs.renderFile( "./views/contactEmail.ejs", {from : req.body.email, message: req.body.message}, function (error, data) {
+    ejs.renderFile( "./views/contactEmail.ejs", {from : req.body.email, message: req.body.message, name: req.body.name}, function (error, data) {
       if (error) {
         logger.error(`file error: ${error.message} - ${error.stack}`);
       } else {
@@ -50,7 +50,7 @@ router.post('/', validate.email, (req, res) => {
           from: req.body.email,
           to: config.get('SME_EMAIL'),
           replyTo: req.body.email,
-          subject: `${req.body.email} has sent you an email.`,
+          subject: `${req.body.name} has sent you an email.`,
           html: data };
 
         transporter.sendMail(options, (error, info) => {
@@ -59,8 +59,8 @@ router.post('/', validate.email, (req, res) => {
               req.flash('alert', `Your message could not be sent.`)
               res.redirect('/')
             } else {
-              logger.info(`Conact email from ${req.body.email} sent to ${config.get('SME_EMAIL')}`);
-              req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
+              logger.info(`Contact email from ${req.body.name} sent to ${config.get('SME_EMAIL')}`);
+              req.flash('success', `Thanks for the message ${req.body.name}! I‘ll be in touch :)`)
               res.redirect('/')
             }
         });

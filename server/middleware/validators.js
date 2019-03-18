@@ -63,7 +63,11 @@ module.exports = {
       .isEmail()
       .withMessage('That email doesn‘t look right')
       .trim()
-      .normalizeEmail()
+      .normalizeEmail(),
+    check('name')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words in the name.')
+      .trim()
   ],
 
   login: [
