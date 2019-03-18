@@ -242,7 +242,6 @@ router.post('/email', auth, async (req, res) => {
       const options = {
         from: 'noreply@jillpendleton.herokuapp.com',
         to: invoice.client.email,
-        bcc: invoice.details.email,
         replyTo: invoice.details.email,
         subject: `Invoice ${invoice.invNo} - ${moment(invoice.invDate).format("Do MMMM YYYY")}`,
         html: data };
