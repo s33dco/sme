@@ -5,9 +5,9 @@
     <p><%=errorMessage%></p>
   </header>
 
-  <% if (errorCode === (403 || 401)) { %>
+  <% if (errorCode == 403 || errorCode == 401) { %>
     <p class='centre'>Want to give it another go ?</p>
-    <p class='centre'>Why don't you <a href="/login">sign in again</a> then give it another go.</p>
+    <p class='centre'>Why don't you <a href="/login">sign in again</a> and give it another go.</p>
   <% } else { %>
   <p class='centre'>Still haven't found what you're looking for ?</p>
   <p class='centre'>Why don't you head <a href="/">home</a>.</p>
