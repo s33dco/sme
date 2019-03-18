@@ -4,7 +4,11 @@ const bodyParser        = require('body-parser');
 const moment            = require('moment');
 const {validationResult}= require('express-validator/check');
 const validate          = require('../middleware/validators')
-const logger              = require('../startup/logger');
+const nodemailer        = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+const ejs               = require('ejs');
+const logger            = require('../startup/logger');
+const config            = require('config');
 
 router.get('/', (req, res) => {
   res.render('contact', {
@@ -30,10 +34,38 @@ router.post('/', validate.email, (req, res) => {
 
       // send the email.....
 
+    const transporter = nodemailer.createTransport(
+      sendgridTransport({
+        auth: {
+          api_key: config.get('SENDGRID_API_PASSWORD')
+        },
+      })
+    );
 
-    req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
-    res.redirect('/')
+    ejs.renderFile( "./views/contactEmail.ejs", {from : req.body.email, message: req.body.message}, function (error, data) {
+      if (error) {
+        logger.error(`file error: ${error.message} - ${error.stack}`);
+      } else {
+        const options = {
+          from: req.body.email,
+          to: config.get('SME_EMAIL'),
+          replyTo: req.body.email,
+          subject: `${req.body.email} has sent you an email.`,
+          html: data };
 
+        transporter.sendMail(options, (error, info) => {
+            if (error) {
+              logger.error(`send email error: ${error.message} - ${error.stack}`);
+              req.flash('alert', `Your message could not be sent.`)
+              res.redirect('/')
+            } else {
+              logger.info(`Conact email from ${req.body.email} sent to ${config.get('SME_EMAIL')}`);
+              req.flash('success', `Thanks for the message ${req.body.email}! I‘ll be in touch :)`)
+              res.redirect('/')
+            }
+        });
+      };
+    });
 });
 
 module.exports = router

@@ -21,4 +21,4 @@ const makeExpenseCategory = ( async (category) => {
   }).save();
 });
 
-module.exports = { makeExpense };
+module.exports = { makeExpense, makeExpenseCategory };

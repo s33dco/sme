@@ -9,7 +9,7 @@
     <label for="clientId">Bill to</label>
     <select name="clientId">
       <% if (data.clientId && !errors.clientId) { %>
-        <option value="<%=selected._id%>"><%= selected.name%></option>
+        <option  value="<%=selected._id%>"><%= selected.name%></option>
       <% } else { %>
         <option value='select client'>select client</option>
         <%   } %>

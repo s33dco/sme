@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Invoice <%= invoice.invNo %></title>
+    <title>You've been emailed..</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -294,7 +294,7 @@
     </style>
   </head>
   <body class="">
-    <span class="preheader">This is preheader text. Some clients will show this text as a preview.</span>
+    <span class="preheader">You've got an email....</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -311,50 +311,10 @@
                     <tr>
                       <td>
                         <p>Hi there,</p>
-                        <p>Sometimes you just want to send a simple HTML email with a simple design and clear call to action. This is it.</p>
+                        <p>You've received an email from the web form.....</p>
+                        <p><%= message %></p>
 
 
-                        <div class="invoice-message">
-                          <h4><%= invoice.message%> </h4>
-                        </div>
-
-                        <header>
-                          <h1>Invoice <%= invoice.invNo %>.</h1>
-                        </header>
-
-                        <div class="invoice-header">
-                          <h2>Billed to : <%= invoice.client.name %></h2>
-                          <h3>BIlling Date: <%= moment(invoice.invDate).format("Do MMMM YYYY") %></h3>
-                        </div>
-
-                        <div class="billed-items">
-                          <h3>Invoiced Items.</h3>
-                          <% sortedItems.forEach((item) => { %>
-                            <p><%= moment(item.date).format("dddd Do MMMM  YYYY") %>.</p>
-                            <p><%= item.desc %></p>
-                            <p>£<%= item.fee %></p>
-                          <% }) %>
-                        </div>
-
-                        <div class="total-due">
-                            <h3>Total Due £<%= total %></h3>
-                            <% if (invoice.paid) { %>
-                            <h4>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h4>
-                            <% } %>
-                        </div>
-
-                        <div class="signature">
-                          <h4>kind regards,</br>
-                          <%= invoice.details.contact %></br>
-                          <%= invoice.details.email %></br>
-                          <%= invoice.details.phone %></h4>
-                        </div>
-
-                        <div class="pay-details align-center">
-                          <p>UTR : <%= invoice.details.utr %></p>
-                          <p><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
-                          <p>(<%= invoice.details.terms %>)</p>
-                        </div>
 
                       </td>
                     </tr>
@@ -369,16 +329,6 @@
             <!-- START FOOTER -->
             <div class="footer">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td class="content-block">
-                    <p>Thanks!</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content-block powered-by">
-                    Powered by <a href="http://htmlemail.io">HTMLemail</a>.
-                  </td>
-                </tr>
               </table>
             </div>
             <!-- END FOOTER -->

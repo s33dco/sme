@@ -103,7 +103,7 @@ describe('/reports', () => {
 
     it('should display export link', async () => {
       const res = await sendForm();
-      expect(res.text).toContain('Export received 4th March 2019 - 17th March 2019 to a .csv file');
+      expect(res.text).toContain(`Export received ${moment(start).format("Do MMMM YYYY")} - ${moment(end).format("Do MMMM YYYY")} to a .csv file`);
     });
 
     it('should display sum of deductions for period', async () => {
@@ -118,7 +118,7 @@ describe('/reports', () => {
 
     it('should display export link', async () => {
       const res = await sendForm();
-      expect(res.text).toContain('Export HMRC deductions 4th March 2019 - 17th March 2019 to a .csv file');
+      expect(res.text).toContain(`Export HMRC deductions ${moment(start).format("Do MMMM YYYY")} - ${moment(end).format("Do MMMM YYYY")} to a .csv file`);
     });
 
     it('should display sum of unpaid invoices', async () => {
@@ -137,8 +137,6 @@ describe('/reports', () => {
               .set('Cookie', `token=${token}`)
       expect(res.text).toContain('Have another go');
     });
-
-
   });
 
 
