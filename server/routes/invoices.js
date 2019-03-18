@@ -240,7 +240,7 @@ router.post('/email', auth, async (req, res) => {
       logger.error(`file error: ${error.message} - ${error.stack}`);
     } else {
       const options = {
-        from: 'jillpendleton@invoices.com',
+        from: invoice.details.email,
         to: invoice.client.email,
         bcc: invoice.details.email,
         replyTo: invoice.details.email,
