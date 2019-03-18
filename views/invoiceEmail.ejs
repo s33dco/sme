@@ -276,7 +276,6 @@
                       <td>
                         <div class="addresses">
                           <div class="from">
-                            <p>from :</p>
                             <p class='capitalize'><%=invoice.details.business%></p>
                             <p class='capitalize'><%=invoice.details.address1%></p>
                             <% if (invoice.details.address2){ %>
@@ -289,7 +288,6 @@
                           </div>
 
                           <div class="to">
-                            <p>to :</p>
                             <p class='capitalize'><%=invoice.client.name %></p>
                             <p class='capitalize'><%=invoice.client.address1%></p>
                             <% if (invoice.client.address2){ %>
@@ -303,7 +301,7 @@
                         </div>
 
                         <header class="align-center clear">
-                          <h3>Invoice <%= invoice.invNo %> - <%= moment(invoice.invDate).format("Do MMMM YYYY") %>.</h3>
+                          <h3 class='capitalize'>Invoice <%= invoice.invNo %> - <%= moment(invoice.invDate).format("Do MMMM YYYY") %>.</h3>
                         </header>
 
                         <div class="billed-items">
@@ -334,7 +332,7 @@
 
                         <div class="pay-details align-center">
                           <p>UTR : <%= invoice.details.utr %></p>
-                          <p><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
+                          <p class='capitalize'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>.</p>
                           <p>(<%= invoice.details.terms %>)</p>
                         </div>
 

@@ -6,5 +6,5 @@
   "NODE_ENV"              : "NODE_ENV",
   "SUPER_SECRET_COOKIE"   : "SUPER_SECRET_COOKIE",
   "SUPER_SECRET_KEY"      : "SUPER_SECRET_KEY",
-  "SME_EMAIL"             : "SME_EMAIL"
+  "SME_EMAIL"             : "SME_EMAIL",
 }
