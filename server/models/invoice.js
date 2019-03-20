@@ -119,6 +119,22 @@ InvoiceSchema.statics.newestInvoiceNumber = function () {
   ]);
 };
 
+InvoiceSchema.statics.listInvoiceNumbers = async function () {
+  const result =  await this.aggregate([
+    {"$project" : {_id:1, invNo :1}},
+    {"$sort"    : {invNo : 1 }}
+  ]);
+  return result.map(r => r.invNo);
+
+};
+
+InvoiceSchema.statics.findByInvNo = function (id) {
+  return this.aggregate([
+    {"$match" : { 'invNo' : id }},
+    {"$project" : { _id:1 , invNo:1}}
+  ]);
+};
+
 InvoiceSchema.statics.listInvoices = function () {
   return this.aggregate([
     {$project : { invNo:1, invDate:1, "client.name":1, "client._id":1, items:1}},

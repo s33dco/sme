@@ -18,6 +18,8 @@ const admin              = require("../middleware/admin");
 
 router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
+  // const numbers = await Invoice.listInvoiceNumbers();
+  // console.log(numbers);
 
   res.render('invoices/invoices', {
     pageTitle: "Invoices",

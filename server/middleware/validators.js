@@ -1,5 +1,6 @@
 const {check}     = require('express-validator/check');
 const {Client}    = require("../models/client");
+const {Invoice}    = require("../models/invoice");
 const {itemType}  = require("../models/invoice");
 const {categories}= require("../models/expense");
 
@@ -24,8 +25,20 @@ module.exports = {
       .isBefore(new Date().toISOString())
       .withMessage('dates must be today or earlier'),
 
+
     check('invNo')
-      .isInt().withMessage('check invoice number'),
+      .isInt()
+      .withMessage('check invoice number'),
+
+      // .custom(number => {
+      //   return Invoice.listInvoiceNumbers().then(array => {
+      //     if (array.includes(number)) {
+      //       return Promise.reject('duplicate invoice number');
+      //     } else {
+      //       return true
+      //     }
+      //   })
+      // }),
 
     check('message')
       .isLength({ min: 1 }).withMessage('include a message'),

@@ -135,27 +135,30 @@ router.get('/download', [auth, validate.download], async (req, res) => {
                 { label : 'Invoice',
                   value : 'invNo'},
                 { label : 'Invoice Date',
-                  value : (field) => moment(field).format('DD/MM/YY'),
+                  value : 'invDate',
                   stringify: true},
                 { label : 'Type',
                   value : 'items.type'},
                 { label : 'Client Name',
                   value : 'client.name'},
                 { label : 'Item Date',
-                  value : (field) => moment(field).format('DD/MM/YY'),
+                  value : 'items.date',
                   stringify: true},
                 { label : 'Description',
                   value : 'items.desc'},
                 { label : 'Amount',
                   value : 'items.fee'},
                 { label : 'Date Paid',
-                  value : (field) => moment(field).format('DD/MM/YY'),
+                  value : 'datePaid',
                   stringify: true}
               ];
     filepath =`./public/Earnings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format("Do-MMMM-YYYY")}.csv`;
 
     data.forEach((item) => {
-      item.items.fee = parseFloat(item.items.fee).toFixed(2);
+      item.items.fee   = parseFloat(item.items.fee).toFixed(2);
+      item.datePaid    = moment(item.datePaid).format('DD/MM/YY');
+      item.invDate     = moment(item.invDate).format('DD/MM/YY');
+      item.items.date  = moment(item.items.date).format('DD/MM/YY');
     })
   } else {
 
