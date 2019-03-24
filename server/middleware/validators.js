@@ -1,6 +1,6 @@
 const {check}     = require('express-validator/check');
 const {Client}    = require("../models/client");
-const {Invoice}    = require("../models/invoice");
+const {Invoice}   = require("../models/invoice");
 const {itemType}  = require("../models/invoice");
 const {categories}= require("../models/expense");
 

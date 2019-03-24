@@ -87,7 +87,7 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
       let selected;
 
       if (req.body.clientId) {
-        selected = clients.find(c => c._id === req.body.clientId);
+        selected = clients.find(c => c._id == req.body.clientId);
         if (!selected){
           clients
         } else {
