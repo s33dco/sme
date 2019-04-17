@@ -71,6 +71,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
       if (!incomings && !deductions){return 0};
       return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
     }
+  const daysWorked = !labourList ? 0 : labourList.length;
+
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -105,6 +107,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     mktgList,
     mktgSum,
     owedList,
+    daysWorked,
+    tradingDays,
     weeklyIncome : averageWeeklyIncome(),
     hmrcWeekly : averageWeeklyHMRCIncome()
   });
