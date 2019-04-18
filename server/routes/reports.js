@@ -72,7 +72,7 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
       return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
     }
   const daysWorked = !labourList ? 0 : labourList.length;
-  const daysPerWeek = !daysWorked ? 0 : ((daysWorked/tradingDays)/7).toFixed(2);
+  const daysPerWeek = !daysWorked ? 0 : (daysWorked/(tradingDays/7)).toFixed(2);
   const weeklyIncome = averageWeeklyIncome();
   const hmrcWeekly = averageWeeklyHMRCIncome();
   const earnings = parseFloat(hmrcWeekly);
