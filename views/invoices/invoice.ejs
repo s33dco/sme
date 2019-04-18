@@ -99,6 +99,16 @@
     </form>
   </div>
 
+  <div class="pdf">
+    <form method="post" action="/invoices/makepdf?_method=post" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="id" value="<%= invoice._id %>">
+      <div class="form-actions">
+        <button class="btn" type="submit">Download PDF</button>
+      </div>
+    </form>
+  </div>
+
   <% if (invoice.paid){ %>
     <div class="unpaid">
       <form method="post" action="/invoices/unpaid?_method=post" novalidate>

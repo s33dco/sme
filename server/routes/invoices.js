@@ -15,6 +15,7 @@ const {Detail}           = require("../models/detail");
 const logger             = require('../startup/logger');
 const auth               = require("../middleware/auth");
 const admin              = require("../middleware/admin");
+const pdf                = require('html-pdf');
 
 router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
@@ -260,6 +261,46 @@ router.post('/email', auth, async (req, res) => {
           }
       });
     };
+  });
+});
+
+router.post('/makepdf', auth, async (req, res) => {
+
+  if (!ObjectID.isValid(req.body.id)) {
+    throw ({
+      tag : "Invoice can't be emailed",
+      message : "The Invoice can't be found to email maybe you should try again.",
+      statusCode : 404
+    });
+  }
+
+  const id = req.body.id;
+
+  const invoice = await Invoice.withId(id);
+
+  if (!invoice) {
+    throw ({
+      tag : 'No longer available.',
+      message : "The invoice you want to email cannot be found, maybe it was deleted, maybe it was never here.",
+      statusCode : 404
+    });
+  }
+
+  const total = await Invoice.sumOfInvoice(id);
+  const itemsByDateAndType = await Invoice.itemsByDateAndType(id);
+  const html4Pdf = await ejs.renderFile( "./views/invoicePdf.ejs", { total, invoice, itemsByDateAndType, moment: moment });
+  const options = { format: 'Letter' };
+  const fileName = `./public/Invoice-${invoice.invNo}.pdf`
+  pdf.create(html4Pdf, options).toFile(fileName, function(err, doc) {
+    if (err) return console.log(err);
+    res.download(fileName, function (err) {
+      if (err) {
+         console.log("Error");
+         console.log(err);
+       } else {
+           console.log("Success");
+       }
+   });
   });
 });
 
