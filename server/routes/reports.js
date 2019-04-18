@@ -72,7 +72,11 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
       return (Math.round((((parseFloat(incomings) * 100) - (parseFloat(deductions) * 100)) / tradingDays) * 7) / 100).toFixed(2);
     }
   const daysWorked = !labourList ? 0 : labourList.length;
-
+  const daysPerWeek = !daysWorked ? 0 : ((daysWorked/tradingDays)/7).toFixed(2);
+  const weeklyIncome = averageWeeklyIncome();
+  const hmrcWeekly = averageWeeklyHMRCIncome();
+  const earnings = parseFloat(hmrcWeekly);
+  const incomePercent = !earnings ?  0 : ((earnings / (earnings + 250.00)) * 100).toFixed(2);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -107,10 +111,10 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     mktgList,
     mktgSum,
     owedList,
-    daysWorked,
-    tradingDays,
-    weeklyIncome : averageWeeklyIncome(),
-    hmrcWeekly : averageWeeklyHMRCIncome()
+    daysPerWeek,
+    incomePercent,
+    weeklyIncome,
+    hmrcWeekly
   });
 });
 

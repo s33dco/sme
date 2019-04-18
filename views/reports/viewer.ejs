@@ -10,10 +10,14 @@
   </div>
 
   <div class="actionBox">
+    <p class="centre">You've worked <%= daysPerWeek %> days per week</p>
+    <p class="centre">You've provided <%=incomePercent %>% of our income</p>
+  </div>
+
+  <div class="actionBox">
     <h3 class="centre">Invoices</h3>
     <p class="centre"><%=invoicesProduced%> created (<%=invoicesPaid%> paid)</p>
     <p class="centre"><%=itemsInvoiced%> items invoiced (<%=itemsPaid%> paid)</p>
-    <p class="centre">you've worked <%= daysWorked %> out of <%= tradingDays %> days</p>
   </div>
 </div>
 
@@ -23,7 +27,7 @@
     <div class="toggle-content" id="money-in">
       <% if (labourList.length > 0) { %>
         <div class="actionBox">
-          <a class='toggle title' href="#labour">Labour (£<%=labour%>)</a>
+          <a class='toggle title' href="#labour">Labour (£<%=labour%>) - <%= labourList.length %> items.</a>
           <div class="toggle-content" id="labour">
             <%labourList.forEach((item) => { %>
               <div class="actionBox">
@@ -37,7 +41,7 @@
       <% } %>
       <% if (materialsList.length > 0) { %>
         <div class="actionBox">
-          <a class='toggle title' href="#materials">Materials (£<%=materials%>)</a>
+          <a class='toggle title' href="#materials">Materials (£<%=materials%>) - <%= materialsList.length %> items.</a>
           <div class="toggle-content" id="materials">
             <%materialsList.forEach((item) => { %>
               <div class="actionBox">
@@ -50,7 +54,7 @@
       <% } %>
       <% if (expensesList.length > 0) { %>
         <div class="actionBox">
-          <a class='toggle title' href="#expenses">Expenses (£<%=expenses%>)</a>
+          <a class='toggle title' href="#expenses">Expenses (£<%=expenses%>) - <%= expensesList.length %> items.</a>
           <div class="toggle-content" id="expenses">
             <%expensesList.forEach((item) => { %>
               <div class="actionBox">
@@ -73,7 +77,7 @@
 
       <% if (officeList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#office">Office, property and equipment (£<%=officeSum%>)</a>
+        <a class='toggle title' href="#office">Office, property and equipment (£<%=officeSum%>) - <%= officeList.length %> items.</a>
         <div class="toggle-content" id="office">
           <%officeList.forEach((item) => { %>
             <div class="actionBox">
@@ -87,7 +91,7 @@
 
       <% if (carList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#car">Car, van and travel expenses (£<%=carSum%>)</a>
+        <a class='toggle title' href="#car">Car, van and travel expenses (£<%=carSum%>) - <%= carList.length %> items.</a>
         <div class="toggle-content" id="car">
           <%carList.forEach((item) => { %>
             <div class="actionBox">
@@ -101,7 +105,7 @@
 
       <% if (clothingList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#clothing">Clothing expenses (£<%=clothingSum%>)</a>
+        <a class='toggle title' href="#clothing">Clothing expenses (£<%=clothingSum%>) - <%= clothingList.length %> items.</a>
         <div class="toggle-content" id="clothing">
           <%clothingList.forEach((item) => { %>
             <div class="actionBox">
@@ -115,7 +119,7 @@
 
       <% if (staffList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#staff">Staff expenses (£<%=staffSum%>)</a>
+        <a class='toggle title' href="#staff">Staff expenses (£<%=staffSum%>) - <%= staffList.length %> items.</a>
         <div class="toggle-content" id="staff">
           <%staffList.forEach((item) => { %>
             <div class="actionBox">
@@ -129,7 +133,7 @@
 
       <% if (resellingList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#reselling">Reselling goods (£<%=resellingSum%>)</a>
+        <a class='toggle title' href="#reselling">Reselling goods (£<%=resellingSum%>) - <%= resellingList.length %> items.</a>
         <div class="toggle-content" id="reselling">
           <%resellingList.forEach((item) => { %>
             <div class="actionBox">
@@ -143,7 +147,7 @@
 
       <% if (legalList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#legal">Legal and financial costs (£<%=legalSum%>)</a>
+        <a class='toggle title' href="#legal">Legal and financial costs (£<%=legalSum%>) - <%= legalList.length %> items.</a>
         <div class="toggle-content" id="legal">
           <%legalList.forEach((item) => { %>
             <div class="actionBox">
@@ -157,7 +161,7 @@
 
       <% if (mktgList.length > 0) { %>
       <div class="actionBox">
-        <a class='toggle title' href="#mktg">Marketing, entertainment and subscriptions (£<%=mktgSum%>)</a>
+        <a class='toggle title' href="#mktg">Marketing, entertainment and subscriptions (£<%=mktgSum%>) - <%= mktgList.length %> items.</a>
         <div class="toggle-content" id="mktg">
           <%mktgList.forEach((item) => { %>
             <div class="actionBox">
