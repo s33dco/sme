@@ -69,7 +69,7 @@ router.post('/',  [auth, admin, validate.expense], async (req, res) => {
   };
 
   const expense = await new Expense({
-                  date      : moment(req.body.date).startOf('day'),
+                  date      : moment(req.body.date),
                   category  : req.body.category,
                   desc      : req.body.desc,
                   amount    : req.body.amount})

@@ -140,7 +140,7 @@ describe('/reports', () => {
   });
 
 
-  describe('GET /download', async ()=> {
+  describe('GET /download', ()=> {
 
   });
 

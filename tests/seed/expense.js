@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const makeExpense = ( async () => {
   return await new Expense({
-    date: moment().format('YYYY-MM-DD'),
+    date: moment().utc().format('YYYY-MM-DD'),
     category: "Office, property and equipment",
     desc: 'lots of equipment',
     amount: 200.00

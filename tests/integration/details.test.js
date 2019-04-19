@@ -33,7 +33,7 @@ afterEach( async()=> {
   await Detail.deleteMany();
 });
 
-describe('GET /', async ()=> {
+describe('GET /', ()=> {
 
   const getDetails = async ()=>{
     return await request(app).get('/details').set('Cookie', `token=${token}`)
@@ -77,7 +77,7 @@ describe('GET /', async ()=> {
   });
 });
 
-describe('GET /edit', async ()=> {
+describe('GET /edit', ()=> {
   const getEdit = async ()=>{
     return await request(app).get('/details/edit').set('Cookie', `token=${token}`)
   }
@@ -101,7 +101,7 @@ describe('GET /edit', async ()=> {
   });
 });
 
-describe('POST /', async ()=> {
+describe('POST /', ()=> {
   const getForm = async () => {
     const res = await request(app).get('/details/edit')
                   .set('Cookie', `token=${token}`);

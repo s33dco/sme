@@ -269,7 +269,7 @@ router.post('/makepdf', auth, async (req, res) => {
   if (!ObjectID.isValid(req.body.id)) {
     throw ({
       tag : "Invoice can't be emailed",
-      message : "The Invoice can't be found to email maybe you should try again.",
+      message : "The Invoice can't be found to download maybe you should try again.",
       statusCode : 404
     });
   }
@@ -281,7 +281,7 @@ router.post('/makepdf', auth, async (req, res) => {
   if (!invoice) {
     throw ({
       tag : 'No longer available.',
-      message : "The invoice you want to email cannot be found, maybe it was deleted, maybe it was never here.",
+      message : "The invoice you want to downlod cannot be found, maybe it was deleted, maybe it was never here.",
       statusCode : 404
     });
   }
@@ -289,7 +289,7 @@ router.post('/makepdf', auth, async (req, res) => {
   const total = await Invoice.sumOfInvoice(id);
   const itemsByDateAndType = await Invoice.itemsByDateAndType(id);
   const html4Pdf = await ejs.renderFile( "./views/invoicePdf.ejs", { total, invoice, itemsByDateAndType, moment: moment });
-  const options = { format: 'Letter' };
+  const options = { format: 'A4' };
   const fileName = `./public/Invoice-${invoice.invNo}.pdf`
   pdf.create(html4Pdf, options).toFile(fileName, function(err, doc) {
     if (err) return console.log(err);

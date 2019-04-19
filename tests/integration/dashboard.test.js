@@ -41,7 +41,7 @@ let token, client1, client2, client3, clientIds, detail, businessName;
 
 describe('/dashboard', () => {
 
-  describe('GET /', async ()=> {
+  describe('GET /', ()=> {
 
     const getDashboard = async () => {
       return await request(app).get('/dashboard').set('Cookie', `token=${token}`);

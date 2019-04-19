@@ -20,7 +20,7 @@ describe('Expense', () => {
     });
 
     it('should save record with valid data', () => {
-        expect(expense).toHaveProperty('date', new Date(moment().startOf('day')));
+        expect(expense).toHaveProperty('date', new Date(moment().utc().startOf('day')));
         expect(expense).toHaveProperty('category', "Office, property and equipment");
         expect(expense).toHaveProperty('desc', 'lots of equipment');
         expect(expense.amount.toJSON()).toEqual({"$numberDecimal": "200"});
