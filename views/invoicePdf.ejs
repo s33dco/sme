@@ -140,7 +140,7 @@
     <table class='to'>
       <tr>
         <td>
-          <p class='align-right'>to :</p>
+          <p class='align-right'>to : </p>
         </td>
         <td>
           <p class='capitalize'><%=invoice.client.name %></p>
@@ -154,7 +154,7 @@
           <p><%=invoice.client.postcode%></p>
         </td>
         <td>
-          <p class='align-right'>from :</p>
+          <p class='align-right'>from : </p>
         </td>
         <td>
           <p class='capitalize'><%=invoice.details.business%></p>
@@ -183,37 +183,35 @@
         <tr>
           <td>
             <p><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</p>
-            <% item.item.forEach((charge)=> { %>
-              <p class='details'><%= charge.type %>, <%= charge.desc %></p>
           </td>
-          <td>
-            <p class="align-right">£<%= charge.fee %></p>
-          </td>
-          <% }) %>
         </tr>
+            <% item.item.forEach((charge)=> { %>
+            <tr>
+              <td>
+                <p class='details'><%= charge.type %>, <%= charge.desc %></p>
+              </td>
+            <td>
+              <p class="align-right">£<%= charge.fee %></p>
+            </td>
+            </tr>
+          <% }) %>
       <% }) %>
 
 
-    <tr>
-      <td class='align-right'><p>Total Due</p></td>
-      <td class='align-right'><p>£<%= total %><p></td>
-        <% if (invoice.paid) { %>
+      <tr>
+        <td class='align-right'><p>Total Due</p></td>
+        <td class='align-right'><p>£<%= total %><p></td>
       </tr>
     </table>
 
-    <h2 class='thanks'>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h2>
+    <% if (invoice.paid) { %>
+      <h2 class='thanks'>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h2>
     <% } %>
 
     <div class="payment">
-    <p class='capitalize align-center'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>, UTR : <%= invoice.details.utr %>.</p>
-    <p class='align-center'>(<%= invoice.details.terms %>)</p>
-</div>
-
-<div class="symbols">
-  <i class="fas fa-mobile"></i>
-  <i class="fas fa-envelope-open"></i>
-</div>
-
+      <p class='capitalize align-center'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>, UTR : <%= invoice.details.utr %>.</p>
+      <p class='align-center'>(<%= invoice.details.terms %>)</p>
+    </div>
     <div class="footer">
       <p class='contact'>
         <span class='capitalize'><%= invoice.details.contact %></span>,   tel : <%= invoice.details.phone %>,   email : <%=invoice.details.email %></p>
