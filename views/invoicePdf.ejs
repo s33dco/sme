@@ -5,127 +5,110 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Invoice <%= invoice.invNo %></title>
     <style>
-
-
-    @media print {
-       body {
-         color: #000;
-         background: none;
-         margin: 1cm;
-         padding: 0;
-       }
-
-       td {
-         padding: 0;
-         margin:0;
-       }
-
-       p {
-         font-size: .9em;
-       }
-       .header {
-         border-top : 1px solid #000;
-         border-bottom : 1px solid #000;
-         padding : 0;
-         width : 100%;
-       }
-       .header p {
-         font-size: 1em;
-         text-align: right;
-         padding :0;
-       }
-
-       .left h1 {
-         padding : 0;
-       }
-
-       .to {
-         width : 100%;
-         padding : 1em;
-       }
-
-       .to p {
-         padding :0;
-         margin : 0;
-       }
-
-       .to tr {
-         margin : .5em 0 .5em 0;
-         padding :0;
-       }
-
-       .to td {
-         vertical-align: top;
-         padding : 0;
-         margin : 0;
-       }
-
-       .invoice-message, .thanks {
-         text-align: center;
-         font-style: italic;
-         font-size: 1em;
-         margin : 0;
-         padding: 0;
-       }
-
-       .billed-items {
-         width : 100%;
-         margin-top: 1em;
-         margin-bottom: 2em;
-       }
-
-       .billed-items tr td p{
-         padding :0;
-         margin : 0;
-       }
-
-       .date {
-         font-weight: bold;
-         margin :0;
-         padding : 0;
-       }
-
-       td .money {
-         vertical-align: top;
-         text-align: right;
-       }
-       .align-right {
-         text-align: right;
-       }
-       .align-left {
-         text-align: left;
-       }
-       .capitalize {
-         text-transform: capitalize;
-       }
-       .footer {
-         border-top : 1px solid #000;
-         border-bottom : 1px solid #000;
-         margin-top: 1em;
-         width : 100%;
-       }
-
-       .contact {
-         text-align: center;
-         font-size: .75em;
-       }
-
-       .payment {
-         margin : 1em;
-       }
-       .align-center {
-         text-align: center;
-       }
-
-       td p.details {
-         text-align: left;
-         padding :0;
-         margin : 0;
-       }
-
-
-    }
-
+      @media print {
+         body {
+           color: #000;
+           background: none;
+           margin: 1cm;
+           padding: 0;
+         }
+         td {
+           padding: 0;
+           margin:0;
+                      vertical-align: top;
+         }
+         p {
+           font-size: .9em;
+         }
+         .header {
+           border-top : 1px solid #000;
+           border-bottom : 1px solid #000;
+           padding : 0;
+           width : 100%;
+         }
+         .header p {
+           font-size: 1em;
+           text-align: right;
+           padding :0;
+         }
+         .left h1 {
+           padding : 0;
+         }
+         .to {
+           width : 100%;
+           padding : 1em;
+         }
+         .to p {
+           padding:0;
+           margin : 0;
+         }
+         .to tr {
+           margin : .5em 0 .5em 0;
+           padding :0;
+         }
+         .to td {
+           vertical-align: top;
+           padding : 0;
+           margin : 0;
+         }
+         .invoice-message, .thanks {
+           text-align: center;
+           font-style: italic;
+           font-size: 1em;
+           margin : 0;
+           padding: 0;
+         }
+         .billed-items {
+           width : 100%;
+           margin-top: 1em;
+           margin-bottom: 2em;
+         }
+         .billed-items .new-row td p {
+           margin-top: 1em;
+         }
+         .billed-items tr td p{
+           padding :0;
+           margin : 0;
+         }
+         .date {
+           font-weight: bold;
+           margin :0;
+           padding : 0;
+         }
+         td .money {
+           text-align: right;
+         }
+         .align-right {
+           text-align: right;
+         }
+         .align-left {
+           text-align: left;
+         }
+         .capitalize {
+           text-transform: capitalize;
+         }
+         .footer {
+           border-top : 1px solid #000;
+           border-bottom : 1px solid #000;
+           margin-top: 1em;
+           width : 100%;
+         }
+         .contact {
+           text-align: center;
+           font-size: .75em;
+         }
+         .payment {
+           margin : 1em;
+         }
+         .align-center {
+           text-align: center;
+         }
+         td p.details {
+           text-align: left;
+           padding :0;
+           margin : 0;
+         }
+      }
     </style>
   </head>
   <body>
@@ -140,8 +123,6 @@
         </td>
       </tr>
     </table>
-
-
     <table class='to'>
       <tr>
         <td>
@@ -176,16 +157,9 @@
       </tr>
 
     </table>
-
-
-    <div class="invoice-message">
-      <h4><%=invoice.message%></h4>
-    </div>
-
-
     <table class="billed-items">
       <% itemsByDateAndType.forEach((item) => { %>
-        <tr>
+        <tr class='new-row'>
           <td>
             <p class='date'><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</p>
           </td>
@@ -195,24 +169,22 @@
               <td>
                 <p class='details'><%= charge.type %>, <%= charge.desc %></p>
               </td>
-            <td>
-              <p class="align-right">£<%= charge.fee %></p>
-            </td>
+              <td>
+                <p class="money">£<%= charge.fee %></p>
+              </td>
             </tr>
-          <% }) %>
-      <% }) %>
+            <% }) %>
+        <% }) %>
 
 
-      <tr>
+      <tr class='new-row'>
         <td class='align-right'><p>Total Due</p></td>
         <td class='align-right'><p>£<%= total %><p></td>
       </tr>
     </table>
-
     <% if (invoice.paid) { %>
       <h2 class='thanks'>Received with thanks <%= moment(invoice.datePaid).format("Do MMMM YYYY") %>.</h2>
     <% } %>
-
     <div class="payment">
       <p class='capitalize align-center'><%= invoice.details.bank %>, Sort Code : <%= invoice.details.sortcode %>, Account No: <%= invoice.details.accountNo %>, UTR : <%= invoice.details.utr %>.</p>
       <p class='align-center'>(<%= invoice.details.terms %>)</p>
