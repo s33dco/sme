@@ -75,9 +75,14 @@
          margin-bottom: 2em;
        }
 
-       .billed-items tr {
-         padding :0.1em;
-         margin : 0 0 1em 0;
+       .billed-items tr td p{
+         padding :0;
+         margin : 0;
+       }
+
+       .date {
+         margin :0;
+         padding : 0;
        }
 
        td .money {
@@ -96,7 +101,7 @@
        .footer {
          border-top : 1px solid #000;
          border-bottom : 1px solid #000;
-         margin-top: 2em;
+         margin-top: 1em;
          width : 100%;
        }
 
@@ -182,7 +187,7 @@
       <% itemsByDateAndType.forEach((item) => { %>
         <tr>
           <td>
-            <p><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</p>
+            <p class='date'><%= moment(item._id).format("dddd Do MMMM  YYYY")%>.</p>
           </td>
         </tr>
             <% item.item.forEach((charge)=> { %>
