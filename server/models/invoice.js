@@ -22,6 +22,7 @@ let InvoiceSchema = new mongoose.Schema({
                 },
 
   message     : { type: String},
+  emailGreeting : { type: String},
 
   details     : {
     business  : { type: String,

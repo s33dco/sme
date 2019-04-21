@@ -39,6 +39,14 @@
     <% } %>
   </div>
 
+  <div class="form-field <%= errors.emailGreeting ? 'form-field-invalid' : '' %>">
+    <label for="message">emailGreeting</label>
+    <input class="input" id="emailGreeting" name="emailGreeting" type="text" value="<%=data.emailGreeting%>" />
+    <% if (errors.emailGreeting) { %>
+      <div class="error"><%= errors.emailGreeting.msg %></div>
+    <% } %>
+  </div>
+
   <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
     <label for="message">Message</label>
     <textarea class="input" id="message" name="message" rows="2"><%=data.message%></textarea>

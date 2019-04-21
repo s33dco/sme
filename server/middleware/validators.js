@@ -39,6 +39,9 @@ module.exports = {
       //     }
       //   })
       // }),
+    check('emailGreeting')
+      .matches(/(\w(\s)?)+/)
+      .withMessage('just words'),
 
     check('message')
       .isLength({ min: 1 }).withMessage('include a message'),

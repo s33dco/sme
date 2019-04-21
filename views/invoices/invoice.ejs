@@ -1,4 +1,18 @@
 <div class="actionBox">
+  <h3>Email</h3>
+  <div class="actionBox">
+    <p><%= invoice.emailGreeting%> </p>
+  </div>
+  <div class="actionBox">
+    <p><%= invoice.message%> </p>
+  </div>
+  <div class="actionBox">
+    <p><%=invoice.details.farewell %></p>
+    <p class='capitalize'><%= invoice.details.contact %></p>
+  </div>
+</div>
+
+<div class="actionBox">
   <h3>Invoice and Client Details</h3>
   <div class="actionBox">
     <p class='title'>Invoice <%= invoice.invNo %></p>
@@ -14,21 +28,6 @@
     <p><%=invoice.client.postcode%></p>
     <p><%= invoice.client.email %></p>
     <p><%= invoice.client.phone %></p>
-  </div>
-</div>
-
-<div class="actionBox">
-  <h3>Message</h3>
-  <div class="actionBox">
-    <p><%= invoice.message%> </p>
-  </div>
-</div>
-
-<div class="actionBox">
-  <h3>Signature</h3>
-  <div class="actionBox">
-    <p><%=invoice.details.farewell %></p>
-    <p class='capitalize'><%= invoice.details.contact %></p>
   </div>
 </div>
 

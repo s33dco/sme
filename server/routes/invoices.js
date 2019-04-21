@@ -142,6 +142,7 @@ router.post('/',  [auth, admin, validate.invoice], async (req, res) => {
           invNo      : req.body.invNo,
           invDate    : moment(req.body.invDate).endOf('day'),
           message    : req.body.message,
+          emailGreeting : req.body.emailGreeting,
           client     : {
               _id         : client._id,
               name        : client.name,
@@ -228,39 +229,46 @@ router.post('/email', auth, async (req, res) => {
 
   const total = await Invoice.sumOfInvoice(id);
   const itemsByDateAndType = await Invoice.itemsByDateAndType(id);
-
-  // Configure Nodemailer SendGrid Transporter
-  const transporter = nodemailer.createTransport(
-    sendgridTransport({
-      auth: {
-        api_key: config.get('SENDGRID_API_PASSWORD')
-      },
-    })
-  );
-
-  ejs.renderFile( "./views/invoiceEmail.ejs", { total, invoice, itemsByDateAndType, moment: moment }, function (error, data) {
-    if (error) {
-      logger.error(`file error: ${error.message} - ${error.stack}`);
-    } else {
-      const options = {
-        from: 'noreply@jillpendleton.herokuapp.com',
-        to: invoice.client.email,
-        replyTo: invoice.details.email,
-        subject: `Invoice ${invoice.invNo} - ${moment(invoice.invDate).format("Do MMMM YYYY")}`,
-        html: data };
-
-      transporter.sendMail(options, (error, info) => {
-          if (error) {
-            logger.error(`send email error: ${error.message} - ${error.stack}`);
-            req.flash('alert', `Invoice has not been emailed.`)
-            res.redirect('/dashboard')
-          } else {
-            logger.info(`Invoice ${invoice.invNo} mailed to ${invoice.client.email}`);
-            req.flash('success', `Invoice ${invoice.invNo} mailed to ${invoice.client.email}.`)
-            res.redirect('/dashboard')
-          }
-      });
-    };
+  const html4Pdf = await ejs.renderFile( "./views/invoicePdf.ejs", { total, invoice, itemsByDateAndType, moment: moment });
+  const optionsPdf = { format: 'A4' };
+  const filePath = `./public/Invoice-${invoice.invNo}.pdf`
+  pdf.create(html4Pdf, optionsPdf).toFile(filePath, function(err, doc) {
+    if (err) return console.log(err);
+    const transporter = nodemailer.createTransport(
+      sendgridTransport({
+        auth: {
+          api_key: config.get('SENDGRID_API_PASSWORD')
+        },
+      })
+    );
+    ejs.renderFile( "./views/invoiceEmail.ejs", { total, invoice, moment: moment }, function (error, data) {
+      if (error) {
+        logger.error(`file error: ${error.message} - ${error.stack}`);
+      } else {
+        const options = {
+          from: 'noreply@jillpendleton.herokuapp.com',
+          to: invoice.client.email,
+          replyTo: invoice.details.email,
+          subject: `Invoice ${invoice.invNo} (£${total}).`,
+          html: data,
+          attachments:[{
+            filename: `Invoice-${invoice.invNo}.pdf`,
+            path: filePath // stream this file
+          }]
+        };
+        transporter.sendMail(options, (error, info) => {
+            if (error) {
+              logger.error(`send email error: ${error.message} - ${error.stack}`);
+              req.flash('alert', `Invoice has not been emailed.`)
+              res.redirect('/dashboard')
+            } else {
+              logger.info(`Invoice ${invoice.invNo} mailed to ${invoice.client.email}`);
+              req.flash('success', `Invoice ${invoice.invNo} mailed to ${invoice.client.email}.`)
+              res.redirect('/dashboard')
+            }
+        });
+      };
+    });
   });
 });
 
@@ -387,14 +395,14 @@ router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
 
   const clients = await Client.find({}, {name:1}).sort({name: 1})
 
-  let { client, _id, invNo, invDate, message, items} = invoice;
+  let { client, _id, invNo, invDate, message, emailGreeting, items} = invoice;
   let clientId = client._id;
   let selected = client
 
   res.render('invoices/editinvoice', {
     clients,
     selected,
-    data: { _id, invNo, invDate, message, items, clientId},
+    data: { _id, invNo, invDate, message, items, clientId, emailGreeting},
     errors: {},
     csrfToken: req.csrfToken(),  // generate a csrf token
     pageTitle       : "Edit Invoice",
@@ -462,6 +470,7 @@ router.put('/:id',  [auth, admin, validateId, validate.invoice], async (req, res
     {$set:  { invNo     :  req.body.invNo,
               invDate   : moment(req.body.invDate).endOf('day'),
               message   : req.body.message,
+              emailGreeting : req.body.emailGreeting,
               items     : req.body.items,
               client    : { _id  : client._id,
                           name   : client.name,
