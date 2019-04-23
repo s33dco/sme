@@ -204,7 +204,20 @@ router.get('/download', [auth, validate.download], async (req, res) => {
   fs.writeFile(filepath, csv, function(err,data) {
      if (err) {throw err;}
      else{
-       res.download(filepath);
+       res.download(filepath, function (err) {
+         if (err) {
+           logger.error(`could not download pdf ${err}`);
+          } else {
+            logger.info(`${filepath} downloaded`);
+            fs.unlink(filepath, function (err) {
+              if (err) {
+                  logger.error(err.toString());
+              } else {
+                  logger.info(filepath + ' deleted');
+              }
+            });
+          }
+      });
      }
   });
 

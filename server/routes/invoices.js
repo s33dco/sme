@@ -16,6 +16,7 @@ const logger             = require('../startup/logger');
 const auth               = require("../middleware/auth");
 const admin              = require("../middleware/admin");
 const pdf                = require('html-pdf');
+const fs                 = require('fs');
 
 router.get('/',  auth, async (req, res) => {
   const invoices = await Invoice.listInvoices();
@@ -233,7 +234,7 @@ router.post('/email', auth, async (req, res) => {
   const optionsPdf = { format: 'A4' };
   const filePath = `./public/Invoice-${invoice.invNo}.pdf`
   pdf.create(html4Pdf, optionsPdf).toFile(filePath, function(err, doc) {
-    if (err) return console.log(err);
+    if (err) return logger.error(`could not generate pdf ${err}`);
     const transporter = nodemailer.createTransport(
       sendgridTransport({
         auth: {
@@ -257,15 +258,22 @@ router.post('/email', auth, async (req, res) => {
           }]
         };
         transporter.sendMail(options, (error, info) => {
-            if (error) {
-              logger.error(`send email error: ${error.message} - ${error.stack}`);
-              req.flash('alert', `Invoice has not been emailed.`)
-              res.redirect('/dashboard')
-            } else {
-              logger.info(`Invoice ${invoice.invNo} mailed to ${invoice.client.email}`);
-              req.flash('success', `Invoice ${invoice.invNo} mailed to ${invoice.client.email}.`)
-              res.redirect('/dashboard')
-            }
+          if (error) {
+            logger.error(`send email error: ${error.message} - ${error.stack}`);
+            req.flash('alert', `Invoice has not been emailed.`)
+            res.redirect('/dashboard')
+          } else {
+            logger.info(`Invoice ${invoice.invNo} mailed to ${invoice.client.email}`);
+            req.flash('success', `Invoice ${invoice.invNo} mailed to ${invoice.client.email}.`);
+            res.redirect('/dashboard')
+            fs.unlink(filePath, function (err) {
+              if (err) {
+                  logger.error(err.toString());
+              } else {
+                  logger.info(filePath + ' deleted');
+              }
+            });
+          }
         });
       };
     });
@@ -300,13 +308,19 @@ router.post('/makepdf', auth, async (req, res) => {
   const options = { format: 'A4' };
   const fileName = `./public/Invoice-${invoice.invNo}.pdf`
   pdf.create(html4Pdf, options).toFile(fileName, function(err, doc) {
-    if (err) return console.log(err);
+    if (err) return logger.error(`could not generate pdf ${err}`);;
     res.download(fileName, function (err) {
       if (err) {
-         console.log("Error");
-         console.log(err);
+        logger.error(`could not download pdf ${err}`);
        } else {
-           console.log("Success");
+           logger.info(`${fileName} downloaded`);
+           fs.unlink(fileName, function (err) {
+             if (err) {
+                 logger.error(err.toString());
+             } else {
+                 logger.info(fileName + ' deleted');
+             }
+           });
        }
    });
   });
