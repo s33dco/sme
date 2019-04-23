@@ -34,6 +34,9 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
 
   const start             = moment(req.query.start).startOf('day').toISOString();
   const end               = moment(req.query.end).endOf('day').toISOString();
+  const tradingDays       = (moment(end).diff(moment(start), 'days')) + 1;
+
+
   const incomings         = await Invoice.sumOfPaidInvoicesBetween(start,end);
   const invoicesProduced  = await Invoice.numberOfInvoicesProducedBetween(start,end);
   const invoicesPaid      = await Invoice.numberOfInvoicesPaidBetween(start,end);
@@ -62,7 +65,10 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const clothingList      = await Expense.listClothingExpensesBetween(start,end);
   const clothingSum       = await Expense.sumClothingExpensesBetween(start,end);
   const owedList          = await Invoice.listOfMadeUnpaidInvoicesBetween(start,end);
-  const tradingDays       = (moment(end).diff(moment(start), 'days')) + 1;
+
+
+
+
   const averageWeeklyIncome = () => {
       if (!incomings){return 0};
       return (Math.round(((parseFloat(incomings) * 100) / tradingDays) * 7) / 100).toFixed(2);
@@ -220,7 +226,6 @@ router.get('/download', [auth, validate.download], async (req, res) => {
       });
      }
   });
-
 });
 
 
