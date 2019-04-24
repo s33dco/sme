@@ -452,6 +452,7 @@ describe('/invoices', () => {
                   clientId: clientId.toHexString(),
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
+                  emailGreeting : 'Dearest Customer',
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
                   items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
                           {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Materials',desc:'jump a stile',fee: '25.00' }]
@@ -666,6 +667,7 @@ describe('/invoices', () => {
                   clientId: clientId.toHexString(),
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
+                  emailGreeting : 'Hello Cocker',
                   message: 'new message',
                   items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
                           {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
@@ -752,6 +754,7 @@ describe('/invoices', () => {
                   clientId: clientId.toHexString(),
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
+                  emailGreeting : 'Alright',
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
                   items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
                           {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};
@@ -771,6 +774,7 @@ describe('/invoices', () => {
                   clientId: clientId.toHexString(),
                   invDate: moment().format('YYYY-MM-DD'),
                   invNo: 12,
+                  emailGreeting : 'Howdy',
                   message: 'efwefwef itiortjrotg ortihjriotj roorir roririoroi.',
                   items : [{date:moment().subtract(1, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'run a mile',fee: '50.00' },
                           {date:moment().subtract(2, 'days').format('YYYY-MM-DD'), type: 'Labour', desc:'jump a stile',fee: '50.00' }]};

@@ -9,6 +9,7 @@ const makeUnpaidInvoice =  async (id) => {
   return await new Invoice({
             invNo      : 1,
             invDate    : Date.now(),
+            emailGreeting : 'Howdy',
             message    : "thanks",
             client     : {
                 _id         : id,
@@ -45,6 +46,7 @@ const makePaidInvoice =  async (id) => {
   return await new Invoice({
             invNo      : 1,
             invDate    : moment().subtract(2, 'days'),
+            emailGreeting : 'Howdy',
             message    : "thanks",
             client     : {
                 _id         : id,
