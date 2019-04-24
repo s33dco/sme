@@ -82,7 +82,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
   const weeklyIncome = averageWeeklyIncome();
   const hmrcWeekly = averageWeeklyHMRCIncome();
   const earnings = parseFloat(hmrcWeekly);
-  const incomePercent = !earnings ?  0 : ((earnings / (earnings + 250.00)) * 100).toFixed(2);
+  const basicPercent = !earnings ?  0 : ((earnings / 292) * 100).toFixed(2);
+  const truePercent = !earnings ?  0 : ((earnings / 402) * 100).toFixed(2);
 
   res.render('reports/viewer', {
     pageTitle       : "Report Results",
@@ -118,7 +119,8 @@ router.get('/viewer', [auth, validate.reports], async (req, res) => {
     mktgSum,
     owedList,
     daysPerWeek,
-    incomePercent,
+    basicPercent,
+    truePercent,
     weeklyIncome,
     hmrcWeekly
   });
