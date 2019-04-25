@@ -1,64 +1,64 @@
 {
-  "name": "sme",
-  "version": "1.0.0",
-  "description": "website with invoicing backend",
-  "main": "index.js",
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "scripts": {
-    "start": "node ./server/server.js",
-    "test": "jest --watchAll --verbose --coverage --runInBand",
-    "restart": "nodemon ./server/server.js"
-  },
-  "engines": {
-    "node": "10.10.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/s33dco/sme.git"
-  },
-  "author": "s33dco",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/s33dco/sme/issues"
-  },
-  "homepage": "https://github.com/s33dco/sme#readme",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
-    "compression": "^1.7.3",
-    "config": "^3.0.1",
-    "cookie-parser": "^1.4.4",
-    "csurf": "^1.9.0",
-    "ejs": "^2.6.1",
-    "express": "^4.16.4",
-    "express-async-errors": "^3.1.1",
-    "express-flash": "^0.0.2",
-    "express-layout": "^0.1.0",
-    "express-session": "^1.15.6",
-    "express-validator": "^5.3.1",
-    "helmet": "^3.15.1",
-    "html-pdf": "^2.2.0",
-    "json2csv": "^4.3.5",
-    "jsonwebtoken": "^8.5.0",
-    "method-override": "^3.0.0",
-    "moment": "^2.24.0",
-    "mongodb": "^3.1.13",
-    "mongoose": "^5.4.17",
-    "morgan": "^1.9.1",
-    "nodemailer": "^5.1.1",
-    "nodemailer-sendgrid-transport": "^0.2.0",
-    "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^3.8.0",
-    "winston-mongodb": "^4.0.3"
-  },
-  "devDependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "eslint": "^5.15.1",
-    "faker": "^4.1.0",
-    "jest": "^24.1.0",
-    "nodemon": "^1.18.10",
-    "supertest": "^3.4.2"
-  }
+	"name": "sme",
+	"version": "1.0.0",
+	"description": "website with invoicing backend",
+	"main": "index.js",
+	"jest": {
+		"testEnvironment": "node"
+	},
+	"scripts": {
+		"start": "node ./server/server.js",
+		"test": "jest --watchAll --verbose --coverage --runInBand",
+		"restart": "nodemon ./server/server.js"
+	},
+	"engines": {
+		"node": "10.10.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/s33dco/sme.git"
+	},
+	"author": "s33dco",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/s33dco/sme/issues"
+	},
+	"homepage": "https://github.com/s33dco/sme#readme",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.18.3",
+		"compression": "^1.7.3",
+		"config": "^3.0.1",
+		"cookie-parser": "^1.4.4",
+		"csurf": "^1.9.0",
+		"ejs": "^2.6.1",
+		"express": "^4.16.4",
+		"express-async-errors": "^3.1.1",
+		"express-flash": "^0.0.2",
+		"express-layout": "^0.1.0",
+		"express-session": "^1.15.6",
+		"express-validator": "^5.3.1",
+		"helmet": "^3.15.1",
+		"html-pdf": "^2.2.0",
+		"json2csv": "^4.3.5",
+		"jsonwebtoken": "^8.5.0",
+		"method-override": "^3.0.0",
+		"moment": "^2.24.0",
+		"mongodb": "^3.1.13",
+		"mongoose": "^5.4.17",
+		"morgan": "^1.9.1",
+		"nodemailer": "^5.1.1",
+		"nodemailer-sendgrid-transport": "^0.2.0",
+		"winston": "^3.2.1",
+		"winston-daily-rotate-file": "^3.8.0",
+		"winston-mongodb": "^4.0.3"
+	},
+	"devDependencies": {
+		"cheerio": "^1.0.0-rc.2",
+		"eslint": "^5.15.1",
+		"faker": "^4.1.0",
+		"jest": "^24.1.0",
+		"nodemon": "^1.18.10",
+		"supertest": "^3.4.2"
+	}
 }

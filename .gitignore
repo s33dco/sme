@@ -5,3 +5,4 @@ package-lock.json
 config/default.json
 config/test.json
 shellnotes.txt
+backup/

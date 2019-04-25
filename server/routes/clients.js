@@ -1,185 +1,185 @@
-const express           = require('express');
-const router            = express.Router();
-const {validationResult}= require('express-validator/check');
-const validate          = require('../middleware/validators')
-const validateId        = require('../middleware/validateId')
-const {ObjectID}        = require('mongodb');
-const {Client}          = require("../models/client");
-const {Invoice}         = require("../models/invoice");
-const auth              = require("../middleware/auth");
-const admin             = require("../middleware/admin");
-const logger            = require('../startup/logger');
-const mongoose          = require('mongoose');
+const express = require("express")
+const router = express.Router()
+const { validationResult } = require("express-validator/check")
+const validate = require("../middleware/validators")
+const validateId = require("../middleware/validateId")
+const { ObjectID } = require("mongodb")
+const { Client } = require("../models/client")
+const { Invoice } = require("../models/invoice")
+const auth = require("../middleware/auth")
+const admin = require("../middleware/admin")
+const logger = require("../startup/logger")
+const mongoose = require("mongoose")
 
-router.get('/', auth, async (req, res) => {
-  const clients = await Client.orderedByName();
+router.get("/", auth, async (req, res) => {
+	const clients = await Client.orderedByName()
 
-  res.render('clients/clients', {
-      pageTitle       : "Client List",
-      pageDescription : "Clients.",
-      clients,
-      admin : req.user.isAdmin
-  });
-});
-
-router.get('/new', [auth, admin], (req, res) => {
-  res.render('clients/newclient', {
-    data            : {},
-    errors          : {},
-    csrfToken       : req.csrfToken(),  // generate a csrf token
-    pageTitle       : "Add a client",
-    pageDescription : "Create a new client."
-  });
-});
-
-router.get('/:id', [auth, validateId ], async (req, res) => {
-  const id = req.params.id;
-
-  const client = await Client.withId(id);
-
-  if (!client) {
-        throw ({
-          tag : 'No longer available.',
-          message : "The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
-          statusCode : 404
-        });
-  }
-
-  const itemsList = await Invoice.listItemsByClient(id);
-
-  if (itemsList.length > 0){
-    total = await Invoice.totalBilledtoClient(client._id);
-  } else {
-    total = '0';
-  }
-  res.render('clients/client', {
-      pageTitle       : "Client",
-      pageDescription : "Client.",
-      csrfToken       : req.csrfToken(),
-      client,
-      itemsList,
-      total,
-      admin : req.user.isAdmin
-  });
+	res.render("clients/clients", {
+		pageTitle: "Client List",
+		pageDescription: "Clients.",
+		clients,
+		admin: req.user.isAdmin
+	})
 })
 
-router.post('/', [auth, admin, validate.client], async (req, res) => {
+router.get("/new", [auth, admin], (req, res) => {
+	res.render("clients/newclient", {
+		data: {},
+		errors: {},
+		csrfToken: req.csrfToken(), // generate a csrf token
+		pageTitle: "Add a client",
+		pageDescription: "Create a new client."
+	})
+})
 
-  let errors = validationResult(req)
+router.get("/:id", [auth, validateId], async (req, res) => {
+	const id = req.params.id
 
-  if (!errors.isEmpty()) {
-    return res.render('clients/newclient', {
-      data            : req.body,
-      errors          : errors.mapped(),
-      csrfToken       : req.csrfToken(),  // generate new csrf token
-      pageTitle       : "Add a client",
-      pageDescription : "Give it another shot."
-    });
-  };
+	const client = await Client.withId(id)
 
-  const { name, email, phone, address1, address2, address3, postcode} = req.body;
+	if (!client) {
+		throw {
+			tag: "No longer available.",
+			message:
+				"The client you are looking for cannot be found, maybe it's been deleted, maybe it was never here.",
+			statusCode: 404
+		}
+	}
 
-  let client = new Client({name, email, phone, address1, address2, address3, postcode});
-  await client.save();
-  req.flash('success', `${client.name} created !`)
-  res.redirect('/clients')
-});
+	const itemsList = await Invoice.listItemsByClient(id)
 
-router.get('/edit/:id', [auth, admin, validateId], async (req, res) => {
+	if (itemsList.length > 0) {
+		total = await Invoice.totalBilledtoClient(client._id)
+	} else {
+		total = "0"
+	}
+	res.render("clients/client", {
+		pageTitle: "Client",
+		pageDescription: "Client.",
+		csrfToken: req.csrfToken(),
+		client,
+		itemsList,
+		total,
+		admin: req.user.isAdmin
+	})
+})
 
-  const client =  await Client.findOne({_id: req.params.id});
+router.post("/", [auth, admin, validate.client], async (req, res) => {
+	let errors = validationResult(req)
 
-  if (!client ){
-    throw ({
-      tag : "Client can't be found",
-      message : "The client can't be found maybe you should try again.",
-      statusCode : 404
-    });
-  }
+	if (!errors.isEmpty()) {
+		return res.render("clients/newclient", {
+			data: req.body,
+			errors: errors.mapped(),
+			csrfToken: req.csrfToken(), // generate new csrf token
+			pageTitle: "Add a client",
+			pageDescription: "Give it another shot."
+		})
+	}
 
-  let { _id, name, email, phone, address1, address2, address3, postcode} = client;
+	const { name, email, phone, address1, address2, address3, postcode } = req.body
 
-  res.render('clients/editclient', {
-    data: { _id, name, email, phone, address1, address2, address3, postcode},
-    errors: {},
-    csrfToken: req.csrfToken(),  // generate a csrf token
-    pageTitle       : "Edit Client",
-    pageDescription : "edit client."
-  })
-});
+	let client = new Client({ name, email, phone, address1, address2, address3, postcode })
+	await client.save()
+	req.flash("success", `${client.name} created !`)
+	res.redirect("/clients")
+})
 
-router.put('/:id', [auth, admin, validateId, validate.client], async (req, res) => {
+router.get("/edit/:id", [auth, admin, validateId], async (req, res) => {
+	const client = await Client.findOne({ _id: req.params.id })
 
-  const errors = validationResult(req)
+	if (!client) {
+		throw {
+			tag: "Client can't be found",
+			message: "The client can't be found maybe you should try again.",
+			statusCode: 404
+		}
+	}
 
-  if (!errors.isEmpty()) {
-    return res.render('clients/editclient', {
-        data            : req.body,
-        errors          : errors.mapped(),
-        csrfToken       : req.csrfToken(),
-        pageTitle       : "Edit Client",
-        pageDescription : "Give it another shot.",
-    });
-  } else {
+	let { _id, name, email, phone, address1, address2, address3, postcode } = client
 
-    const client = await Client.findOneAndUpdate({_id: req.params.id},
-      { name: req.body.name,
-        phone: req.body.phone,
-        email: req.body.email,
-        address1: req.body.address1,
-        address2: req.body.address2,
-        address3: req.body.address3,
-        postcode : req.body.postcode},
-      {new: true});
+	res.render("clients/editclient", {
+		data: { _id, name, email, phone, address1, address2, address3, postcode },
+		errors: {},
+		csrfToken: req.csrfToken(), // generate a csrf token
+		pageTitle: "Edit Client",
+		pageDescription: "edit client."
+	})
+})
 
-    if (!client) {
-      throw ({
-        tag : "Client can't be found",
-        message : "The client can't be found to update maybe you should try again.",
-        statusCode : 404
-      });
-    }
+router.put("/:id", [auth, admin, validateId, validate.client], async (req, res) => {
+	const errors = validationResult(req)
 
-    req.flash('success', `${client.name} updated!`);
-    res.redirect(`/clients`);
-  }
-});
+	if (!errors.isEmpty()) {
+		return res.render("clients/editclient", {
+			data: req.body,
+			errors: errors.mapped(),
+			csrfToken: req.csrfToken(),
+			pageTitle: "Edit Client",
+			pageDescription: "Give it another shot."
+		})
+	} else {
+		const client = await Client.findOneAndUpdate(
+			{ _id: req.params.id },
+			{
+				name: req.body.name,
+				phone: req.body.phone,
+				email: req.body.email,
+				address1: req.body.address1,
+				address2: req.body.address2,
+				address3: req.body.address3,
+				postcode: req.body.postcode
+			},
+			{ new: true }
+		)
 
-router.delete('/', [auth, admin], async (req, res) => {
+		if (!client) {
+			throw {
+				tag: "Client can't be found",
+				message: "The client can't be found to update maybe you should try again.",
+				statusCode: 404
+			}
+		}
 
-  if (!ObjectID.isValid(req.body.id)) {
-    throw ({
-      tag : "Client can't be deleted",
-      message : "The client can't be found maybe you should try again.",
-      statusCode : 400
-    });
-  }
+		req.flash("success", `${client.name} updated!`)
+		res.redirect(`/clients`)
+	}
+})
 
-  const client =  await Client.findOne({_id: req.body.id});
+router.delete("/", [auth, admin], async (req, res) => {
+	if (!ObjectID.isValid(req.body.id)) {
+		throw {
+			tag: "Client can't be deleted",
+			message: "The client can't be found maybe you should try again.",
+			statusCode: 400
+		}
+	}
 
-  if (!client ){
-    throw ({
-      tag : "Client can't be found",
-      message : "The client can't be found maybe you should try again.",
-      statusCode : 404
-    });
-  }
+	const client = await Client.findOne({ _id: req.body.id })
 
-  const attachedInvoices = await Invoice.withClientId(req.body.id);
+	if (!client) {
+		throw {
+			tag: "Client can't be found",
+			message: "The client can't be found maybe you should try again.",
+			statusCode: 404
+		}
+	}
 
-  if (attachedInvoices.length) {
-    req.flash('alert', `${client.name} cannot be deleted!`);
-    throw ({
-      tag : "Client can't be deleted",
-      message : `The client is attached to invoice(s) and cannot be deleted.`,
-      statusCode : 400
-    });
-  }
+	const attachedInvoices = await Invoice.withClientId(req.body.id)
 
-  await client.remove();
+	if (attachedInvoices.length) {
+		req.flash("alert", `${client.name} cannot be deleted!`)
+		throw {
+			tag: "Client can't be deleted",
+			message: `The client is attached to invoice(s) and cannot be deleted.`,
+			statusCode: 400
+		}
+	}
 
-  req.flash('alert', `${client.name} deleted!`);
-  res.redirect("/dashboard");
-});
+	await client.remove()
+
+	req.flash("alert", `${client.name} deleted!`)
+	res.redirect("/dashboard")
+})
 
 module.exports = router
