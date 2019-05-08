@@ -1,43 +1,43 @@
-const fs = require("fs")
-const Json2csvParser = require("json2csv").Parser
-const express = require("express")
+const fs = require('fs')
+const Json2csvParser = require('json2csv').Parser
+const express = require('express')
 const router = express.Router()
-const moment = require("moment")
-const { Invoice } = require("../models/invoice")
-const { Expense } = require("../models/expense")
-const { validationResult } = require("express-validator/check")
-const validate = require("../middleware/validators")
-const auth = require("../middleware/auth")
-const logger = require("../startup/logger")
+const moment = require('moment')
+const { Invoice } = require('../models/invoice')
+const { Expense } = require('../models/expense')
+const { validationResult } = require('express-validator/check')
+const validate = require('../middleware/validators')
+const auth = require('../middleware/auth')
+const logger = require('../startup/logger')
 
-router.get("/", auth, (req, res) => {
-	res.render("reports/form", {
+router.get('/', auth, (req, res) => {
+	res.render('reports/form', {
 		data: {},
 		errors: {},
-		pageTitle: "Run a report",
-		pageDescription: "Run an invoice report."
+		pageTitle: 'Run a report',
+		pageDescription: 'Run an invoice report.'
 	})
 })
 
-router.get("/viewer", [auth, validate.reports], async (req, res) => {
+router.get('/viewer', [auth, validate.reports], async (req, res) => {
 	let errors = validationResult(req)
 
 	if (!errors.isEmpty()) {
-		return res.render("reports/form", {
+		return res.render('reports/form', {
 			data: req.query,
 			errors: errors.mapped(),
-			pageTitle: "Run a report",
-			pageDescription: "Run an invoice report."
+			pageTitle: 'Run a report',
+			pageDescription: 'Run an invoice report.'
 		})
 	}
 
 	const start = moment(req.query.start)
-		.startOf("day")
+		.startOf('day')
 		.toISOString()
 	const end = moment(req.query.end)
-		.endOf("day")
+		.endOf('day')
 		.toISOString()
-	const tradingDays = moment(end).diff(moment(start), "days") + 1
+	const tradingDays = moment(end).diff(moment(start), 'days') + 1
 
 	const incomings = await Invoice.sumOfPaidInvoicesBetween(start, end)
 	const invoicesProduced = await Invoice.numberOfInvoicesProducedBetween(start, end)
@@ -88,11 +88,11 @@ router.get("/viewer", [auth, validate.reports], async (req, res) => {
 	const weeklyIncome = averageWeeklyIncome()
 	const hmrcWeekly = averageWeeklyHMRCIncome()
 	const earnings = parseFloat(hmrcWeekly)
-	const basicPercent = !earnings ? 0 : ((earnings / 292) * 100).toFixed(2)
-	const truePercent = !earnings ? 0 : ((earnings / 402) * 100).toFixed(2)
+	const basicPercent = !earnings ? 0 : ((earnings / 323) * 100).toFixed(2)
+	const truePercent = !earnings ? 0 : ((earnings / 425) * 100).toFixed(2)
 
-	res.render("reports/viewer", {
-		pageTitle: "Report Results",
+	res.render('reports/viewer', {
+		pageTitle: 'Report Results',
 		pageDescription: `Report Results`,
 		start,
 		end,
@@ -132,68 +132,68 @@ router.get("/viewer", [auth, validate.reports], async (req, res) => {
 	})
 })
 
-router.get("/download", [auth, validate.download], async (req, res) => {
+router.get('/download', [auth, validate.download], async (req, res) => {
 	let errors = validationResult(req)
 	let data, fields, filepath
 
 	if (!errors.isEmpty()) {
 		logger.error(`csv failed `, errors)
-		req.flash("alert", "export failed !")
-		return res.redirect("/reports")
+		req.flash('alert', 'export failed !')
+		return res.redirect('/reports')
 	}
 
 	const { start, end, type } = req.query
 
-	if (type === "incoming") {
+	if (type === 'incoming') {
 		data = await Invoice.listPaidItemsBetween(start, end)
 
 		if (data.length === 0) {
-			req.flash("alert", "no data to export!")
-			return res.redirect("/reports")
+			req.flash('alert', 'no data to export!')
+			return res.redirect('/reports')
 		}
 
 		fields = [
-			{ label: "Invoice", value: "invNo" },
-			{ label: "Invoice Date", value: "invDate", stringify: true },
-			{ label: "Type", value: "items.type" },
-			{ label: "Client Name", value: "client.name" },
-			{ label: "Item Date", value: "items.date", stringify: true },
-			{ label: "Description", value: "items.desc" },
-			{ label: "Amount", value: "items.fee" },
-			{ label: "Date Paid", value: "datePaid", stringify: true }
+			{ label: 'Invoice', value: 'invNo' },
+			{ label: 'Invoice Date', value: 'invDate', stringify: true },
+			{ label: 'Type', value: 'items.type' },
+			{ label: 'Client Name', value: 'client.name' },
+			{ label: 'Item Date', value: 'items.date', stringify: true },
+			{ label: 'Description', value: 'items.desc' },
+			{ label: 'Amount', value: 'items.fee' },
+			{ label: 'Date Paid', value: 'datePaid', stringify: true }
 		]
-		filepath = `./public/Earnings-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format(
-			"Do-MMMM-YYYY"
+		filepath = `./public/Earnings-${moment(start).format('Do-MMMM-YYYY')}-to-${moment(end).format(
+			'Do-MMMM-YYYY'
 		)}.csv`
 
 		data.forEach(item => {
 			item.items.fee = parseFloat(item.items.fee).toFixed(2)
-			item.datePaid = moment(item.datePaid).format("DD/MM/YY")
-			item.invDate = moment(item.invDate).format("DD/MM/YY")
-			item.items.date = moment(item.items.date).format("DD/MM/YY")
+			item.datePaid = moment(item.datePaid).format('DD/MM/YY')
+			item.invDate = moment(item.invDate).format('DD/MM/YY')
+			item.items.date = moment(item.items.date).format('DD/MM/YY')
 		})
 	} else {
 		data = await Expense.listOfExpensesBetween(start, end)
 
 		if (data.length === 0) {
-			req.flash("alert", "no data to export!")
-			return res.redirect("/reports")
+			req.flash('alert', 'no data to export!')
+			return res.redirect('/reports')
 		}
 
 		fields = [
-			{ label: "Expense Date", value: "date" },
-			{ label: "Category", value: "category" },
-			{ label: "Description", value: "desc" },
-			{ label: "Amount", value: "amount" }
+			{ label: 'Expense Date', value: 'date' },
+			{ label: 'Category', value: 'category' },
+			{ label: 'Description', value: 'desc' },
+			{ label: 'Amount', value: 'amount' }
 		]
 
-		filepath = `./public/Deductions-${moment(start).format("Do-MMMM-YYYY")}-to-${moment(end).format(
-			"Do-MMMM-YYYY"
+		filepath = `./public/Deductions-${moment(start).format('Do-MMMM-YYYY')}-to-${moment(end).format(
+			'Do-MMMM-YYYY'
 		)}.csv`
 
 		data.forEach(item => {
 			item.amount = parseFloat(item.amount).toFixed(2)
-			item.date = moment(item.date).format("DD/MM/YY")
+			item.date = moment(item.date).format('DD/MM/YY')
 		})
 	}
 
@@ -213,7 +213,7 @@ router.get("/download", [auth, validate.download], async (req, res) => {
 						if (err) {
 							logger.error(err.toString())
 						} else {
-							logger.info(filepath + " deleted")
+							logger.info(filepath + ' deleted')
 						}
 					})
 				}
