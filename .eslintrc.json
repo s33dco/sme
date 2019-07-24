@@ -1,0 +1,25 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"node": true,
+		"mongo": true,
+		"jest": true
+	},
+	"extends": ["airbnb", "prettier", "plugin:node/recommended"],
+	"plugins": ["prettier", "react"],
+	"rules": {
+		"prettier/prettier": [
+			"error",
+			{ "singleQuote": true, "tabWidth": 2, "useTabs": true }
+		],
+		"no-unused-vars": "warn",
+		"no-console": "off",
+		"func-names": "off",
+		"no-process-exit": "off",
+		"object-shorthand": "off",
+		"class-methods-use-this": "off",
+		"consistent-return": "off"
+	}
+}

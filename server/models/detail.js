@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
 
 let detailSchema = new mongoose.Schema({
 	business: { type: String, required: true },
@@ -35,12 +35,12 @@ let detailSchema = new mongoose.Schema({
 		uppercase: true,
 		trim: true
 	}
-})
+});
 
 detailSchema.statics.getBusinessName = async function() {
-	const result = await this.findOne({})
-	return result.business
-}
+	const result = await this.findOne({});
+	return result.business;
+};
 
-let Detail = mongoose.model("Detail", detailSchema)
-module.exports = { Detail }
+let Detail = mongoose.model('Detail', detailSchema);
+module.exports = { Detail };

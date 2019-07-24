@@ -1,34 +1,34 @@
-const express = require("express")
-const router = express.Router()
-const { validationResult } = require("express-validator/check")
-const validate = require("../middleware/validators")
-const { ObjectID } = require("mongodb")
-const { Detail } = require("../models/detail")
-const auth = require("../middleware/auth")
-const admin = require("../middleware/admin")
-const logger = require("../startup/logger")
+const express = require('express');
+const router = express.Router();
+const { validationResult } = require('express-validator/check');
+const validate = require('../middleware/validators');
+const { ObjectID } = require('mongodb');
+const { Detail } = require('../models/detail');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
+const logger = require('../startup/logger');
 
-router.get("/", [auth, admin], async (req, res) => {
-	const detail = await Detail.findOne()
+router.get('/', [auth, admin], async (req, res) => {
+	const detail = await Detail.findOne();
 
 	if (!detail) {
-		req.flash("alert", `You must enter the standard invoice details first!`)
-		res.redirect(`/details/edit`)
+		req.flash('alert', `You must enter the standard invoice details first!`);
+		res.redirect(`/details/edit`);
 	}
 
-	res.render("details/details", {
-		pageTitle: "Invoice Details",
-		pageDescription: "Basic Invoice Details",
+	res.render('details/details', {
+		pageTitle: 'Invoice Details',
+		pageDescription: 'Basic Invoice Details',
 		csrfToken: req.csrfToken(),
 		detail
-	})
-})
+	});
+});
 
-router.get("/edit", [auth, admin, validate.detail], async (req, res) => {
-	let detail = await Detail.findOne()
+router.get('/edit', [auth, admin, validate.detail], async (req, res) => {
+	let detail = await Detail.findOne();
 
 	if (!detail) {
-		detail = {}
+		detail = {};
 	}
 
 	let {
@@ -46,9 +46,9 @@ router.get("/edit", [auth, admin, validate.detail], async (req, res) => {
 		address2,
 		address3,
 		postcode
-	} = detail
+	} = detail;
 
-	res.render("details/editdetails", {
+	res.render('details/editdetails', {
 		data: {
 			business,
 			utr,
@@ -67,22 +67,22 @@ router.get("/edit", [auth, admin, validate.detail], async (req, res) => {
 		},
 		errors: {},
 		csrfToken: req.csrfToken(),
-		pageTitle: "Edit Inv Info",
-		pageDescription: "edit Inv Info."
-	})
-})
+		pageTitle: 'Edit Inv Info',
+		pageDescription: 'edit Inv Info.'
+	});
+});
 
-router.post("/", [auth, admin, validate.detail], async (req, res) => {
-	const errors = validationResult(req)
+router.post('/', [auth, admin, validate.detail], async (req, res) => {
+	const errors = validationResult(req);
 
 	if (!errors.isEmpty()) {
-		return res.render("details/editdetails", {
+		return res.render('details/editdetails', {
 			data: req.body,
 			errors: errors.mapped(),
 			csrfToken: req.csrfToken(),
-			pageTitle: "Edit Inv Info",
-			pageDescription: "Give it another shot."
-		})
+			pageTitle: 'Edit Inv Info',
+			pageDescription: 'Give it another shot.'
+		});
 	} else {
 		await Detail.updateOne(
 			{},
@@ -105,11 +105,11 @@ router.post("/", [auth, admin, validate.detail], async (req, res) => {
 				}
 			},
 			{ upsert: true }
-		)
+		);
 
-		req.flash("success", `Invoice Information updated!`)
-		res.redirect(`/details`)
+		req.flash('success', `Invoice Information updated!`);
+		res.redirect(`/details`);
 	}
-})
+});
 
-module.exports = router
+module.exports = router;

@@ -1,34 +1,34 @@
-const { User } = require("../../server/models/user")
-const faker = require("faker/locale/en")
+const { User } = require('../../server/models/user');
+const faker = require('faker/locale/en');
 
 const makeUser = async () => {
 	return await new User({
 		firstName: faker.name.firstName(),
 		lastName: faker.name.firstName(),
 		email: faker.internet.email(),
-		password: "password",
+		password: 'password',
 		isAdmin: false
-	}).save()
-}
+	}).save();
+};
 
 const makeAdmin = async () => {
 	return await new User({
 		firstName: faker.name.firstName(),
 		lastName: faker.name.firstName(),
 		email: faker.internet.email(),
-		password: "password",
+		password: 'password',
 		isAdmin: true
-	}).save()
-}
+	}).save();
+};
 
 const makeUserToken = async () => {
-	user = await makeUser()
-	return await user.generateAuthToken()
-}
+	user = await makeUser();
+	return await user.generateAuthToken();
+};
 
 const makeAdminToken = async () => {
-	user = await makeAdmin()
-	return await user.generateAuthToken()
-}
+	user = await makeAdmin();
+	return await user.generateAuthToken();
+};
 
-module.exports = { makeUser, makeAdmin, makeUserToken, makeAdminToken }
+module.exports = { makeUser, makeAdmin, makeUserToken, makeAdminToken };

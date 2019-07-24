@@ -5,21 +5,21 @@ module.exports = (req, res, next) => {
 	// 403 forbidden
 
 	if (!req.user.isAdmin) {
-		req.flash("alert", `You can only view!`)
-		res.status(403)
+		req.flash('alert', `You can only view!`);
+		res.status(403);
 		throw {
-			tag: "Computer says no...",
+			tag: 'Computer says no...',
 			message:
-				"You do not have access to amend, create or delete data, speak to your administrator if you need this access.",
+				'You do not have access to amend, create or delete data, speak to your administrator if you need this access.',
 			statusCode: 403
-		}
+		};
 		logger.info(
-			`${e.statusCode} - ${e.tag} - ${e.message} - ${req.originalUrl} - ${req.method} - ${
-				req.ip
-			} - ${ip} - ${req.user}`
-		)
-		next(Error)
+			`${e.statusCode} - ${e.tag} - ${e.message} - ${req.originalUrl} - ${
+				req.method
+			} - ${req.ip} - ${ip} - ${req.user}`
+		);
+		next(Error);
 	}
 
-	next()
-}
+	next();
+};

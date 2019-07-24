@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
 
 let clientSchema = new mongoose.Schema({
 	name: {
@@ -44,26 +44,29 @@ let clientSchema = new mongoose.Schema({
 		uppercase: true,
 		trim: true
 	}
-})
+});
 
 clientSchema.statics.isValid = function(id) {
 	return this.findById(id).then(result => {
 		if (!result) {
-			return false
+			return false;
 		} else {
-			return id
+			return id;
 		}
-	})
-}
+	});
+};
 
 clientSchema.statics.withId = function(id) {
-	return this.findOne({ _id: id })
-}
+	return this.findOne({ _id: id });
+};
 
 clientSchema.statics.orderedByName = function() {
-	return this.aggregate([{ $project: { _id: 1, name: 1 } }, { $sort: { name: 1 } }])
-}
+	return this.aggregate([
+		{ $project: { _id: 1, name: 1 } },
+		{ $sort: { name: 1 } }
+	]);
+};
 
-let Client = mongoose.model("Client", clientSchema)
+let Client = mongoose.model('Client', clientSchema);
 
-module.exports = { Client }
+module.exports = { Client };
